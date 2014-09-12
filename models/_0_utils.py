@@ -33,7 +33,7 @@ def alert_gedgat_error(msg):
     return alert
 
 
-def my_represent_field(field, value, row):
+def field_rep(field, value, row):
 
     def format(table, record):
         if isinstance(table._format,str):
@@ -44,17 +44,19 @@ def my_represent_field(field, value, row):
             return '#'+str(record.id)
 
     if callable(field.represent):
-        return field.represent(value, row)
-
-    referee = field.type[10:]
-    if referee:
-        record = db[referee]('id')
-        value = format(db[referee], record)
+        value = field.represent(value, row)
+    else:
+        referee = field.type[10:]
+        if referee:
+            record = db[referee]('id')
+            value = format(db[referee], record)
+    if not value:
+        value = ''
 
     return value
 
 
-def my_default_values(table):
+def table_default_values(table):
     defaults = {}
     for fname in table.fields:
         if table[fname].default:

@@ -22,7 +22,7 @@
 							<span></span>
 							<small>
 								<a href="{{= URL(vars=dict(search_option='customer', search_text = row.customer.name))}}">
-								{{= my_represent_field(db.solicitation.customer_id, row.solicitation.customer_id, row)}}
+								{{= field_rep(db.solicitation.customer_id, row.solicitation.customer_id, row)}}
 								{{if row.solicitation.customer_detail:}}
 									<span>/</span>
 									{{= row.solicitation.customer_detail}}
@@ -41,7 +41,7 @@
 				</div>
 				<div class="row-fluid">
 					<div class="span7">
-						{{= my_represent_field(db.solicitation.tags, row.solicitation.tags, row)}}
+						{{= field_rep(db.solicitation.tags, row.solicitation.tags, row)}}
 					</div>					
 					<div class="span5">
 						<div class="muted pull-right">

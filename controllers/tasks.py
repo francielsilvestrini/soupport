@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
+ 
+query_my_tasks = (db.task.user_task == auth.user_id) & (db.task.status.belongs('analysis','development','test') )
 
-testable_tasks = (db.task.status == '3') & (db.task.test_status.belongs('1', '4'))
+query_waiting_tests = (db.task.status == 'test') 
+query_waiting_tests &= (db.task.test_status.belongs('waiting', 'retest'))
+query_waiting_tests &= (db.releases.id == db.task.test_release)
+
 pagination = 10
 
 
 def tasks_count(d):
     kSolicitations = db(db.solicitation.is_new == True).count()
-    kTasks = db((db.task.user_task == auth.user_id) & (db.task.status.belongs('1','2','3') )).count()
-    kTests = db(testable_tasks).count()
+    kTasks = db(query_my_tasks).count()
+    kTests = db(query_waiting_tests).count()
 
     text = lambda k: {0: T('No Records'), 1: T('One Record'), 2: T('%s records') % k}[k if k < 2 else 2]
 
@@ -64,7 +69,9 @@ def pagination_calc(page, record_count):
     if page > pages:
         page = pages
 
-    return (page, pages)
+    limitby = (pagination*(page-1), (pagination*page))
+
+    return (page, pages, limitby)
 
 
 @auth.requires_login()
@@ -88,9 +95,8 @@ def index():
         page = int(request.vars.get('page', '1'))
     except:
         page = 1
-    page, pages = pagination_calc(page=page, record_count=db(query).count())
+    page, pages, limitby = pagination_calc(page=page, record_count=db(query).count())
 
-    limitby = (pagination*(page-1), (pagination*page))
     rows = db(query).select(
             limitby=limitby,
             orderby=~db.solicitation.id
@@ -108,12 +114,10 @@ def index():
 @auth.requires_login()
 def my_tasks():
     search = dict(
-        subject=(T('What'), lambda search: (db.task.what.like('%%%s%%' % search, case_sensitive=False)) ),
+        what=(T('What'), lambda search: (db.task.what.like('%%%s%%' % search, case_sensitive=False)) ),
         )
 
-    query = (db.task.user_task == auth.user_id)
-    query &= db.task.status.belongs('1','2','3')
-    #query &= ~db.task.test_status.belongs('3')
+    query = query_my_tasks
     search_text  = request.vars.get('search_text')
     if search_text:
         opt = request.vars.get('search_option', 'what')
@@ -124,13 +128,11 @@ def my_tasks():
         page = int(request.vars.get('page', '1'))
     except:
         page = 1
-    page, pages = pagination_calc(page=page, record_count=db(query).count())
-
-    limitby = (pagination*(page-1), (pagination*page))
+    page, pages, limitby = pagination_calc(page=page, record_count=db(query).count())
 
     rows = db(query).select(
         limitby=limitby,
-        orderby=db.task.status)
+        orderby=(db.task.status, db.task.id))
 
     content = dict(
         rows=rows,
@@ -140,6 +142,38 @@ def my_tasks():
     tasks_count(content)
     return content
 
+
+@auth.requires_login()
+def waiting_tests():
+    search = dict(
+        what=(T('What'), lambda search: (db.task.what.like('%%%s%%' % search, case_sensitive=False)) ),
+        test_release=(T('Test Release'), lambda search: (db.releases.name.like('%%%s%%' % search, case_sensitive=False)) ),
+        )
+
+    query = query_waiting_tests
+    search_text  = request.vars.get('search_text')
+    if search_text:
+        opt = request.vars.get('search_option', 'what')
+        opt_query = search[opt][1]
+        query &= opt_query(search_text)
+
+    try:
+        page = int(request.vars.get('page', '1'))
+    except:
+        page = 1
+    page, pages, limitby = pagination_calc(page=page, record_count=db(query).count())
+
+    rows = db(query).select(
+        limitby=limitby,
+        orderby=(db.releases.name, db.task.id))
+
+    content = dict(
+        rows=rows,
+        pagination=make_pagination(page, pages),
+        search_form=make_search_form(search, 'what'),
+        )
+    tasks_count(content)
+    return content
 
 
 def _get_crud_id():
@@ -259,7 +293,6 @@ def app_crud_grid(table, controller=request.controller, function=request.functio
 
 def solicitation_accept(form):
     tags = form.vars.get('tags', '')
-    print tags
     for name in tags.split(','):
         record = db(db.tag.name == name).select().first()
         if not record:
@@ -397,7 +430,7 @@ def solicitation_to_task():
     if not solicitation:
         raise HTTP(404)
     
-    defaults = my_default_values(db.task)
+    defaults = table_default_values(db.task)
     defaults['owner_table'] = 'solicitation'
     defaults['owner_key'] = owner_key
     defaults['what'] = solicitation.content_txt
@@ -502,9 +535,10 @@ def tests():
     table = db.task
 
     record = db(db.task.id == id).select().first()
+
     next_test = db((db.task.id > id) &
         (db.task.test_release == record.test_release) &
-        testable_tasks).select(limitby=(0,1)).first()
+        query_waiting_tests).select(limitby=(0,1)).first()
 
     response.title = T('Tests')    
     response.subtitle = T('Task')
@@ -525,7 +559,7 @@ def tests():
 
     has_test = db((db.test.owner_table == 'task') & (db.test.owner_key == record.oplink)).count()
 
-    return dict(record=record,next_test=next_test, form=form, has_test=has_test)
+    return dict(record=record,next_test=next_test.task, form=form, has_test=has_test)
 
 
 def tests_list():

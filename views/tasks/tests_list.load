@@ -21,13 +21,13 @@
 			<p>{{= XML(row.note, sanitize=False)}}</p>
 		</div>
 		<div class="span2">
-			<p>{{= my_represent_field(db.test.updated_by, row.updated_by, row)}}</p>
+			<p>{{= field_rep(db.test.updated_by, row.updated_by, row)}}</p>
 		</div>
 		<div class="span2">
 			<p>{{= row.updated_on}}</p>
 		</div>
 		<div class="span1">
-			<p>{{= my_represent_field(db.test.test_result, row.test_result, row)}}</p>
+			<p>{{= field_rep(db.test.test_result, row.test_result, row)}}</p>
 		</div>
 	</div>
 	{{pass}}

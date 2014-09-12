@@ -6,8 +6,8 @@ next_url = URL(c='tasks', f='tests.html', args=[next_test.id]) if next_test else
 
 <div class="row-fluid">
 	<div class="span8">
-		<h3>{{= my_represent_field(db.task.test_release, record.test_release, record)}}
-			<small> {{=  my_represent_field(db.task.test_status, record.test_status, record)}}</small>
+		<h3>{{= field_rep(db.task.test_release, record.test_release, record)}}
+			<small> {{=  field_rep(db.task.test_status, record.test_status, record)}}</small>
 		</h3>
 	</div>
 	<div class="span4">
@@ -23,13 +23,13 @@ next_url = URL(c='tasks', f='tests.html', args=[next_test.id]) if next_test else
 	<div class="span1">
 		<small><strong>{{= T('Priority')}}</strong></small>
 		<div>
-			{{= my_represent_field(db.task.priority, record.priority, record)}}
+			{{= field_rep(db.task.priority, record.priority, record)}}
 		</div>	
 	</div>
 	<div class="span2">
 		<small><strong>{{= T('User Task')}}</strong></small>
 		<div>
-			{{= my_represent_field(db.task.user_task, record.user_task, record)}}
+			{{= field_rep(db.task.user_task, record.user_task, record)}}
 		</div>
 	</div>
 	<div class="span4">
@@ -79,7 +79,7 @@ next_url = URL(c='tasks', f='tests.html', args=[next_test.id]) if next_test else
 
 <hr/>
 {{if has_test:}}
-{{include 'default/tests_frame.html'}}
+{{include 'tasks/tests_frame.html'}}
 {{pass}}
 
 {{ 
@@ -92,8 +92,8 @@ owner_key  = record.owner_key
 	<hr/>
 {{pass}}
 
-{{include 'default/attachments_frame.html'}}
+{{include 'attachments/attachments_frame.html'}}
 
 <hr/>
     
-{{include 'default/comments_frame.html'}}
+{{include 'comments/comments_frame.html'}}

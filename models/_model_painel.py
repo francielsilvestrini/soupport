@@ -16,7 +16,7 @@ class PainelModel(ModelBase):
 
     def create_defaults(self):
         if db(db.painel).isempty():
-            defaults = my_default_values(db.painel)
+            defaults = table_default_values(db.painel)
             db.painel.insert(**defaults)
         return
 
@@ -35,26 +35,26 @@ class PainelModel(ModelBase):
     		return
 
         def upd_sets():
-            db(db.solicitation.priority == 'Normal').update(priority='1')
-            db(db.solicitation.priority == 'Warning').update(priority='2')
-            db(db.solicitation.priority == 'Damage').update(priority='3')
+            db(db.solicitation.priority == 'Normal').update(priority='normal')
+            db(db.solicitation.priority == 'Warning').update(priority='warning')
+            db(db.solicitation.priority == 'Damage').update(priority='damage')
 
-            db(db.task.priority == 'Normal').update(priority='1')
-            db(db.task.priority == 'Warning').update(priority='2')
-            db(db.task.priority == 'Damage').update(priority='3')
+            db(db.task.priority == 'Normal').update(priority='normal')
+            db(db.task.priority == 'Warning').update(priority='warning')
+            db(db.task.priority == 'Damage').update(priority='damage')
 
-            db(db.task.status == 'Analysis').update(status='1')
-            db(db.task.status == 'Development').update(status='2')
-            db(db.task.status == 'Test').update(status='3')
-            db(db.task.status == 'Released').update(status='4')
+            db(db.task.status == 'Analysis').update(status='analysis')
+            db(db.task.status == 'Development').update(status='development')
+            db(db.task.status == 'Test').update(status='test')
+            db(db.task.status == 'Released').update(status='released')
 
-            db(db.task.test_status == 'Waiting').update(test_status='1')
-            db(db.task.test_status == 'Success').update(test_status='2')
-            db(db.task.test_status == 'Error').update(test_status='3')
-            db(db.task.test_status == 'Retest').update(test_status='4')
+            db(db.task.test_status == 'Waiting').update(test_status='waiting')
+            db(db.task.test_status == 'Success').update(test_status='success')
+            db(db.task.test_status == 'Error').update(test_status='error')
+            db(db.task.test_status == 'Retest').update(test_status='retest')
 
-            db(db.test.test_result == 'Success').update(test_result='1')
-            db(db.test.test_result == 'Error').update(test_result='2')
+            db(db.test.test_result == 'Success').update(test_result='success')
+            db(db.test.test_result == 'Error').update(test_result='error')
             return
 
     	def update_function(id, function):

@@ -25,13 +25,13 @@
 							<p>{{= XML(row.what, sanitize=False)}}</p>
 						</div>
 						<div class="span1">
-							<p>{{= my_represent_field(db.task.status, row.status, row)}}</p>
+							<p>{{= field_rep(db.task.status, row.status, row)}}</p>
 						</div>
 						<div class="span1">
-							<p>{{= my_represent_field(db.task.test_status, row.test_status, row)}}</p>
+							<p>{{= field_rep(db.task.test_status, row.test_status, row)}}</p>
 						</div>
 						<div class="span1">
-							<p>{{= my_represent_field(db.task.test_release, row.test_release, row)}}</p>
+							<p>{{= field_rep(db.task.test_release, row.test_release, row)}}</p>
 						</div>
 						<div class="span3">
 							<div class="pull-right">

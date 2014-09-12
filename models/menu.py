@@ -5,7 +5,7 @@
 ## Customize your APP title, subtitle and menus here
 #########################################################################
 
-response.logo = A(B('{ ',SPAN('A'),' }'),SMALL('Onnix Sistemas'),
+response.logo = A(B('{ ',SPAN('soupport'),' }'),SMALL('Onnix Sistemas'),
                   _class="brand",_href=URL(f='index'))
 #response.title = request.application.replace('_',' ').title()
 response.title = 'Onnix Sistemas'

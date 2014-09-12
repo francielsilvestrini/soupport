@@ -1,7 +1,7 @@
 <div class="row-fluid">
 	<div class="span8">
 		<h3>{{= record.subject}}
-			<small> {{=  my_represent_field(db.solicitation.platform_id, record.platform_id, record)}}</small>
+			<small> {{=  field_rep(db.solicitation.platform_id, record.platform_id, record)}}</small>
 		</h3>
 	</div>
 	<div class="span4">
@@ -17,7 +17,7 @@
 	<div class="span7">
 		<div>
 			<small><strong>{{= T('Customer')}}</strong></small>
-		  	<p>{{= my_represent_field(db.solicitation.customer_id,  record.customer_id, record)}}</p>
+		  	<p>{{= field_rep(db.solicitation.customer_id,  record.customer_id, record)}}</p>
 		</div>	
 	</div>
 	<div class="span5">
@@ -31,13 +31,13 @@
 	<div class="span1">
 		<div>
 			<small><strong>{{= T('Priority')}}</strong></small>
-			{{= my_represent_field(db.solicitation.priority, record.priority, record)}}
+			{{= field_rep(db.solicitation.priority, record.priority, record)}}
 		</div>	
 	</div>
 	<div class="span6">
 		<div>
 			<small><strong>{{= T('Tags')}}</strong></small>
-			{{= my_represent_field(db.solicitation.tags, record.tags, record)}}
+			{{= field_rep(db.solicitation.tags, record.tags, record)}}
 		</div>	
 	</div>
 	<div class="span5">

@@ -2,8 +2,8 @@
 
 <div class="row-fluid">
 	<div class="span8">
-		<h3>{{= my_represent_field(db.task.status, record.status, record)}}
-			<small> {{=  my_represent_field(db.task.platform_id, record.platform_id, record)}}</small>
+		<h3>{{= field_rep(db.task.status, record.status, record)}}
+			<small> {{=  field_rep(db.task.platform_id, record.platform_id, record)}}</small>
 		</h3>
 	</div>
 	<div class="span4">
@@ -22,13 +22,13 @@
 	<div class="span1">
 		<small><strong>{{= T('Priority')}}</strong></small>
 		<div>
-			{{= my_represent_field(db.task.priority, record.priority, record)}}
+			{{= field_rep(db.task.priority, record.priority, record)}}
 		</div>	
 	</div>
 	<div class="span2">
 		<small><strong>{{= T('User Task')}}</strong></small>
 		<div>
-			{{= my_represent_field(db.task.user_task, record.user_task, record)}}
+			{{= field_rep(db.task.user_task, record.user_task, record)}}
 		</div>
 	</div>
 	<div class="span4">

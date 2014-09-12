@@ -23,8 +23,8 @@
 				</div>
 			</a>
 		</li>
-		<li class="{{= 'active' if request.function == 'tests' else ''}}">
-			<a href="#tab_waiting_test" data-toggle="tab">
+		<li class="{{= 'active' if request.function == 'waiting_tests' else ''}}">
+			<a href="{{= URL(c='tasks',f='waiting_tests')}}">
 				<div>
 					<i class="icon-tasks"></i>
 					<strong>{{= T('Waiting Test')}}</strong>
