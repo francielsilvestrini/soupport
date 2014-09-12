@@ -1,0 +1,86 @@
+{{extend 'layouts/main.html'}}
+
+{{include 'tasks/main_tabs.html'}}
+
+<!-- Begin Search solicitation -->
+<div class="row-fluid">
+{{= search_form}}
+</div>
+<!-- End Search solicitation -->
+
+<!-- begin tab solicitation -->
+<div class="tab-pane active">
+	<section id="section_solicitation">
+		{{ for row in rows: }}
+		<article id="article_solicitation_{{=row.solicitation.id}}" class="container-fluid">
+			<header>
+				<div class="row-fluid">
+					<div class="span10">
+						<h3>
+							<a href="{{= URL(c='tasks', f='solicitation_detail', args=[row.solicitation.id])}}">
+								{{= row.solicitation.subject}}</a>
+							<span></span>
+							<small>
+								<a href="{{= URL(vars=dict(search_option='customer', search_text = row.customer.name))}}">
+								{{= my_represent_field(db.solicitation.customer_id, row.solicitation.customer_id, row)}}
+								{{if row.solicitation.customer_detail:}}
+									<span>/</span>
+									{{= row.solicitation.customer_detail}}
+								{{pass}}
+								</a>
+							</small>
+						</h3>
+					</div>
+					<div class="span2">
+						<div class="pull-right">
+							<a href="{{= URL(c='tasks', f='solicitation.html', args=['edit', row.solicitation.id])}}" 
+								class="btn btn-small tooltip-bottom" 
+								data-original-title="{{= T('Edit')}}"><i class="icon-pencil"></i></a>
+						</div>
+					</div>
+				</div>
+				<div class="row-fluid">
+					<div class="span7">
+						{{= my_represent_field(db.solicitation.tags, row.solicitation.tags, row)}}
+					</div>					
+					<div class="span5">
+						<div class="muted pull-right">
+							{{
+							pretty_date = prettydate(row.solicitation.updated_on, T)
+							author_name = '%(first_name)s %(last_name)s' % db.auth_user[row.solicitation.updated_by]
+							author_name = A(author_name, _href=URL(c='default', f='report', vars=dict(author=author_name) ))
+							}}
+							<small>{{=T('Updated %s') % pretty_date}}</small>
+							<small>{{=XML( T(' by %s') % author_name )}}</small>
+						</div>
+					</div>
+				</div>
+			</header>
+			<div>
+				<p>{{=XML(row.solicitation.content_txt, sanitize=False)}}</p>
+			</div>
+			<footer>
+				<hr/>  							
+			</footer>
+		</article>
+		{{pass}}
+	</section>				
+</div>
+<!-- end tab solicitacoes -->
+
+<!-- begin pagination -->
+{{= pagination}}
+<!-- end pagination -->
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+    $(".tag").click(function () {
+    	var el = $(this).children('span');
+    	var text = el.text();
+    	
+    	var url = "{{= URL(vars=dict(search_option='tag'))}}&search_text="+text;
+    	window.location.href=url;
+    });
+});        
+</script>

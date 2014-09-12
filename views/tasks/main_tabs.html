@@ -1,0 +1,39 @@
+<!-- Begin Tabs -->
+<div style="margin-top:10px;">
+	<ul class="nav nav-tabs">
+		<li class="{{= 'active' if request.function == 'index' else ''}}">
+			<a href="{{= URL(c='tasks',f='index')}}">
+				<div>
+					<i class="icon-bullhorn"></i>
+					<strong>{{= T('News Solicitations')}}</strong>
+				</div>
+				<div>
+					<small>{{= kSolicitations[1] }}</small>
+				</div>
+			</a>
+		</li>
+		<li class="{{= 'active' if request.function == 'my_tasks' else ''}}">
+			<a href="{{= URL(c='tasks',f='my_tasks')}}">
+				<div>
+					<i class="icon-tasks"></i>
+					<strong>{{= T('My Tasks')}}</strong>
+				</div>
+				<div>
+					<small>{{= kTasks[1] }}</small>
+				</div>
+			</a>
+		</li>
+		<li class="{{= 'active' if request.function == 'tests' else ''}}">
+			<a href="#tab_waiting_test" data-toggle="tab">
+				<div>
+					<i class="icon-tasks"></i>
+					<strong>{{= T('Waiting Test')}}</strong>
+				</div>
+				<div>
+					<small>{{= kTests[1] }}</small>
+				</div>
+			</a>
+		</li>
+	</ul>
+</div>
+<!-- End Tabs -->

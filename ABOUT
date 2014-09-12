@@ -1,0 +1,107 @@
+GESTÃO DE EQUIPAMENTOS
+
+Sistema para gerenciar despesas e receitas de equipamentos como: maquinas, veiculos, imoveis e objetos mensuravies.
+
+Um objeto pode ser novo ou usado, com prazo de validade, depreciavel ou valorizavel, prestador de serviço, operavel ou autonomo.
+
+Um objeto pode ser divido em partes independentes. Exemplo: um reboque faz parte de um caminhao, uma concha faz parte de um trator. Essas partes são gerenciadas de forma independente.
+
+Um objeto deve ser equipado, exemplo, um veiculo tem extintor, roda dianteria direita, roda dianteira esquerda, etc. Esses equipamentos tem validade, podem ser substituidos ou sofrer manutenção. Cada tipo de objeto terá suas propriedades, casa propriedade terá um tipo. Pneu dianteiro esquerdo deve aceitar ser equipado somente com itens do tipo pneu.
+
+Cada objeto tem suas proprias caracteristicas. Podem gerar receitas com fretes, alugueis, etc.
+
+Manutenção preventiva, agendada ou vencimento.
+
+Baixa de objetos por desuso, acidente, roubo, etc.
+
+
+RESULTADOS ESPERADOS:
+Saber quanto um objeto esta custando, desde a aquisição.
+Saber quanto um objeto custa ao mes.
+Saber a rentabilidade de um objeto.
+Saber quais manutenções estão vencidas ou a vencer.
+Historico dos objetos.
+Resultado por conta, exemplo gasto com combustivel de todos os objetos.
+Durabilidade de equipamentos
+
+
+
+
+Cadastrar tipo de itens (pneu, extintor, oleo motor, fluido de freio)
+Cadastro de itens (posso ter em estoque)
+
+
+onnixsistemas.com.br/A --> administração/desenvolvimento/solicitacoes/financeiro
+onnixsistemas.com.br/B
+	/dashbord --> resultados
+	/objects  --> config, cadastro de objetos
+	/others   --> outros cadastros e configs
+	/default  --> em teste ou ainda nao definidos
+	/history  --> historico do objeto
+	/sales_order
+	/object_mng
+	/comments --> gestao de comentarios
+	/attatchments --> 
+
+	/ToDo        --> lembretes ou coisas para fazer
+	/HistoryNote --> notas de historico, para o cliente no caso
+	/Bookmarks   --> links para sites do governo por exemplo
+	/Calendar    --> agendamento de eventos, ToDo pode gerar?
+	/Message     --> mensagem para outro usuario
+	/Chat        --> bate papo com usuario do sistema
+	/SendMail    --> envio de email
+	/Ticket      --> criacao de tickets pelo cliente
+	/Tutorial    --> manual de como configurar o sistema por exemplo
+	
+
+
+1) cadastrar um objeto, definir sua caracteristicas.
+2) equipar o objeto criado
+3) definir suas partes
+4) dar entrada desse objeto no gerenciamento de custos (valor de compra)
+5) registrar alimentacao (combustivel) == 11
+6) registrar uma receita OS (frete/alugel) --> deverá gerar documentos fiscais
+7) registrar despesas da OS (hospedagem/alimentacao)
+8) registrar troca de equipamento na OS (estourou um pneu)
+9) registrar depreciacao mensal do objeto (automatico?)
+10) fazer manutencao preventiva de um equipamento conforme agendamento/resultado
+11) registrar manutencao do objeto (geralmente é feito mais de um reparo)
+12) registrar troca de equipamento
+13) registrar a baixa de um objeto (desuso/roubo/acidente)
+14) agendar uma manutenção preventiva
+15)
+
+
+O sistema será vendido o cliente irá receber um link: www.onnixge.com.br/[id_cliente]/dashbord/index.html
+Ao  acessar o GE dever verificar se o cliente esta pagando as mensalidades ou esta com o contrato vencido.
+Se vencido ou nao pago deverá redirecionar para www.onnixsistemas.com.br/A/accont?lic=hash, depois do login com qqr usuario do grupo admin
+
+
+MODELS
+no db.py criar chamadas para models especificos dos controllers exemplo: ModelComments.definetables()
+
+STATICS
+somente quando for algo bem especifico
+	/comments/js
+	/comments/css
+
+====================
+
+auth/login
+auth/user
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

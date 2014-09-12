@@ -1,0 +1,6 @@
+<h3>{{= T('Comments')}}</h3>
+	
+{{= LOAD(c='comments', f='comments_list.load', args=[owner_table, owner_key], ajax=True)}}
+
+{{= LOAD(c='comments', f='comments_form.load', args=[owner_table, owner_key], ajax=True)}}
+
