@@ -1,14 +1,13 @@
 soupport
 ========
-
 Tool support for software development
-
-
 Powered by web2py Python web framework
 
+
 REQUIREMENTS
-Python 2.7+
-web2py trunk
+------------
+- Python 2.7+
+- web2py trunk
 
 git clone git://github.com/mdipierro/web2py.git web2py
 
