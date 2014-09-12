@@ -5,11 +5,13 @@ Tool support for software development
 Powered by web2py Python web framework
 
 
-REQUIREMENTS
+Requirements
 ------------
 - Python 2.7+
 - web2py trunk
 
+Install
+------------
 * git clone git://github.com/mdipierro/web2py.git web2py
 * cd web2py/applications
 * git clone git://github.com/francielsilvestrini/soupport.git soupport
@@ -18,3 +20,8 @@ REQUIREMENTS
 
 Go to brower and:
 * http://localhost:8000/soupport
+
+---
+
+* Username: admin
+* Password: admin
