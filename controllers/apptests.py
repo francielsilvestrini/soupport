@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-from h5_widgets import TagsInputWidget
 
 def index():
 	return dict()
 
 
+def todo():
+	return dict()
+'''
+from h5_widgets import TagsInputWidget
 def form_test():
 	form = SQLFORM.factory(
 		Field('tags', 'string', 
@@ -22,3 +25,4 @@ def tag_data():
 		data.append(row.name)
 		
 	return response.json(data)
+'''

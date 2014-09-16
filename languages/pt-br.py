@@ -221,6 +221,7 @@
 'lost password?': 'lost password?',
 'Main Menu': 'Menu Principal',
 'Manage Cache': 'Manage Cache',
+'Marque para apagar': 'Marque para apagar',
 'Menu Model': 'Modelo de Menu',
 'My Sites': 'My Sites',
 'My Tasks': 'My Tasks',

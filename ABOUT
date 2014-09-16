@@ -1,3 +1,29 @@
+SOUPPORT
+
+onnixsistemas.com.br/A --> administração/desenvolvimento/solicitacoes/financeiro
+onnixsistemas.com.br/B
+	/dashbord --> resultados
+	/objects  --> config, cadastro de objetos
+	/others   --> outros cadastros e configs
+	/default  --> em teste ou ainda nao definidos
+	/history  --> historico do objeto
+	/sales_order
+	/object_mng
+	/comments --> gestao de comentarios
+	/attatchments --> 
+
+	/ToDo        --> lembretes ou coisas para fazer
+	/HistoryNote --> notas de historico, para o cliente no caso
+	/Bookmarks   --> links para sites do governo por exemplo
+	/Calendar    --> agendamento de eventos, ToDo pode gerar?
+	/Message     --> mensagem para outro usuario
+	/Chat        --> bate papo com usuario do sistema
+	/SendMail    --> envio de email
+	/Ticket      --> criacao de tickets pelo cliente
+	/Tutorial    --> manual de como configurar o sistema por exemplo
+
+
+
 GESTÃO DE EQUIPAMENTOS
 
 Sistema para gerenciar despesas e receitas de equipamentos como: maquinas, veiculos, imoveis e objetos mensuravies.
@@ -105,3 +131,8 @@ auth/user
 
 
 
+
+
+
+zip -r filename.zip foldername/
+rm -rf foldername/
