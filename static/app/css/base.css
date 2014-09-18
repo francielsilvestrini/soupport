@@ -23,3 +23,12 @@
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #92C65F;
   */
 }
+
+._LookupWidget {
+  margin-right: 5px;
+  margin-bottom: 10px;
+  border: 1px;
+  padding: 6px 4px 6px 4px;
+  width: 316px;
+  height: 20px;
+}

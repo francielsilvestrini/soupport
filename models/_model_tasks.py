@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from onx_model import ModelBase
+from h5_widgets import NicEditorWidget, LookupWidget
 
 class TasksModel(ModelBase):
     PRIORITY_SET = {
@@ -87,10 +88,12 @@ class TasksModel(ModelBase):
         db.solicitation.platform_id.default = defaultPlatform
         db.solicitation.customer_id.requires = IS_IN_DB(db(db.customer.is_active == True), 
             db.customer, db.customer._format, orderby=db.customer.name)
+        db.solicitation.customer_id.widget = LookupWidget().widget
         db.solicitation.priority.requires = IS_IN_SET(TasksModel.PRIORITY_SET)
         db.solicitation.priority.default = 'normal'
         db.solicitation.priority.represent = lambda k,row: priority_rep(k)
         db.solicitation.subject.requires = [IS_NOT_EMPTY()]
+        db.solicitation.content_txt.widget = NicEditorWidget().widget
         db.solicitation.content_txt.represent = lambda value,row: XML(value, sanitize=False)
         db.solicitation.is_new.default = True
 
@@ -136,7 +139,9 @@ class TasksModel(ModelBase):
         db.task.test_status.represent = lambda value,row: TasksModel.TEST_STATUS_SET[value] if value else ''
         db.task.test_release.requires = IS_EMPTY_OR(IS_IN_DB(db, db.releases, db.releases._format, orderby=db.releases.name))
         db.task.final_release.requires = IS_EMPTY_OR(IS_IN_DB(db, db.releases, db.releases._format, orderby=db.releases.name))
+        db.task.what.widget = NicEditorWidget().widget
         db.task.what.represent = lambda value,row: XML(value, sanitize=False)
+        db.task.note.widget = NicEditorWidget().widget
         db.task.note.represent = lambda value,row: XML(value, sanitize=False)
 
 
@@ -150,6 +155,7 @@ class TasksModel(ModelBase):
         db.test.test_result.requires = IS_IN_SET(TasksModel.TEST_RESULT_SET)
         db.test.test_result.default = 'success'
         db.test.test_result.represent = lambda value,row: test_result_set(value)
+        db.test.note.widget = NicEditorWidget().widget
         db.test.note.represent = lambda value,row: XML(value, sanitize=False)
         return
 

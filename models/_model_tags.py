@@ -26,7 +26,7 @@ class TagsModel(ModelBase):
     def make_field_tags(self, db):
         field_tags = Field('tags', 'string', 
             label=T('Tags'),
-            widget=TagsInputWidget(url=URL(c='apptests', f='tag_data.json', host=True)).widget,
+            widget=TagsInputWidget(url=URL(c='tags', f='tag_data.json', host=True)).widget,
             represent=lambda value,row: tag_represent(value)
             )
 

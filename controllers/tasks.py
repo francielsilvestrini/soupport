@@ -328,10 +328,6 @@ def solicitation():
                 attr['onaccept'] = lambda form:solicitation_accept(form)
             content = app_crud(db.solicitation, **attr)
 
-        if action in ('new', 'edit'):
-            my_extra_element = nic_editor_js('solicitation_content_txt')
-            content[0].insert(-1, my_extra_element)
-
     return dict(content=content)
 
 
@@ -415,9 +411,6 @@ def task():
             db.task.owner_key.default = uuid.uuid4()
 
         content = app_crud(db.task, **attr)
-        if action in ('new', 'edit'):
-            my_extra_element = nic_editor_js('task_what')
-            content[0].insert(-1, my_extra_element)
         if action == 'edit':
             response.subtitle = T('Editing...')
     return dict(content=content)
@@ -469,9 +462,6 @@ def tasks_modal_form():
 
     form = SQLFORM(db.task, edit_id, fields=['user_task', 'priority', 'status', 'what'])
 
-    my_extra_element = nic_editor_js('task_what', '500px')
-    form[0].insert(-1, my_extra_element)
-
     if form.process().accepted:
         if owner_table == 'solicitation':
             db(db.solicitation.oplink == owner_key).update(is_new=False)
@@ -513,9 +503,6 @@ def task_detail_form():
 
     form = SQLFORM(db.task, id, fields=['note', 'status', 'final_release', 'test_status', 'test_release'])
 
-    my_extra_element = DIV( nic_editor_js('task_note', '100%'), _id='task_detail_form_nic')
-    form[0].insert(-1, my_extra_element)
-
     form.elements('#task_status')[0] ['_style'] = 'width:100%;'
     form.elements('#task_final_release')[0] ['_style'] = 'width:100%;'
     form.elements('#task_test_status')[0] ['_style'] = 'width:100%;'
@@ -548,8 +535,6 @@ def tests():
 
     form = SQLFORM(db.test, fields=['note', 'test_result'])
 
-    my_extra_element = DIV( nic_editor_js('test_note', '100%'), _id='test_form_nic')
-    form[0].insert(-1, my_extra_element)
     form.elements('#test_test_result')[0] ['_style'] = 'width:100%;'
 
     if form.process().accepted:

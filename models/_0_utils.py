@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-response.header_files = []
+response.header_files = dict()
+response.footer_files = dict()
 
 from gluon.custom_import import track_changes
 track_changes(True)
@@ -67,27 +68,27 @@ def table_default_values(table):
     return defaults
 
 
-def nic_editor_js(field_name, width='750px'):
-    js = '''
-        jQuery(document).ready(function(){
-            jQuery('#%(field_name)s').css('width','%(width)s').css('height','100px');
+def _include_files(files):
+    css_template = '<link href="%s" rel="stylesheet" type="text/css"/>' 
+    js_template = '<script src="%s" type="text/javascript"></script>'
 
-            var wysiwygfield = new nicEditor({
-                fullPanel : true,
-                iconsPath :"%(iconsPath)s",
-                uploadURI :"%(uploadURI)s",
-            })
-            wysiwygfield.panelInstance("%(field_name)s");
-            jQuery('input[type=submit]').click(function(){
-                wysiwygfield.panelInstance("%(field_name)s");});
-        }); 
-        ''' % {
-            'field_name':field_name,
-            'width': width,
-            'iconsPath':URL(c='static', f='nicEdit/nicEditorIcons.gif'),
-            'uploadURI':URL(c='uploads', f='nicedit_image', args=[field_name]),
-        }
-    return SCRIPT(js, _type='text/javascript')
+    hfiles = []
+    for k in files:
+        f = files[k]
+        if f.endswith('.js'):
+            hfiles.append(js_template % f)
+        elif f.endswith('.css'):
+            hfiles.append(css_template % f)
+
+    return XML('\n'.join([f for f in hfiles]))  
+
+
+def include_header_files():
+    return _include_files(response.header_files)
+
+
+def include_footer_files():
+    return _include_files(response.footer_files)
 
 
 def get_user_photo_url(user_id):
@@ -100,15 +101,3 @@ def get_user_photo_url(user_id):
     return url
 
 
-def include_header_files():
-    css_template = '<link href="%s" rel="stylesheet" type="text/css" />' 
-    js_template = '<script src="%s" type="text/javascript"></script>'
-
-    hfiles = []
-    for f in response.header_files:
-        if f.endswith('.js'):
-            hfiles.append(js_template % f)
-        elif f.endswith('.css'):
-            hfiles.append(css_template % f)
-
-    return XML(''.join([f for f in hfiles]))  

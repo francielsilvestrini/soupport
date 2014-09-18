@@ -55,6 +55,27 @@ class PainelModel(ModelBase):
 
             db(db.test.test_result == 'Success').update(test_result='success')
             db(db.test.test_result == 'Error').update(test_result='error')
+
+            db(db.solicitation.priority == '1').update(priority='normal')
+            db(db.solicitation.priority == '2').update(priority='warning')
+            db(db.solicitation.priority == '3').update(priority='damage')
+
+            db(db.task.priority == '1').update(priority='normal')
+            db(db.task.priority == '2').update(priority='warning')
+            db(db.task.priority == '3').update(priority='damage')
+
+            db(db.task.status == '1').update(status='analysis')
+            db(db.task.status == '2').update(status='development')
+            db(db.task.status == '3').update(status='test')
+            db(db.task.status == '4').update(status='released')
+
+            db(db.task.test_status == '1').update(test_status='waiting')
+            db(db.task.test_status == '2').update(test_status='success')
+            db(db.task.test_status == '3').update(test_status='error')
+            db(db.task.test_status == '4').update(test_status='retest')
+
+            db(db.test.test_result == '1').update(test_result='success')
+            db(db.test.test_result == '2').update(test_result='error')            
             return
 
     	def update_function(id, function):

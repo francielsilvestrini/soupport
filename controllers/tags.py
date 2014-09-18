@@ -12,3 +12,10 @@ def tag():
         content = app_crud(db.tag)
     return dict(content=content)
 
+
+def tag_data():
+	data = []
+	for row in db(db.tag.id > 0).select(orderby=db.tag.name):
+		data.append(row.name)
+		
+	return response.json(data)

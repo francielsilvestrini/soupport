@@ -59,7 +59,9 @@
 	<link href="{{=URL('static', 'w2p/css/web2py_bootstrap_nojs.css')}}" rel="stylesheet" type="text/css" />
 	</noscript>
 
+	<!-- begin widgets header files -->
 	{{= include_header_files() }}
+	<!-- end widgets header files -->
 
 	{{block head}}
 	<!-- include css -->
@@ -90,6 +92,10 @@
 	{{end}}
 	
 	{{ response.include_files() }}
+
+	<!-- begin widgets footer files -->
+	{{= include_footer_files() }}
+	<!-- end widgets footer files -->
 
 	{{if response.google_analytics_id:}}
 		<script src="{{=URL('static','js/analytics.min.js')}}"></script>
