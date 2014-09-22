@@ -9,16 +9,21 @@ class TagsInputWidget(StringWidget):
     def __init__(self, url):
         self.url = url
 
+
+    def widget_files(self):
+        session = current.session
+
+        session.page.header_files['typeahead.css'] = URL('static','assets/typeahead.js/typeahead.css')
+        session.page.header_files['bootstrap-tagsinput.css'] = URL('static','assets/bootstrap-tags/bootstrap-tagsinput.css')
+
+        session.page.footer_files['bloodhound.min.js'] = URL('static','assets/typeahead.js/bloodhound.min.js')
+        session.page.footer_files['typeahead.jquery.min.js'] = URL('static','assets/typeahead.js/typeahead.jquery.min.js')
+        session.page.footer_files['typeahead.bundle.min.js'] = URL('static','assets/typeahead.js/typeahead.bundle.min.js')
+        session.page.footer_files['bootstrap-tagsinput.min.js'] = URL('static','assets/bootstrap-tags/bootstrap-tagsinput.min.js')
+        return
+
     def widget(self, field, value):
-        response = current.response
-
-        response.header_files['typeahead.css'] = URL('static','assets/typeahead.js/typeahead.css')
-        response.header_files['bootstrap-tagsinput.css'] = URL('static','assets/bootstrap-tags/bootstrap-tagsinput.css')
-
-        response.footer_files['bloodhound.min.js'] = URL('static','assets/typeahead.js/bloodhound.min.js')
-        response.footer_files['typeahead.jquery.min.js'] = URL('static','assets/typeahead.js/typeahead.jquery.min.js')
-        response.footer_files['typeahead.bundle.min.js'] = URL('static','assets/typeahead.js/typeahead.bundle.min.js')
-        response.footer_files['bootstrap-tagsinput.min.js'] = URL('static','assets/bootstrap-tags/bootstrap-tagsinput.min.js')
+        self.widget_files()
 
         wgt_default = StringWidget.widget(field, value, **{
             '_data-role':'tagsinput', '_placeholder':current.T('Add Tag')})
@@ -68,17 +73,18 @@ class TagsInputWidget(StringWidget):
 from gluon.sqlhtml import TextWidget
 class NicEditorWidget(TextWidget):
 
-    def __init__(self, width='720px'):
-        self.width = width
+    def widget_files(self):
+        current.session.page.footer_files['nicEditComplete.js'] = URL('static','assets/nicEdit/nicEditComplete.js')
+        return
 
     def widget(self, field, value, **attributes):
+        self.widget_files()
+
         wgt_default = TextWidget.widget(field, value, **attributes)
         wgt_id = wgt_default.attributes.get('_id', 'no_id')
 
         js = '''
             jQuery(document).ready(function(){
-                jQuery('#%(field_name)s').css('width','%(width)s').css('height','100px');
-
                 var wysiwygfield = new nicEditor({
                     fullPanel : true,
                     iconsPath :"%(iconsPath)s",
@@ -90,12 +96,10 @@ class NicEditorWidget(TextWidget):
             }); 
             ''' % {
                 'field_name':wgt_id,
-                'width': self.width,
                 'iconsPath':URL(c='static', f='assets/nicEdit/nicEditorIcons.gif'),
                 'uploadURI':URL(c='uploads', f='editor', args=[wgt_id]),
             }
         jq_script=SCRIPT(js, _type="text/javascript")
-        current.response.footer_files['nicEditComplete.js'] = URL('static','assets/nicEdit/nicEditComplete.js')
 
         wrapper = DIV(_class="NicEditorWidget") 
         wrapper.components.extend([wgt_default, jq_script])
@@ -105,10 +109,14 @@ class NicEditorWidget(TextWidget):
 from gluon.sqlhtml import OptionsWidget
 class LookupWidget(OptionsWidget):
 
-    #def __init__(self, width='720px'):
-    #    self.width = width
+    def widget_files(self):
+        current.session.page.header_files['select2.css'] = URL('static','assets/select2-3.5.1/select2.css')
+        current.session.page.footer_files['select2.min.js'] = URL('static','assets/select2-3.5.1/select2.min.js')
+        return
 
     def widget(self, field, value, **attributes):
+        self.widget_files()
+        
         attributes['_style'] = 'width: 316px; height: 20px; margin-bottom: 14px;'
         wgt_default = OptionsWidget.widget(field, value, **attributes)
         wgt_id = wgt_default.attributes.get('_id', 'no_id')
@@ -119,8 +127,6 @@ class LookupWidget(OptionsWidget):
             }); 
             ''' % {'field_name':wgt_id}
         jq_script=SCRIPT(js, _type="text/javascript")
-        current.response.header_files['select2.css'] = URL('static','assets/select2-3.5.1/select2.css')
-        current.response.footer_files['select2.min.js'] = URL('static','assets/select2-3.5.1/select2.min.js')
 
         wrapper = DIV(_class="LookupWidget") 
         wrapper.components.extend([wgt_default, jq_script])

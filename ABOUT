@@ -13,10 +13,11 @@ onnixsistemas.com.br/B
 	/attatchments --> 
 
 	/ToDo        --> lembretes ou coisas para fazer
+	/Message     --> mensagem de outro usuario
+	/Notify  	 --> notificação do sistema
 	/HistoryNote --> notas de historico, para o cliente no caso
 	/Bookmarks   --> links para sites do governo por exemplo
 	/Calendar    --> agendamento de eventos, ToDo pode gerar?
-	/Message     --> mensagem para outro usuario
 	/Chat        --> bate papo com usuario do sistema
 	/SendMail    --> envio de email
 	/Ticket      --> criacao de tickets pelo cliente

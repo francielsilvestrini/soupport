@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-response.header_files = dict()
-response.footer_files = dict()
+from onx_views import PageConfig
+if not 'page' in session: 
+    session.page = PageConfig()
+
 
 from gluon.custom_import import track_changes
 track_changes(True)
@@ -23,15 +25,6 @@ UPLOAD_URLS = {
 
 def getlist(x, index, default=None):
     return x[index] if len(x) > index else default
-
-
-def alert_gedgat_error(msg):
-    alert = DIV(
-        BUTTON('&times;', _type='button', _class='close', **{'_data-dismiss':'alert'}),
-        STRONG(T('ERROR!')),
-        SPAN(T(msg)),
-        _class='alert alert-error')
-    return alert
 
 
 def field_rep(field, value, row):
@@ -68,29 +61,6 @@ def table_default_values(table):
     return defaults
 
 
-def _include_files(files):
-    css_template = '<link href="%s" rel="stylesheet" type="text/css"/>' 
-    js_template = '<script src="%s" type="text/javascript"></script>'
-
-    hfiles = []
-    for k in files:
-        f = files[k]
-        if f.endswith('.js'):
-            hfiles.append(js_template % f)
-        elif f.endswith('.css'):
-            hfiles.append(css_template % f)
-
-    return XML('\n'.join([f for f in hfiles]))  
-
-
-def include_header_files():
-    return _include_files(response.header_files)
-
-
-def include_footer_files():
-    return _include_files(response.footer_files)
-
-
 def get_user_photo_url(user_id):
     url = URL('static','images/user-comment.png')
     if user_id == auth.user_id:
@@ -101,3 +71,10 @@ def get_user_photo_url(user_id):
     return url
 
 
+def alert_gedgat_error(msg):
+    alert = DIV(
+        BUTTON('&times;', _type='button', _class='close', **{'_data-dismiss':'alert'}),
+        STRONG(T('ERROR!')),
+        SPAN(T(msg)),
+        _class='alert alert-error')
+    return alert

@@ -62,4 +62,5 @@ def dev_menu():
       ])]
 if DEVELOPMENT_MENU: dev_menu()
 
+
 if "auth" in locals(): auth.wikimenu() 

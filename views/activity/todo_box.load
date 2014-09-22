@@ -1,0 +1,59 @@
+
+<div id="todo_box-load">
+    <div id="todo_form">
+    {{ form.elements('#no_table_content')[0] ['_placeholder'] = T('Content') }}
+    {{ form.elements('#no_table_url')[0] ['_placeholder'] = T('URL') }}
+
+    {{= form.custom.begin}}
+        <div>
+            {{= form.custom.widget.content}}
+        </div>
+        <div class="inline">
+            {{= form.custom.widget.url}}
+            <div class="pull-right">
+                <a href="javascript:void(0);" id="todo_form-post" class="btn btn-success">{{= T('Post')}}</a>     
+            </div>
+        </div>
+    {{= form.custom.end}}
+    </div>
+
+    <div id="todo_list">
+        {{if len(todo_lst):}}
+
+            {{for row in todo_lst:}}
+            <div class="inline">
+                <div>
+                    {{= field_rep(db.activity_todo.status, row.status, row)}}
+                </div>
+                <div>
+                    {{= field_rep(db.activity_todo.content, row.content, row)}}
+                    {{if row.url:}}
+                        <span> <a href="{{= row.url}}">[{{= T('more')}}]</a></span>
+                    {{pass}}
+                </div>
+            </div>
+            {{pass}}
+        
+        {{else:}}
+        
+        <div class="alert">
+            <strong>{{= T('ToDo')}}!</strong> {{= T('No task To Do') }}
+        </div>
+        {{pass}}
+    </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function () {
+
+    $('.popover #todo_form-post').click(function (e) {
+        var form = $(this).parents('form:first');
+        var values = $(form).serialize();
+        $.post( "{{= URL(f='todo_post') }}", values, function( data ) {
+            web2py_component("{{= URL(c='activity', f='todo_box.load') }}","todo-content");
+            make_popover(false);
+        }); 
+    });
+
+});
+</script>

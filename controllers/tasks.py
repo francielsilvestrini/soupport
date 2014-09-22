@@ -76,6 +76,7 @@ def pagination_calc(page, record_count):
 
 @auth.requires_login()
 def index():
+    session.page.reset_files()
     search = dict(
         subject=(T('Subject'), lambda search: (db.solicitation.subject.like('%%%s%%' % search, case_sensitive=False)) ),
         customer=(T('Customer'), lambda search: (db.customer.name.like('%%%s%%' % search, case_sensitive=False)) ),
@@ -113,6 +114,7 @@ def index():
 
 @auth.requires_login()
 def my_tasks():
+    session.page.reset_files()
     search = dict(
         what=(T('What'), lambda search: (db.task.what.like('%%%s%%' % search, case_sensitive=False)) ),
         )
@@ -145,6 +147,7 @@ def my_tasks():
 
 @auth.requires_login()
 def waiting_tests():
+    session.page.reset_files()
     search = dict(
         what=(T('What'), lambda search: (db.task.what.like('%%%s%%' % search, case_sensitive=False)) ),
         test_release=(T('Test Release'), lambda search: (db.releases.name.like('%%%s%%' % search, case_sensitive=False)) ),
@@ -302,6 +305,7 @@ def solicitation_accept(form):
 
 @auth.requires_login()
 def solicitation():
+    session.page.reset_files()
     action = request.args(0) or ''
 
     if action == '':
@@ -327,7 +331,6 @@ def solicitation():
                 row = db(db.solicitation.id == _get_crud_id()).select().first()
                 attr['onaccept'] = lambda form:solicitation_accept(form)
             content = app_crud(db.solicitation, **attr)
-
     return dict(content=content)
 
 
@@ -483,6 +486,10 @@ def task_detail():
 
     response.title = T(table._plural)    
     response.subtitle = T('Detail')
+
+    from h5_widgets import NicEditorWidget
+    NicEditorWidget().widget_files()
+
     return dict(record=record,has_test=has_test)
 
 

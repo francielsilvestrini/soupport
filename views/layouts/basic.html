@@ -60,7 +60,9 @@
 	</noscript>
 
 	<!-- begin widgets header files -->
-	{{= include_header_files() }}
+	{{if 'page' in session:}}
+	{{= session.page.include_header_files() }}
+	{{pass}}
 	<!-- end widgets header files -->
 
 	{{block head}}
@@ -94,8 +96,14 @@
 	{{ response.include_files() }}
 
 	<!-- begin widgets footer files -->
-	{{= include_footer_files() }}
+	{{if 'page' in session:}}
+	{{= session.page.include_footer_files() }}
+	{{pass}}
 	<!-- end widgets footer files -->
+
+  	<!-- Begin default app scripts -->
+  	<script src="{{=URL('static','app/js/base.js')}}"></script>
+  	<!-- End default app scripts -->
 
 	{{if response.google_analytics_id:}}
 		<script src="{{=URL('static','js/analytics.min.js')}}"></script>

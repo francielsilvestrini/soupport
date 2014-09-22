@@ -1,67 +1,98 @@
 {{extend 'layouts/form.html'}}
 
-<!-- Link que receberá o evento do popover ao ser clicado.-->
-<a href="#" id="a-popover" class="btn btn-success">Abrir popover</a>
-<!-- Div oculta que será exibida dentro do popover. -->
-<div id="div-popover" class="hide">
-   Conteúdo do popover.
-   <br />
-   <br />
-   <!-- Botão dentro do popover responsável por abrir o modal. -->
-   <a id="btn-modal" class="btn btn-primary">Abrir modal</a>
-   <!-- Botão dentro do popover responsável por fechar o popover. -->
-   <button id="btn-fechar" class="btn btn-danger">Fechar</button>
-</div>
-<!-- Div oculta utilizada para montar o modal. -->
-<div class="modal hide" id="div-modal">
-   <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal">×</button>
-      <h3>Título modal</h3>
-   </div>
-   <div class="modal-body">
-      Conteúdo do modal.
-   </div>
-   <div class="modal-footer">
-     <!-- Botão dentro do modal responsável por fechar o modal. -->
-     <button class="btn" data-dismiss="modal">Fechar modal</button>
-   </div>
-</div>
 
-<a id="pp" href="#" class="btn btn-large btn-danger" data-toggle="popover" title="" data-content="And here's some amazing content. It's very engaging. right?" data-original-title="A Title">Click to toggle popover</a>
+<a href="javascript:void(0);" id="a-activity" class="btn btn-info"><i class="fa fa-user"></i></a>     
+
+<style type="text/css">
+
+.popover {
+    width:400px;
+    height:350px;
+    max-height: 350px;
+}
+
+#todo_list {
+    height: 180px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#todo_form {
+    padding-left: 4px;
+    padding-top: 4px;
+}
+
+#todo_form #no_table_content {
+    width: 224px;
+}
+
+#todo_form #no_table_url {
+    width: 156px;
+}
+
+#todo_form input[type=submit] {
+    width: 56px;
+}
+</style>
+
+<div id="div-activity" class="hide">
+
+    <div class="tabbable">
+        <ul class="nav nav-tabs" style="margin-bottom:4px;">
+            <li class="active"><a href="#tab1" data-toggle="tab">ToDo</a></li>
+            <li><a href="#tab2" data-toggle="tab">Msg</a></li>
+            <li><a href="#tab3" data-toggle="tab">Notify</a></li>
+        </ul>        
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab1">
+                <div id="todo-content">
+                {{= LOAD(c='activity', f='todo_box.load')}}
+                </div>
+            </div>
+            <div class="tab-pane" id="tab2">
+                <p>Howdy, I'm in Section 2.</p>
+            </div>
+            <div class="tab-pane" id="tab3">
+                <p>Howdy, I'm in Section 3.</p>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript">
-   $(document).ready(function () {
-      // Associa o evento do popover ao clicar no link.
-      $('#pp').popover({
-         //trigger: 'manual',
-         html: true,
-         title: 'Título popover',
-         content: $('#div-popover').html() // Adiciona o conteúdo da div oculta para dentro do popover.
-      }
+$(document).ready(function () {
 
-        );
-      $('#a-popover').popover({
-         trigger: 'manual',
-         html: true,
-         title: 'Título popover',
-         content: $('#div-popover').html() // Adiciona o conteúdo da div oculta para dentro do popover.
-      }).click(function (e) {
-         e.preventDefault();
-         // Exibe o popover.
-         $(this).popover('show');
-      });
+    function make_popover(is_show) {
+        $('#a-activity').popover({
+            trigger: 'manual',
+            html: true,
+            placement: 'bottom',
+            content: function() {
+                return $('#div-activity').html();
+            },
+        });
+        
+        if(is_show) {
+            $('#a-activity').popover('show');
+        }
+    }
 
-    $("#btn-fechar").click(function () {
-    	alert('close');
-		$('#a-popover').popover('hide');
-    });      
- 
- 
-      $('#btn-modal').click( function (e) {
-         // Oculta o popover ao clicar no botão abrir modal.
-         $('#a-popover').popover('hide');
-         // Abre o modal.
-         $('#div-modal').modal();
-      });
-   });
- </script>
+    make_popover(false);
+
+    $('#a-activity').click(function (e) {
+        e.preventDefault();
+        $(this).popover('show'); 
+    });
+
+
+    $('body').on('click', function (e) {
+        $('#a-activity').each(function () {
+            //the 'is' for buttons that trigger popups
+            //the 'has' for icons within a button that triggers a popup
+            if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                $(this).popover('hide');
+            }
+        });
+    });
+});
+</script>

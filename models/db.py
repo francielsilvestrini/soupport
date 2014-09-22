@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-db = DAL('sqlite://storage.sqlite',pool_size=1,check_reserved=['all'])
+db = DAL('sqlite://storage.sqlite',pool_size=1,check_reserved=['sqlite', 'mysql'])
 
 
 response.generic_patterns = []
@@ -56,6 +56,7 @@ def define_tables():
         TagsModel,
         CommentsModel,
         AttachmentsModel,
+        ActivityModel,
         TasksModel,
         ]
 

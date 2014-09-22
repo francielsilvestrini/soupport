@@ -1,3 +1,5 @@
+{{ form.elements('#task_note')[0] ['_style'] = 'width:100%;' }}
+
 {{= form.custom.begin}}
 <div class="row-fluid">
 	<div class="span7">
@@ -33,4 +35,4 @@
 	</div>
 </div>
 {{= form.custom.end}}
-{{= form.element(_id='task_detail_form_nic')}}
+
