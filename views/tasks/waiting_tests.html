@@ -10,77 +10,77 @@
 
 <!-- begin tab waiting test -->
 <div id="tab_rows" class="tab-pane">
-	{{if len(rows):}}
-		<div class="row-fluid">
-			<div class="span6">
-				<strong>{{= T('What?')}}</strong>
-			</div>
-			<div class="span1">
-				<strong>{{= T('User')}}</strong>
-			</div>
-			<div class="span1">
-				<strong>{{= T('Status')}}</strong>
-			</div>
-			<div class="span1">
-				<strong>{{= T('Test')}}</strong>
-			</div>
-			<div class="span1">
-				<strong>{{= T('Test Release')}}</strong>
-			</div>
-			<div class="span2">
-			</div>
-		</div>
+    {{if len(rows):}}
+        <div class="row-fluid">
+            <div class="span6">
+                <strong>{{= T('What?')}}</strong>
+            </div>
+            <div class="span1">
+                <strong>{{= T('User')}}</strong>
+            </div>
+            <div class="span1">
+                <strong>{{= T('Status')}}</strong>
+            </div>
+            <div class="span1">
+                <strong>{{= T('Test')}}</strong>
+            </div>
+            <div class="span1">
+                <strong>{{= T('Test Release')}}</strong>
+            </div>
+            <div class="span2">
+            </div>
+        </div>
 
-		{{for row in rows:}}
-		<div class="row-fluid spt-row">
-			<div class="span6">
-				<p>{{= XML(row.task.what, sanitize=False)}}</p>
-			</div>
-			<div class="span1">
-				<p>{{= field_rep(db.task.user_task, row.task.user_task, row)}}</p>
-			</div>
-			<div class="span1">
-				<p>{{= field_rep(db.task.status, row.task.status, row)}}</p>
-			</div>
-			<div class="span1">
-				<p>{{= field_rep(db.task.test_status, row.task.test_status, row)}}</p>
-			</div>
-			<div class="span1">
-				<p>{{= field_rep(db.task.test_release, row.task.test_release, row)}}</p>
-			</div>
-			<div class="span2">
-				<div class="pull-right">
-					<a href="{{= URL(f='tests.html', args=[row.task.id])}}" class="btn btn-small">
-						<i class="icon-check"></i>&nbsp;{{= T('Test')}}</a>
+        {{for row in rows:}}
+        <div class="row-fluid spt-row">
+            <div class="span6">
+                <p>{{= XML(row.task.what, sanitize=False)}}</p>
+            </div>
+            <div class="span1">
+                <p>{{= field_rep(db.task.user_task, row.task.user_task, row)}}</p>
+            </div>
+            <div class="span1">
+                <p>{{= field_rep(db.task.status, row.task.status, row)}}</p>
+            </div>
+            <div class="span1">
+                <p>{{= field_rep(db.task.test_status, row.task.test_status, row)}}</p>
+            </div>
+            <div class="span1">
+                <p>{{= field_rep(db.task.test_release, row.task.test_release, row)}}</p>
+            </div>
+            <div class="span2">
+                <div class="pull-right">
+                    <a href="{{= URL(f='tests.html', args=[row.task.id])}}" class="btn btn-small">
+                        <i class="icon-check"></i>&nbsp;{{= T('Test')}}</a>
 
-					<div class="btn-group">
-                		<button class="btn btn-small dropdown-toggle" data-toggle="dropdown">
-                			<i class="fa fa-ellipsis-h"></i></button>
-                		<ul class="dropdown-menu pull-right">
-                  			<li>
-                  				<a href="{{= URL(f='task_detail.html', args=[row.task.id])}}">
-                  					<i class="icon-eye-open"></i>{{=T('Detail')}}</a>
-                  			</li>
-                  			<li>
-                  				<a href="{{= URL(f='task.html', args=['edit', row.task.id])}}">
-                  					<i class="icon-pencil"></i>{{=T('Edit Task')}}</a>
-                  			</li>
-                  			<li>
-								<a href="{{= URL(f='task.html', args=['remove', row.task.id])}}">
-									<i class="icon-trash"></i>{{=T('Remove Task')}}</a>              						
-                  			</li>
-                		</ul>
-              		</div>	
+                    <div class="btn-group">
+                        <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-ellipsis-h"></i></button>
+                        <ul class="dropdown-menu pull-right">
+                            <li>
+                                <a href="{{= URL(f='task_detail.html', args=[row.task.id])}}">
+                                    <i class="icon-eye-open"></i>{{=T('Detail')}}</a>
+                            </li>
+                            <li>
+                                <a href="{{= URL(f='task.html', args=['edit', row.task.id])}}">
+                                    <i class="icon-pencil"></i>{{=T('Edit Task')}}</a>
+                            </li>
+                            <li>
+                                <a href="{{= URL(f='task.html', args=['remove', row.task.id])}}">
+                                    <i class="icon-trash"></i>{{=T('Remove Task')}}</a>                                     
+                            </li>
+                        </ul>
+                    </div>  
 
-				</div>
-			</div>
-		</div>
-		{{pass}}
-	{{else:}}
-		<div class="row-fluid">
-			<p>{{= T('No task to test')}}</p>
-		</div>
-	{{pass}}
+                </div>
+            </div>
+        </div>
+        {{pass}}
+    {{else:}}
+        <div class="row-fluid">
+            <p>{{= T('No task to test')}}</p>
+        </div>
+    {{pass}}
 </div>
 <!-- end tab waiting test -->
 

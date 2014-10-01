@@ -4,7 +4,6 @@
 def todo_box():
     form = SQLFORM.factory(
         db.activity_todo.content,
-        db.activity_todo.url
         )
 
     query = (db.activity_todo.created_by == auth.user_id)
@@ -14,20 +13,17 @@ def todo_box():
     return dict(form=form, todo_lst=todo_lst)
 
 
-def todo_post():
-    content = request.vars['content'] or 'ToDo Empty'
-    url = request.vars['url'] or ''
+def todo_method():
+    if request.vars.get('done'):
+        id = int(request.vars.done)
+        db(db.activity_todo.id == id).update(status='done')
+    elif request.vars.get('canceled'):
+        id = int(request.vars.canceled)
+        db(db.activity_todo.id == id).update(status='canceled')
+    else:
+        content = request.vars['content'] or 'To-Do Empty'
+        defaults = table_default_values(db.activity_todo)
+        defaults['content'] = content
 
-    defaults = table_default_values(db.activity_todo)
-    defaults['content'] = content
-    defaults['url'] = url
-
-    db.activity_todo.insert(**defaults)
-
-        # response.js = '''
-        #    web2py_component('%(url_list)s','todo-container');
-        #    make_popover(false);
-        #''' % dict(
-        #    url_list=URL(f='todo_list.load'))
-
+        db.activity_todo.insert(**defaults)
     return

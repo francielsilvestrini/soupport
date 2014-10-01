@@ -5,8 +5,8 @@
 ## Customize your APP title, subtitle and menus here
 #########################################################################
 
-response.logo = A(B('{ ',SPAN('soupport'),' }'),SMALL('Onnix Sistemas'),
-                  _class="brand",_href=URL(f='index'))
+response.logo = A(SPAN('soupport',SPAN(' '),SMALL('Onnix Sistemas'),
+                                    _class="brand",_href=URL(f='index')))
 #response.title = request.application.replace('_',' ').title()
 response.title = 'Onnix Sistemas'
 response.subtitle = ''
@@ -25,42 +25,50 @@ response.google_analytics_id = None
 #########################################################################
 
 response.menu = [
-    (T('Home'), False, URL('default', 'index'), [])
+        (T('Home'), False, URL('default', 'index'), [])
 ]
 
-DEVELOPMENT_MENU = auth.is_logged_in() and auth.user.email == 'admin@admin.app'
-
+#DEVELOPMENT_MENU = auth.is_logged_in() and auth.user.email == 'admin@admin.app'
+DEVELOPMENT_MENU = True
 #########################################################################
 ## provide shortcuts for development. remove in production
 #########################################################################
 
 def dev_menu():
-    # shortcuts
-    app = request.application
-    ctr = request.controller
-    # useful links to internal and external resources
-    response.menu += [
-      (SPAN('Admin', _class='highlighted'), False, None, [
-        (T('My Sites'), False, URL('admin', 'default', 'site')),
-        (T('This App'), False, URL('admin', 'default', 'design/%s' % app), [
-          (T('Controller'), False, URL('admin', 'default', 'edit/%s/controllers/%s.py' % (app, ctr))),
-          (T('View'), False, URL('admin', 'default', 'edit/%s/views/%s' % (app, response.view))),
-          (T('Layout'), False, URL('admin', 'default', 'edit/%s/views/layout.html' % app)),
-          (T('Stylesheet'), False, URL('admin', 'default', 'edit/%s/static/css/web2py.css' % app)),
-          (T('DB Model'), False, URL('admin', 'default', 'edit/%s/models/db.py' % app)),
-          (T('Menu Model'), False, URL('admin', 'default', 'edit/%s/models/menu.py' % app)),
-          (T('Database'), False, URL(app, 'appadmin', 'index')),
-          (T('Errors'), False, URL('admin', 'default', 'errors/' + app)),
-          (T('About'), False, URL('admin', 'default', 'about/' + app)),
-        ]),
+        # shortcuts
+        app = request.application
+        ctr = request.controller
+        # useful links to internal and external resources
+        response.menu += [
+            (SPAN('Admin', _class='highlighted'), False, None, [
+                (T('My Sites'), False, URL('admin', 'default', 'site')),
+                (T('This App'), False, URL('admin', 'default', 'design/%s' % app), [
+                    (T('Controller'), False, URL('admin', 'default', 'edit/%s/controllers/%s.py' % (app, ctr))),
+                    (T('View'), False, URL('admin', 'default', 'edit/%s/views/%s' % (app, response.view))),
+                    (T('Layout'), False, URL('admin', 'default', 'edit/%s/views/layout.html' % app)),
+                    (T('Stylesheet'), False, URL('admin', 'default', 'edit/%s/static/css/web2py.css' % app)),
+                    (T('DB Model'), False, URL('admin', 'default', 'edit/%s/models/db.py' % app)),
+                    (T('Menu Model'), False, URL('admin', 'default', 'edit/%s/models/menu.py' % app)),
+                    (T('Database'), False, URL(app, 'appadmin', 'index')),
+                    (T('Errors'), False, URL('admin', 'default', 'errors/' + app)),
+                    (T('About'), False, URL('admin', 'default', 'about/' + app)),
+                ]),
 
-        (T('Access Control'), False, None, [
-          (T('Users'), False, URL('default', 'auth_user')),
-          (T('Groups'), False, URL('default', 'auth_group')),
-        ]),
+                (T('Access Control'), False, None, [
+                    (T('Users'), False, URL('default', 'auth_user')),
+                    (T('Groups'), False, URL('default', 'auth_group')),
+                ]),
 
-      ])]
+            ])]
 if DEVELOPMENT_MENU: dev_menu()
 
 
 if "auth" in locals(): auth.wikimenu() 
+
+
+#projects = {'project_name':(caption, index_page, admin_required),}
+response.projects = dict(
+    tasks=(T('Tasks'), URL(c='tasks', f='index'), False),
+    activity=(T('Activity'), URL(c='activity', f='index'), False),
+    painel=(T('Painel'), URL(c='painel', f='index'), True),
+    )

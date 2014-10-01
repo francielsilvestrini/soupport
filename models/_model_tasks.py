@@ -154,7 +154,7 @@ class TasksModel(ModelBase):
             format='%(note)s')
         db.test.test_result.requires = IS_IN_SET(TasksModel.TEST_RESULT_SET)
         db.test.test_result.default = 'success'
-        db.test.test_result.represent = lambda value,row: test_result_set(value)
+        db.test.test_result.represent = lambda value,row: test_result_rep(value)
         db.test.note.widget = NicEditorWidget().widget
         db.test.note.represent = lambda value,row: XML(value, sanitize=False)
         return

@@ -2,6 +2,15 @@
 
 db = DAL('sqlite://storage.sqlite',pool_size=1,check_reserved=['sqlite', 'mysql'])
 
+session.connect(request, response, separate=True)
+
+from gluon import current
+current.db = db
+
+
+from onx_views import PageConfig
+if not 'page' in session: 
+    session.page = PageConfig()
 
 response.generic_patterns = []
 # response.optimize_css = 'concat,minify,inline'
@@ -10,6 +19,7 @@ response.generic_patterns = []
 
 from gluon.tools import Auth
 auth = Auth(db, controller='user')
+auth.settings.logout_next = URL(c='default', f='index')
 
 from gluon.tools import Crud
 crud = Crud(db)

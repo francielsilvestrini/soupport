@@ -19,16 +19,28 @@ class ActivityModel(ModelBase):
                 }[value]
             return XML(rep % ActivityModel.TODO_STATUS_SET[value])
 
+        def todo_content_rep(value, row):
+            import re
+            match = re.search('(?P<url>https?://[^\s]+)', value)
+            if match is not None: 
+                url = match.group('url')
+                content = value.replace(url, '')
+                if content == '':
+                    content = value
+                return SPAN(A(content, _href=url, _target='_blank'))
+            else:
+                return value
+
         db.define_table('activity_todo',
             owner_fields,
             oplink_field,
             signature_fields,
             Field('content', 'string', label=T('Content')),
-            Field('url', 'string', label=T('URL')),
             Field('status', 'string', label=T('Status')),
             migrate='activity_todo.table',
             format='%(content)s')
         db.activity_todo.content.requires = [IS_NOT_EMPTY()]
+        db.activity_todo.content.represent = lambda value, row: todo_content_rep(value, row)
         db.activity_todo.status.requires = IS_IN_SET(ActivityModel.TODO_STATUS_SET)
         db.activity_todo.status.default = 'waiting'
         db.activity_todo.status.represent = lambda value, row: todo_status_rep(value, row)

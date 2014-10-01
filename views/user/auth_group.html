@@ -10,14 +10,14 @@
 
 {{if request.args(0) == 'edit':}}
 <div class="row-fluid">
-	<div class="span7">
-		{{= content}}
-	</div>
-	<div class="span5">
-		{{= LOAD('user','auth_groups.load', args=['group', getlist(request.args, 1, 0)], ajax=True)}}
-	</div>
+    <div class="span7">
+        {{= content}}
+    </div>
+    <div class="span5">
+        {{= LOAD('user','auth_groups.load', args=['group', getlist(request.args, 1, 0)], ajax=True)}}
+    </div>
 </div>
 {{else:}}
-	{{= content}}
+    {{= content}}
 {{pass}}
 

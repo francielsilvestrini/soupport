@@ -1,17 +1,18 @@
 @charset "UTF-8";
+@import url(http://fonts.googleapis.com/css?family=Cuprum);
 
 /* BASE STYLE FOR APP */
 
-.spt { /* base style app class*/ }
+.onx { /* base style app class*/ }
 
-.spt-row:hover {
-	background: #ddd;
+.onx-row:hover {
+  background: #ddd;
 
 
   /*
-  	border-left: 4px solid #8AC007;
-	border-right: 4px solid #8AC007;
-	border-radius: 4px;
+    border-left: 4px solid #8AC007;
+  border-right: 4px solid #8AC007;
+  border-radius: 4px;
 
   border-color: #81A74C;
   background-color: #99FF99;
@@ -24,11 +25,101 @@
   */
 }
 
-._LookupWidget {
-  margin-right: 5px;
-  margin-bottom: 10px;
-  border: 1px;
-  padding: 6px 4px 6px 4px;
-  width: 316px;
-  height: 20px;
+#todo_form {
+    padding-left: 4px;
+    padding-top: 4px;
+}
+
+#todo_form>form {
+    margin-bottom: 0px;
+}
+
+#todo_form #no_table_content {
+    width: 224px;
+}
+
+#todo_list {
+    height: 240px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#todo_list div.todo-item {
+    position: relative;
+    margin-bottom: 2px;
+    padding-left: 2px;
+}
+
+#todo_list div.todo-item div.todo-options {
+    position: absolute;
+    opacity: 0;
+    left: 184px;
+    top: 3px;
+}
+
+#todo_list div.todo-item:hover div.todo-options {
+    opacity: 1;
+}
+
+#todo_list p.alert {
+    margin-bottom: 4px;
+    margin-top: 0;
+    color: #675100;
+    border-width: 0;
+    border-left-width: 5px;
+    padding: 4px;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-color: #9cb4c5;
+    color: #305d8c;
+    background: #d6dde7;
+}
+
+div.onx-navbar {
+    background: #474544;
+    padding: 8px;
+    position: relative;
+}
+
+div.onx-navbar .pull-left span {
+    margin-left: 4px;
+}
+
+div.onx-navbar .label {
+    background: #474544;
+    display: block;
+    color: #bfbfbf;
+    font-size: 10px;
+    text-transform: uppercase;
+    padding-left: 0;
+    text-align: left;
+}
+
+div.onx-navbar .brand {
+    color: #bfbfbf;
+    font-family: 'Cuprum', sans-serif;
+    font-size: 24pt;
+    font-weight: 800;
+    text-shadow: 1px 1px 1px black;
+}
+
+div.onx-navbar .brand small {
+    font-size: 12pt;
+    font-weight: 400;
+}
+
+div.onx-navbar .logo {
+    padding: 10px;
+    margin-bottom: 4px;
+    background-color: #f5f5f5;
+    border: 1px solid #e3e3e3;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    height: 44px;
+}
+
+div.onx-navbar .span2 {
+    margin-left: 12px;
 }

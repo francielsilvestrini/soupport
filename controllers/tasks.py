@@ -76,6 +76,7 @@ def pagination_calc(page, record_count):
 
 @auth.requires_login()
 def index():
+    session.project = 'tasks'
     session.page.reset_files()
     search = dict(
         subject=(T('Subject'), lambda search: (db.solicitation.subject.like('%%%s%%' % search, case_sensitive=False)) ),
@@ -390,7 +391,14 @@ def releases():
 def task():
     action = request.args(0) or ''
 
-    if action == '':
+    if action == 'flag_as_released':
+        id = int(request.args(1) or 0)
+        record = db(db.task.id == id).select().first()
+        if record:
+            record.update_record(final_release=record.test_release, status='released')
+        next = request.vars.get('next', URL(c='task', f='my_tasks'))
+        redirect(next)
+    elif action == '':
         extra_links =  [lambda row: A(
             SPAN(_class="icon icon-eye-open")+' '+T('Detail'),
             _href=URL(f='task_detail', args=[row.id]), 

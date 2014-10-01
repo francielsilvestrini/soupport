@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from onx_views import PageConfig
-if not 'page' in session: 
-    session.page = PageConfig()
-
-
 from gluon.custom_import import track_changes
 track_changes(True)
 
