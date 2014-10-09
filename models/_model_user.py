@@ -34,3 +34,9 @@ class UserModel(ModelBase):
             auth.add_membership(group_id, user_id)
         return
 
+
+def auth_has_access(c=request.controller, f=request.function): 
+    if auth.has_membership(role='admin'):
+        return True
+    # é o contrario de permitido, se tiver significa bloqueado
+    return not auth.has_permission(c,f)

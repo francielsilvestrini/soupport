@@ -1,5 +1,16 @@
 SOUPPORT
 
+/MUL --> management of user licenses
+	/platform    --> exemplo onnix erp (onnix erp e onnix fiscal)
+		#modules --> 02,04,08,16,32...
+	/contract    --> contrato entre o cliente e a plataforma
+		#modules --> modulos liberados no contrato
+	/history     --> historico do contrato eas liberações
+	
+
+
+
+
 onnixsistemas.com.br/A --> administração/desenvolvimento/solicitacoes/financeiro
 onnixsistemas.com.br/B
 	/dashbord --> resultados
@@ -119,23 +130,13 @@ auth/user
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 zip -r filename.zip foldername/
 rm -rf foldername/
 
-diego:  99744620
+enviar para github
+git add --all
+git commit -m "comentario"
+git push origin master
+
+atualizar na kinghost
+git pull origin master

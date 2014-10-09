@@ -7,6 +7,7 @@ def index():
     menus = []
     menus += [(T('Admin'), URL(f='admin'))]
     menus += [(T('Database'), URL(f='database'))]
+    menus += [(T('Clear Cache'), URL(f='clear_cache'))]
     return dict(menus=menus)
 
 
@@ -68,6 +69,15 @@ def database_clear():
             response.flash = T('Error when cleaning')
 
     return dict(form=form)
+
+
+def clear_cache():
+    cache.ram.clear()
+    cache.disk.clear()
+    response.flash = T('Successfully cleaned')
+    redirect(URL(f='index'))
+    return
+
 
 
 

@@ -364,18 +364,6 @@ def solicitation_preview():
 
 
 @auth.requires_login()
-def customer():
-    response.view = 'others/generic_crud.html'
-    action = request.args(0) or ''
-
-    if action == '':
-        content = app_crud_grid(db.customer, controller=request.controller, function=request.function)
-    else:
-        content = app_crud(db.customer)
-    return dict(content=content)
-
-
-@auth.requires_login()
 def releases():
     response.view = 'others/generic_crud.html'
     action = request.args(0) or ''
@@ -559,7 +547,11 @@ def tests():
 
     has_test = db((db.test.owner_table == 'task') & (db.test.owner_key == record.oplink)).count()
 
-    return dict(record=record,next_test=next_test.task, form=form, has_test=has_test)
+    if next_test:
+        next_task = next_test.task
+    else:
+        next_task = None
+    return dict(record=record,next_test=next_task, form=form, has_test=has_test)
 
 
 def tests_list():

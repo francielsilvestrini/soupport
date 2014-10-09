@@ -73,3 +73,4 @@ def alert_gedgat_error(msg):
         SPAN(T(msg)),
         _class='alert alert-error')
     return alert
+

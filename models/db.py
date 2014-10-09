@@ -67,7 +67,9 @@ def define_tables():
         CommentsModel,
         AttachmentsModel,
         ActivityModel,
+        EntriesModel,
         TasksModel,
+        MULModel,
         ]
 
     for cls in ordened_models:

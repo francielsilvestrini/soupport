@@ -5,8 +5,12 @@
 ## Customize your APP title, subtitle and menus here
 #########################################################################
 
-response.logo = A(SPAN('soupport',SPAN(' '),SMALL('Onnix Sistemas'),
-                                    _class="brand",_href=URL(f='index')))
+response.app_version = '1.0'
+response.logo = A(SPAN('soupport',
+    SMALL(response.app_version), 
+    SPAN(' '),
+    SMALL('Onnix Sistemas'),
+    _class="brand",_href=URL(f='index')))
 #response.title = request.application.replace('_',' ').title()
 response.title = 'Onnix Sistemas'
 response.subtitle = ''
@@ -71,4 +75,6 @@ response.projects = dict(
     tasks=(T('Tasks'), URL(c='tasks', f='index'), False),
     activity=(T('Activity'), URL(c='activity', f='index'), False),
     painel=(T('Painel'), URL(c='painel', f='index'), True),
+    entries=(T('Entries'), URL(c='entries', f='index'), False),
+    mul=(T('Management of User Licenses'), URL(c='mul', f='index'), False),
     )

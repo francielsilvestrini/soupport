@@ -27,28 +27,8 @@ class TasksModel(ModelBase):
         }
 
     def define_tables(self):
-        db.define_table('platform',
-            Field('name', 'string', label=T('Name')),
-            migrate="platform.table",
-            format='%(name)s')
-        db.platform.name.requires = [IS_NOT_EMPTY(),IS_NOT_IN_DB(db, 'platform.name')]    
-
-        field_tags = TagsModel().make_field_tags(db)
-
-        db.define_table('customer',
-            oplink_field,
-            Field('name', 'string', label=T('Name')),
-            Field('phone', 'string', label=T('Phone')),
-            Field('contact', 'string', label=T('Contact')),
-            Field('email', 'string', label=T('Email')),
-            Field('note', 'text', label=T('Note')),
-            Field('is_active','boolean', label=T('Active')),
-            migrate="customer.table",
-            format='%(name)s')
-        db.customer.name.requires = [IS_NOT_EMPTY(),IS_NOT_IN_DB(db, 'customer.name')]
-        db.customer.is_active.default = True
-                
-
+        self.validate_required(db, ['platform', 'customer'])
+        
         def defaultPlatform():
             r = db(db.platform).select().first()
             return r.id        
@@ -70,6 +50,7 @@ class TasksModel(ModelBase):
                 }[k]
             return XML(rep % TasksModel.TEST_RESULT_SET[k])
 
+        field_tags = TagsModel().make_field_tags(db)
 
         db.define_table('solicitation',
             oplink_field,
@@ -158,7 +139,3 @@ class TasksModel(ModelBase):
         db.test.note.widget = NicEditorWidget().widget
         db.test.note.represent = lambda value,row: XML(value, sanitize=False)
         return
-
-    def create_defaults(self):
-        if db(db.platform).isempty():
-            db.platform.insert(name='Onnix Sistemas')

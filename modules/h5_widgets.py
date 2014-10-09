@@ -133,6 +133,35 @@ class LookupWidget(OptionsWidget):
         return wrapper
 
 
+class MaskWidget(StringWidget):  
+
+    def __init__(self, mask):
+        self.mask = mask
+        return
+
+    def widget_files(self):
+        current.session.page.footer_files['jquery.mask.min.js'] = URL('static','assets/mask/jquery.mask.min.js')
+        return
+
+    def widget(self, field, value, **attributes):
+        self.widget_files()
+        
+        wgt_default = StringWidget.widget(field, value, **attributes)
+        wgt_id = wgt_default.attributes.get('_id', 'no_id')
+
+        js = '''
+            jQuery(document).ready(function(){
+                jQuery('#%(field_name)s').each( function(){ 
+                    jQuery(this).mask('%(mask)s'); 
+                });  
+            }); 
+            ''' % dict(field_name=wgt_id, mask=self.mask)
+        jq_script=SCRIPT(js, _type="text/javascript")
+
+        wrapper = DIV(_class="MaskWidget") 
+        wrapper.components.extend([wgt_default, jq_script])
+        return wrapper
+
 
 class H5ColorWidget(StringWidget):  
     def widget(self, field, value, **attr):
