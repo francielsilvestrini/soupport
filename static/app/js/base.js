@@ -8,6 +8,8 @@ $(function(){
 
         $('.tooltip-top').tooltip({ placement: 'top' });
 
+        $("a[data-toggle='tooltip']").tooltip({ placement: 'top' });
+
         $("a[data-action='launchFullscreen']").click(function () {
             if (screenfull.isFullscreen) {
                 $(this).removeClass( "btn" ).addClass( "btn btn-inverse" );                
@@ -16,6 +18,26 @@ $(function(){
                 $(this).removeClass( "btn btn-inverse" ).addClass( "btn" );                
                 screenfull.request();
             }
-        });     
+        });
+
+
+        // Side Bar Toggle
+        $('.hide-sidebar').click(function() {
+          $('#sidebar').hide('fast', function() {
+            $('#content').removeClass('span9');
+            $('#content').addClass('span12');
+            $('.hide-sidebar').hide();
+            $('.show-sidebar').show();
+          });
+        });
+
+        $('.show-sidebar').click(function() {
+            $('#content').removeClass('span12');
+            $('#content').addClass('span9');
+            $('.show-sidebar').hide();
+            $('.hide-sidebar').show();
+            $('#sidebar').show('fast');
+        });
+
     });
 });

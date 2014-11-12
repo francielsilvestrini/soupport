@@ -1,61 +1,49 @@
 {{extend 'layouts/basic.html'}}
 
+{{
+    project_name = session.get('project', response.project_default)
+    project = response.projects[project_name]
+}}
+
 <!-- begin navbar -->
 {{include 'layouts/navbar.html'}}
 <!-- end navbar -->
 
 <div class="container-fluid">
-    <div class="row-fluid">
-    {{
-    left_sidebar_main = globals().get('left_sidebar_main',True)
-    right_sidebar_main = globals().get('right_sidebar_main',False)
-    if not globals().get('middle_columns_main',None):
-        middle_columns_main = {0:'span12',1:'span10',2:'span7'}[(left_sidebar_main and 1 or 0)+(right_sidebar_main and 1 or 0)]
-    pass
-    }}
-        
-    {{if left_sidebar_main:}}
-        <div class="span2">
-            {{block left_sidebar_main}}
-            {{include 'tasks/left_sidebar.html'}}
-            {{end}}
-        </div>
-        {{pass}}
+    <div class="row-fluid">       
 
-        <div class="{{=middle_columns_main}}">
+        <!-- begin sidebar -->
+        {{block left_sidebar_main}}
+        <div id="sidebar" class="span3">
+            {{if project.get('sidebar'):}}
+                {{include 'layouts/sidebar.html'}}
+            {{pass}}
+        </div>
+        {{end}}
+        <!-- end sidebar -->
+
+        <div id="content" class="{{= 'span9' if project.sidebar else 'span12' }}">
+            {{block breadcrumb}}
+            {{include 'layouts/breadcrumb.html'}}
+            {{end}}
+
             {{block center_main}}
             {{include}}
             {{end}}
         </div>
-
-        {{if right_sidebar_main:}}
-        <div class="span3">
-            {{block right_sidebar_main}}
-            <div class="well">
-            <h3>Left Sidebar</h3>
-            </div>
-            {{end}}
-        </div>
-        {{pass}}
     </div>
 </div>
-
-<div class="container-fluid">
-    <div class="row-fluid">
-        <footer class="footer" id="footer">
-            <div class="footer-content">
-                {{block footer}} 
-                <div class="copyright pull-left">{{=T('Copyright')}} &#169; {{=request.now.year}}</div>
-                <div id="poweredBy" class="pull-right">
-                    {{=T('Powered with')}}
-                    <a href="http://www.web2py.com/">web2py</a>
-                </div>
-                {{end}}
+<footer class="footer" id="footer">
+    <div class="footer-content">
+        {{block footer}} 
+            <div class="copyright pull-left">{{=T('Copyright')}} &#169; {{=request.now.year}}</div>
+            <div id="poweredBy" class="pull-right">
+                {{=T('Powered with')}}
+                <a href="http://www.web2py.com/">web2py</a>
             </div>
-        </footer>
+        {{end}}
     </div>
-</div>
-
+</footer>
  
 {{block head}}
     <link href="{{=URL('static','assets/select2-3.5.1/select2.css')}}" rel="stylesheet" media="screen">

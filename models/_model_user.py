@@ -3,6 +3,7 @@
 from onx_model import ModelBase
 
 class UserModel(ModelBase):
+    name = 'user'
 
     def define_tables(self):
         auth.settings.extra_fields['auth_user']= [

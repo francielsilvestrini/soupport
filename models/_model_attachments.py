@@ -3,6 +3,7 @@
 from onx_model import ModelBase
 
 class AttachmentsModel(ModelBase):
+    name = 'attachments'
 
     def define_tables(self):
         db.define_table('attachments',

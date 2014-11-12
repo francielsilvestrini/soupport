@@ -3,6 +3,7 @@
 from onx_model import ModelBase
 
 class ActivityModel(ModelBase):
+    name = 'activity'
     
     TODO_STATUS_SET = {
         'waiting':T('Waiting'), 

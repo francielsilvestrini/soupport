@@ -31,22 +31,23 @@ crud = Crud(db)
 #plugins = PluginManager()
 
 
-def _define_auth_model():
-    model = UserModel()
-    model.define_tables()
-    model.create_defaults()
-    return
-
-_define_auth_model()
+_models_class =  [TagsModel, CommentsModel,  AttachmentsModel,  ActivityModel]
+_models_class += [EntriesModel]
+_models_class += [TasksModel]
+_models_class += [MULModel]
 
 
-import uuid
+from gluon.storage import Storage
+app_models = Storage()
+app_models.users = UserModel()
+app_models.users.model_define()
+
+
 oplink_field = Field('oplink', 'string', 
     label=T('Operation Link'), 
     default=uuid.uuid4, 
     writable=False, 
     readable=False)
-
 
 signature_fields = db.Table(db, 'signature',
     Field('created_on', 'datetime', default=request.now, writable=False, readable=False),
@@ -54,41 +55,22 @@ signature_fields = db.Table(db, 'signature',
     Field('updated_on', 'datetime', update=request.now, writable=False, readable=False),
     Field('updated_by', db.auth_user, update=auth.user_id, writable=False, readable=False))
 
-
 owner_fields = db.Table(db, 'owner',
     Field('owner_table', 'string', label=T('Owner Table'), writable=False, readable=False),
     Field('owner_key', 'string', label=T('Owner Key'), writable=False, readable=False),
     )
 
 
-def define_tables():
-    ordened_models = [
-        TagsModel,
-        CommentsModel,
-        AttachmentsModel,
-        ActivityModel,
-        EntriesModel,
-        TasksModel,
-        MULModel,
-        ]
-
-    for cls in ordened_models:
-        m = cls()
-        m.define_tables()
-        m.create_defaults()
-    return
-
-define_tables()
+for cls in _models_class:
+    model = cls()
+    model.model_define()
+    app_models[model.name] = model
 
 
-def _config_painel():
-    painel = PainelModel()
-    painel.define_tables()
-    painel.create_defaults()
-    painel.apply_updates()
-    return
+app_models.painel = PainelModel()
+app_models.painel.model_define()
+app_models.painel.apply_updates()
 
-_config_painel()
 
 
 '''

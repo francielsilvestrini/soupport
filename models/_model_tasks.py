@@ -4,6 +4,8 @@ from onx_model import ModelBase
 from h5_widgets import NicEditorWidget, LookupWidget
 
 class TasksModel(ModelBase):
+    name = 'task'
+
     PRIORITY_SET = {
         'normal':T('Normal'), 
         'warning':T('Warning'),

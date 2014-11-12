@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from gluon.storage import Storage
+from gluon.html import URL
 
 class ModelBase(object):
     ''' 
@@ -7,9 +9,6 @@ class ModelBase(object):
     Diferente dos plugins, essa metodologia deixa uma nomenclatura mais favoravel,
     e pode ser reutilizar sem problemas.
     '''
-    def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
 
     def __repr__(self):
         return "Model: %s" % self.name
@@ -33,3 +32,8 @@ class ModelBase(object):
         for tname in tables:
             if not tname in db.tables:
                 raise Exception('Table "%s" no defined!' % tname)      
+
+    def model_define(self):
+        self.define_tables()
+        self.create_defaults()
+        return

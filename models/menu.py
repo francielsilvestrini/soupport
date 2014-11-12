@@ -69,12 +69,153 @@ if DEVELOPMENT_MENU: dev_menu()
 
 if "auth" in locals(): auth.wikimenu() 
 
+from gluon.storage import Storage
+menus = Storage()
+app_menus = dict()
 
-#projects = {'project_name':(caption, index_page, admin_required),}
-response.projects = dict(
-    tasks=(T('Tasks'), URL(c='tasks', f='index'), False),
-    activity=(T('Activity'), URL(c='activity', f='index'), False),
-    painel=(T('Painel'), URL(c='painel', f='index'), True),
-    entries=(T('Entries'), URL(c='entries', f='index'), False),
-    mul=(T('Management of User Licenses'), URL(c='mul', f='index'), False),
+
+def create_menus():
+
+    def append_menu(name, caption, url, new_record, apps, icon='icon-file'):
+        item = Storage(
+            caption=caption,
+            icon=icon,
+            url=url,
+            new_record=new_record,
+        )
+        menus[name] = item
+
+        for app_name in apps:
+            if app_menus.get(app_name):
+                app_menus[app_name].append(name)
+            else:
+                app_menus[app_name] = [name]
+
+        return item
+
+    append_menu(
+        name='platform', 
+        caption=T('Platform'), 
+        url=URL(c='entries', f='platform'),
+        new_record=(T('New Platform'), URL(c='entries', f='platform', args=['new'])),
+        apps=['soupport'],
+        )
+    append_menu(
+        name='customer', 
+        caption=T('Customer'), 
+        url=URL(c='entries', f='customer'),
+        new_record=(T('New Customer'), URL(c='entries', f='customer', args=['new'])),
+        apps=['soupport'],
+        )
+    append_menu(
+        name='tag', 
+        caption=T('Tag'), 
+        url=URL(c='tags', f='tag'),
+        new_record=(T('New Tag'), URL(c='tags', f='tag', args=['new'])),
+        apps=['soupport'],
+        )
+    append_menu(
+        name='solicitation', 
+        caption=T('Solicitation'), 
+        url=URL(c='tasks', f='solicitation'),
+        new_record=(T('New Solicitation'), URL(c='tasks', f='solicitation', args=['new'])),
+        icon='icon-bullhorn',
+        apps=['soupport'],
+        )
+    append_menu(
+        name='task', 
+        caption=T('Task'), 
+        url=URL(c='tasks', f='task'),
+        new_record=(T('New Task'), URL(c='tasks', f='task', args=['new'])),
+        icon='icon-tasks',
+        apps=['soupport'],
+        )
+    append_menu(
+        name='releases', 
+        caption=T('Releases'), 
+        url=URL(c='tasks', f='releases'),
+        new_record=(T('New Releases'), URL(c='tasks', f='releases', args=['new'])),
+        icon='icon-tags',
+        apps=['soupport'],
+        )
+    append_menu(
+        name='auth_user', 
+        caption=T('User'), 
+        url=URL(c='user', f='auth_user'),
+        new_record=(T('New User'), URL(c='user', f='auth_user', args=['new'])),
+        apps=['soupport'],
+        )
+    append_menu(
+        name='auth_group', 
+        caption=T('User Group'), 
+        url=URL(c='user', f='auth_user'),
+        new_record=(T('New User Group'), URL(c='user', f='auth_group', args=['new'])),
+        apps=['soupport'],
+        )
+    return
+
+
+create_menus()
+
+app_name = 'soupport'
+response.menu = [] 
+for imenu in app_menus[app_name]:
+    menu = menus[imenu]
+    response.menu.append( (menu.caption, False, menu.url) )
+    response.menu.append( (menu.new_record[0], False, menu.new_record[1]) )
+
+
+def sidebar_tasks():
+    toplinks = [
+        (T('Home'), URL(c='tasks', f='index'), 'icon-home'),
+        (T('New Solicitation'), menus.solicitation.new_record, 'icon-bullhorn'),
+        (T('New Task'), menus.task.new_record, 'icon-tasks'),
+        (T('Customers'), menus.customer.url, 'icon-file'),
+        (T('Releases'), menus.releases.url, 'icon-tags'),
+        ]
+
+    accordion_menu = [
+        (T('Entries'), 'accordion_entries', 'icon-folder-open',  [
+            menus.solicitation,
+            menus.task,
+            menus.releases,
+            menus.customer,
+            menus.platform,
+            menus.tag,
+
+            ]),
+
+        ]
+
+    return Storage(toplinks=toplinks, accordion_menu=accordion_menu)
+
+
+#projects = {'project_name':(caption, index_page, admin_required, navbar),}
+response.projects = Storage(
+    tasks=Storage(
+        caption=T('Tasks'), 
+        url=URL(c='tasks', f='index'), 
+        admin_required=False, 
+        sidebar=sidebar_tasks()),
+    activity=Storage(
+        caption=T('Activity'), 
+        url=URL(c='activity', f='index'), 
+        admin_required=False, 
+        sidebar=None),
+    painel=Storage(
+        caption=T('Painel'), 
+        url=URL(c='painel', f='index'), 
+        admin_required=True, 
+        sidebar=None),
+    entries=Storage(
+        caption=T('Entries'), 
+        url=URL(c='entries', f='index'),
+        admin_required=False, 
+        sidebar=None),
+    mul=Storage(
+        caption=T('Management of User Licenses'),
+        url=URL(c='mul', f='index'),
+        admin_required=False, 
+        sidebar=None),
     )
+response.project_default = 'activity'

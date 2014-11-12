@@ -5,6 +5,8 @@ track_changes(True)
 
 ## GLOBAL IMPORTS ##
 from gluon.tools import prettydate
+import uuid
+from os import path
 ## END GLOBAL IMPORTS ##
 
 
@@ -12,7 +14,6 @@ SMALL = lambda x, **kwargs: XML(TAG.small(x, **kwargs).xml())
 SUP = lambda x, **kwargs: XML(TAG.sup(x, **kwargs).xml())
 
 
-from os import path
 UPLOAD_URLS = {
     'profile': path.join(request.folder,'uploads','profile'),
     'attachments': path.join(request.folder,'uploads','attachments'),

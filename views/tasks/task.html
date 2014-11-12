@@ -1,3 +1,10 @@
 {{extend 'layouts/form.html'}}
 
+{{ 
+txt = content.elements('#task_what')
+if txt:
+    txt[0] ['_style'] = 'width:750px;height:150px;' 
+pass
+}}
+
 {{= content}}

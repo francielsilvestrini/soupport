@@ -3,6 +3,7 @@
 from onx_model import ModelBase
 
 class PainelModel(ModelBase):
+    name = 'painel'
 
     def define_tables(self):
         db.define_table('painel',

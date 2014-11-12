@@ -19,14 +19,13 @@
                     style="width:100px;"
                     data-toggle="dropdown">
                     <i class="fa fa-caret-right"></i>
-                    {{pname = session.get('project', 'activity') }}
-                    {{= response.projects[pname][0] }}
+                    {{= project.get('caption') }}
                 </a>
                 <ul class="dropdown-menu">
-                {{for pname in response.projects:}}
-                    {{caption, index_page, admin_required = response.projects[pname]}}
-                    {{if not admin_required or auth.has_membership(role='admin'):}}
-                    <li><a href="{{= index_page}}">{{= caption}}</a></li>
+                {{for k in response.projects:}}
+                    {{prj = response.projects[k]}}
+                    {{if not prj.get('admin_required', False) or auth.has_membership(role='admin'):}}
+                    <li><a href="{{= prj.get('url')}}">{{= prj.get('caption')}}</a></li>
                     {{pass}}
                 {{pass}}
                 </ul>
@@ -45,7 +44,7 @@
                                 <select id="menu_search" style="width:150px;">
                                     <option></option>
                                     {{for m in response.menu:}}
-                                    <option>{{= m[0] }}</option>
+                                    <option value="{{= m[2] }}">{{= m[0] }}</option>
                                     {{pass}}
                                 </select>
                             </form>
@@ -161,7 +160,14 @@
 
         $("#menu_search").select2({
             placeholder: "{{= T('Search action')}}...",
+            dropdownAutoWidth: true,
         });
+
+        $("#menu_search").on("change", function(e) {
+            var s = "http://{{= request.env.http_host}}"+ $(this).val();
+            window.location = s;
+            //window.location.reload(true);
+        });    
 
         $('body').on('click', function (e) {
             $('#a-activity').each(function () {

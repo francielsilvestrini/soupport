@@ -14,6 +14,7 @@ def tag_represent(value):
 
 
 class TagsModel(ModelBase):
+    name = 'tags'
 
     def define_tables(self):
         db.define_table('tag',

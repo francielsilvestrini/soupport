@@ -4,6 +4,7 @@ from onx_model import ModelBase
 from h5_widgets import MaskWidget 
 
 class MULModel(ModelBase):
+    name = 'mul'
     
     def define_tables(self):
         self.validate_required(db, ['platform', 'customer'])

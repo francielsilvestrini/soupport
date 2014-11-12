@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from gluon.html import XML, INPUT, A, SPAN, URL
+from gluon.html import XML, INPUT, A, SPAN, URL, DIV
 from gluon.globals import current
 from gluon.sqlhtml import SQLFORM
 from gluon.dal import Table
@@ -205,7 +205,7 @@ class ONXFORM(object):
         if not record: raise HTTP(404, 'Record ID invalid!')
 
         navegate = ONXFORM.navegate()
-        if getlist(request.args, 2, '') == 'confirmed':
+        if request.args(2) == 'confirmed':
             try:
                 db(table.id == record.id).delete()
                 response.flash = T('Record Deleted')

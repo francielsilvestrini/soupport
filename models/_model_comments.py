@@ -3,6 +3,7 @@
 from onx_model import ModelBase
 
 class CommentsModel(ModelBase):
+    name = 'comments'
 
     def define_tables(self):
         db.define_table('comments',
