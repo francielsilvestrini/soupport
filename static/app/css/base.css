@@ -302,6 +302,7 @@ div.onx-navbar .label {
     text-transform: uppercase;
     padding-left: 0;
     text-align: left;
+    width: 80%;
 }
 
 div.onx-navbar .brand {
@@ -330,4 +331,8 @@ div.onx-navbar .logo {
 
 div.onx-navbar .span2 {
     margin-left: 12px;
+}
+
+.web2py_htmltable table {
+  min-width: 100%;
 }

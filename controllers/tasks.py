@@ -77,6 +77,7 @@ def pagination_calc(page, record_count):
 @auth.requires_login()
 def index():
     session.project = 'tasks'
+    session.breadcrumbs.reset(T('Tasks'), current_url())
     session.page.reset_files()
     search = dict(
         subject=(T('Subject'), lambda search: (db.solicitation.subject.like('%%%s%%' % search, case_sensitive=False)) ),
@@ -143,6 +144,7 @@ def my_tasks():
         search_form=make_search_form(search, 'what'),
         )
     tasks_count(content)
+    breadcrumbs_add(title=T('My Tasks'), reset=True)
     return content
 
 
@@ -177,6 +179,7 @@ def waiting_tests():
         search_form=make_search_form(search, 'what'),
         )
     tasks_count(content)
+    breadcrumbs_add(title=T('Waiting Tests'), reset=True)
     return content
 
 
@@ -332,6 +335,7 @@ def solicitation():
                 row = db(db.solicitation.id == _get_crud_id()).select().first()
                 attr['onaccept'] = lambda form:solicitation_accept(form)
             content = app_crud(db.solicitation, **attr)
+    breadcrumbs_add()
     return dict(content=content)
 
 
@@ -345,6 +349,7 @@ def solicitation_detail():
 
     response.title = T(db.solicitation._plural)    
     response.subtitle = T('Detail')
+    breadcrumbs_add()
     return dict(record=record)
 
 

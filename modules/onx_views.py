@@ -4,7 +4,7 @@ from gluon.globals import current
 from gluon.sqlhtml import SQLFORM
 from gluon.dal import Table
 from gluon.storage import Storage
-from gluon.http import redirect
+from gluon.http import redirect, HTTP
 
 
 class PageConfig(object):
@@ -47,6 +47,13 @@ class PageConfig(object):
         return self.include_files(self.footer_files)
 
 
+def remove_menu_origin():
+    url_vars = current.request.vars.copy()
+    if 'origin' in url_vars:
+        del url_vars['origin']
+    return url_vars
+
+
 class ONXFORM(object):
 
     """
@@ -80,9 +87,11 @@ class ONXFORM(object):
     def navegate():
         request = current.request
 
+        url_vars = remove_menu_origin()
+
         navegate = Storage(
-            next= request.vars.get('next') or request.vars.get('_next') or URL(c=request.controller, f=request.function, vars=request.vars),
-            previous= request.vars.get('previous') or request.vars.get('_previous') or URL(c=request.controller, f=request.function, vars=request.vars),
+            next= url_vars.get('next') or url_vars.get('_next') or URL(c=request.controller, f=request.function, vars=url_vars),
+            previous= url_vars.get('previous') or url_vars.get('_previous') or URL(c=request.controller, f=request.function, vars=url_vars),
             )
         return navegate
 
@@ -94,6 +103,7 @@ class ONXFORM(object):
 
         response.title = T(table._plural)
         response.subtitle = T('New Record')
+        response.breadcrumbs = response.subtitle
 
         navegate = ONXFORM.navegate()
         buttons = [
@@ -134,6 +144,7 @@ class ONXFORM(object):
 
         response.title = T(table._plural)
         response.subtitle = T('View')+': '+record_label
+        response.breadcrumbs = record_label
 
         navegate = ONXFORM.navegate()
         buttons = [
@@ -169,6 +180,7 @@ class ONXFORM(object):
 
         response.title = T(table._plural)
         response.subtitle = T('Editing')+': '+record_label
+        response.breadcrumbs = record_label
 
         navegate = ONXFORM.navegate()
         buttons = [
@@ -220,10 +232,11 @@ class ONXFORM(object):
 
             response.title = T(table._plural)
             response.subtitle = T('Confirm delete "%s"?') % record_label
+            response.breadcrumbs = T('Delete Record')
 
             request.args.append('confirmed')
             buttons = [
-                A(T('Delete'), _class='btn btn-danger', _href=URL(c=request.controller, f=request.function, args=request.args, vars=request.vars)),
+                A(T('Delete'), _class='btn btn-danger', _href=URL(c=request.controller, f=request.function, args=request.args, vars=remove_menu_origin())),
                 SPAN(' '),
                 A(T('Cancel'), _class='btn', _href=navegate.previous),
                 ]    
@@ -248,7 +261,7 @@ class ONXFORM(object):
         link = lambda row: A(
                 SPAN(_class='icon icon-pencil'),
                 SPAN(caption),
-                _href=URL(c=request.controller, f=request.function, args=['update', row.id], vars=request.vars), 
+                _href=URL(c=request.controller, f=request.function, args=['update', row.id], vars=remove_menu_origin()), 
                 _class='btn btn-small')
         return link
 
@@ -263,7 +276,7 @@ class ONXFORM(object):
         link = lambda row: A(
                 SPAN(_class='icon icon-trash'),
                 SPAN(caption),
-                _href=URL(c=request.controller, f=request.function, args=['delete', row.id], vars=request.vars), 
+                _href=URL(c=request.controller, f=request.function, args=['delete', row.id], vars=remove_menu_origin()), 
                 _class='btn btn-small')
         return link
 
@@ -278,6 +291,7 @@ class ONXFORM(object):
         else:
             response.title = T(request.function)    
         response.subtitle = T('Listing')
+        response.breadcrumbs = response.title
 
         exportclasses = dict(
             csv_with_hidden_cols=False,
@@ -401,3 +415,28 @@ class ONXFORM(object):
 
         response.view = 'others/generic_crud.html'
         return content
+
+
+class Breadcrumbs(object):
+
+    def __init__(self):
+        self.items = []
+        return
+
+    def reset(self, home_title, home_url):
+        self.items = [(home_title, home_url)]
+
+    def delete_item(self, index):
+        while len(self.items) > index: 
+            del self.items[-1]
+
+    def add(self, title, url, reset=False):
+        if reset:
+            self.delete_item(1)
+        else:
+            for i, (t, u) in enumerate(self.items):
+                from urlparse import urlparse
+                if urlparse(u).path == urlparse(url).path:
+                    self.delete_item(i)
+                    break
+        self.items.append( (title, url) )

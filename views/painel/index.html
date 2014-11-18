@@ -1,20 +1,13 @@
 {{extend 'layouts/main.html'}}
 
-{{block head}}
-{{super}}
-<style type="text/css">
-div#menus {
-    margin-top: 10px;
-}
-</style>
-{{end}}
-
-<div id="menus" class="row">
-    <ul class="thumbnails">
-        {{for t, url in menus:}}
-        <li class="span3">
-            <a href="{{= url}}" class="thumbnail">{{= t}}</a>
-        </li>
-        {{pass}}
-    </ul>
+<div class="block block-main">
+    <div class="row-fluid">
+        <ul class="thumbnails" style="margin:5px;">
+            {{for t, url in menus:}}
+            <li class="span3">
+                <a href="{{= url}}" class="thumbnail">{{= t}}</a>
+            </li>
+            {{pass}}        
+        </ul>
+    </div>
 </div>

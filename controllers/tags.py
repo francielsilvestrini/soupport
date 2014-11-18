@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
+from onx_views import ONXFORM 
 
 
-@auth.requires_login()
+@auth.requires(lambda: auth_has_access())
 def tag():
-    response.view = 'others/generic_crud.html'
-    action = request.args(0) or ''
-
-    if action == '':
-        content = app_crud_grid(db.tag, controller=request.controller, function=request.function)
-    else:
-        content = app_crud(db.tag)
-    return dict(content=content)
+    content = ONXFORM.make(db.tag)
+    breadcrumbs_add()
+    return content
 
 
 def tag_data():

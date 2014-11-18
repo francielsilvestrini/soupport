@@ -18,6 +18,7 @@ UPLOAD_URLS = {
     'profile': path.join(request.folder,'uploads','profile'),
     'attachments': path.join(request.folder,'uploads','attachments'),
 }
+ADMIN_ROLE = 'admin'
 
 def getlist(x, index, default=None):
     return x[index] if len(x) > index else default
@@ -75,3 +76,25 @@ def alert_gedgat_error(msg):
         _class='alert alert-error')
     return alert
 
+
+def current_url():
+    url = URL(r=request, args=request.args, vars=request.vars)
+    return url
+
+
+def breadcrumbs_add(title=None, url=None, reset=None):
+    if not title:
+        if 'breadcrumbs' in response:
+            title = response.breadcrumbs
+        else:
+            title = response.title+' '+response.subtitle
+    if not url:
+        url = current_url()
+
+    if reset == None:
+        reset = request.vars.get('origin', '') == 'menu'
+        if reset: del request.vars['origin']
+
+    if 'breadcrumbs' in session:
+        session.breadcrumbs.add(title, url, reset)
+    return

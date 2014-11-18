@@ -18,11 +18,11 @@ class UserModel(ModelBase):
 
     def create_defaults(self):
         if db(db.auth_user).isempty():
-            row = db(db.auth_group.role=='admin').select().first()
+            row = db(db.auth_group.role==ADMIN_ROLE).select().first()
             if row:
                 group_id = row.id
             else:
-                group_id = db.auth_group.insert(role='admin', description=T('Admin'))
+                group_id = db.auth_group.insert(role=ADMIN_ROLE, description=T('Admin'))
 
             defaults = my_default_values(db.auth_user)
             defaults['first_name'] = 'Admin'
@@ -37,7 +37,7 @@ class UserModel(ModelBase):
 
 
 def auth_has_access(c=request.controller, f=request.function): 
-    if auth.has_membership(role='admin'):
+    if auth.has_membership(role=ADMIN_ROLE):
         return True
     # é o contrario de permitido, se tiver significa bloqueado
     return not auth.has_permission(c,f)

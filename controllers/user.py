@@ -23,7 +23,7 @@ def user():
 
 
 
-@auth.requires(auth.has_membership(role='Admin'))
+@auth.requires(auth.has_membership(role=ADMIN_ROLE))
 def auth_user():
     action = request.args(0) or ''
 
@@ -40,7 +40,7 @@ def auth_user():
     return dict(content=content)
 
 
-@auth.requires(auth.has_membership(role='Admin'))
+@auth.requires(auth.has_membership(role=ADMIN_ROLE))
 def auth_group():
     action = request.args(0) or ''
 

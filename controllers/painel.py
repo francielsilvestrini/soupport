@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+from onx_views import ONXFORM 
 
 
-@auth.requires(auth.has_membership(role='admin'))
+@auth.requires(auth.has_membership(role=ADMIN_ROLE))
 def index():
     session.project = 'painel'
+    session.breadcrumbs.reset(T('Painel'), current_url())
+
     menus = []
     menus += [(T('Admin'), URL(f='admin'))]
     menus += [(T('Database'), URL(f='database'))]
@@ -11,23 +14,30 @@ def index():
     return dict(menus=menus)
 
 
-@auth.requires(auth.has_membership(role='admin'))
+@auth.requires(auth.has_membership(role=ADMIN_ROLE))
 def admin():
     record = db(db.painel.id > 0).select().first()
-    form = crud.update(db.painel, record.id)
-    return dict(form=form)
+    request.args.append('update')
+    request.args.append(str(record.id))
+    request.vars['_previous'] = URL(f='index')
+    request.vars['_next'] = URL(f='index')
+    content = ONXFORM.make(db.painel)
+    breadcrumbs_add()    
+    return content
 
 
-@auth.requires(auth.has_membership(role='admin'))
+@auth.requires(auth.has_membership(role=ADMIN_ROLE))
 def database():
     menus = []
-    menus += [(T('Back'), URL(f='index'))]
     menus += [(T('Backup'), URL(f='database_backup'))]
     menus += [(T('Clear'), URL(f='database_clear'))]
+    response.breadcrumbs = T('Database')
+    breadcrumbs_add()    
+    response.view = 'painel/index.html'
     return dict(menus=menus)
 
 
-@auth.requires(auth.has_membership(role='admin'))
+@auth.requires(auth.has_membership(role=ADMIN_ROLE))
 def database_backup():
     import cStringIO
     s = cStringIO.StringIO()
@@ -41,7 +51,7 @@ def database_backup():
     return s.getvalue()
 
 
-@auth.requires(auth.has_membership(role='admin'))
+@auth.requires(auth.has_membership(role=ADMIN_ROLE))
 def database_clear():
     def make_form():
         tables = dict(all=T(' All '))

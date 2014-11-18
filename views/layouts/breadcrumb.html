@@ -7,13 +7,18 @@
                 <i class="fa fa-arrow-circle-right show-sidebar" style="display: none;"></i>
             </a> <span class="divider">/</span>  
             </li>
-            <li>
-                <a href="#">#1</a> <span class="divider">/</span>    
-            </li>
-            <li>
-                <a href="#">#2</a> <span class="divider">/</span> 
-            </li>
-            <li class="active">#3</li>
+
+            {{bc = session.get('breadcrumbs', {'items':[]})}}
+            {{for i, (title, url) in enumerate(bc.items):}}
+                {{if i+1 == len(bc.items):}}
+                <li class="active">
+                    {{= title}}
+                {{else:}}
+                <li>
+                    <a href="{{= url}}">{{= title }}</a> <span class="divider">/</span>
+                {{pass}}
+                </li>                
+            {{pass}}
         </ul>
     </div>
 </div>

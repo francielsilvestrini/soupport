@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 
 def index():
-    import re
-    myString = "This is my tweet check it out http://127.0.0.1:8000/soupport/apptests/"
-    match = re.search("(?P<url>https?://[^\s]+)", myString)
-    if match is not None: 
-        print match.group("url")
+    content = SQLFORM.grid(db.platform)
 
-    return dict()
+    return dict(content=content)
 
 
 def todo():
