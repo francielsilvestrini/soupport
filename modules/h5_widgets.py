@@ -9,8 +9,8 @@ class TagsInputWidget(StringWidget):
     def __init__(self, url):
         self.url = url
 
-
-    def widget_files(self):
+    @staticmethod
+    def widget_files():
         session = current.session
 
         session.page.header_files['typeahead.css'] = URL('static','assets/typeahead.js/typeahead.css')
@@ -23,7 +23,7 @@ class TagsInputWidget(StringWidget):
         return
 
     def widget(self, field, value):
-        self.widget_files()
+        TagsInputWidget.widget_files()
 
         wgt_default = StringWidget.widget(field, value, **{
             '_data-role':'tagsinput', '_placeholder':current.T('Add Tag')})
@@ -73,12 +73,13 @@ class TagsInputWidget(StringWidget):
 from gluon.sqlhtml import TextWidget
 class NicEditorWidget(TextWidget):
 
-    def widget_files(self):
+    @staticmethod
+    def widget_files():
         current.session.page.footer_files['nicEditComplete.js'] = URL('static','assets/nicEdit/nicEditComplete.js')
         return
 
     def widget(self, field, value, **attributes):
-        self.widget_files()
+        NicEditorWidget.widget_files()
 
         wgt_default = TextWidget.widget(field, value, **attributes)
         wgt_id = wgt_default.attributes.get('_id', 'no_id')
@@ -109,13 +110,14 @@ class NicEditorWidget(TextWidget):
 from gluon.sqlhtml import OptionsWidget
 class LookupWidget(OptionsWidget):
 
-    def widget_files(self):
+    @staticmethod
+    def widget_files():
         current.session.page.header_files['select2.css'] = URL('static','assets/select2-3.5.1/select2.css')
         current.session.page.footer_files['select2.min.js'] = URL('static','assets/select2-3.5.1/select2.min.js')
         return
 
     def widget(self, field, value, **attributes):
-        self.widget_files()
+        LookupWidget.widget_files()
         
         attributes['_style'] = 'width: 316px; height: 20px; margin-bottom: 14px;'
         wgt_default = OptionsWidget.widget(field, value, **attributes)
@@ -139,12 +141,13 @@ class MaskWidget(StringWidget):
         self.mask = mask
         return
 
-    def widget_files(self):
+    @staticmethod
+    def widget_files():
         current.session.page.footer_files['jquery.mask.min.js'] = URL('static','assets/mask/jquery.mask.min.js')
         return
 
     def widget(self, field, value, **attributes):
-        self.widget_files()
+        MaskWidget.widget_files()
         
         wgt_default = StringWidget.widget(field, value, **attributes)
         wgt_id = wgt_default.attributes.get('_id', 'no_id')

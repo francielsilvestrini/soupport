@@ -106,7 +106,7 @@ class TasksModel(ModelBase):
             Field('test_release', db.releases, label=T('Test Release')),
             Field('final_release', db.releases, label=T('Final Release')),
             migrate='task.table',
-            format='%(what)s')
+            format='#%(id)s')
         db.task.platform_id.requires = IS_IN_DB(db, db.platform, db.platform._format)
         db.task.platform_id.default = defaultPlatform
         db.task.user_task.default = auth.user_id

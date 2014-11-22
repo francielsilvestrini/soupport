@@ -71,4 +71,21 @@ only screen and (max-width: 700px),
     .web2py_grid .web2py_form td {
         padding: 0px 0px 0px 0px;
     }
+
+
+
+
+
+    .web2py_htmltable tbody td {
+        padding: 0px 0px 0px 35%;
+        text-align: left;
+    }
+    
+    .web2py_htmltable .web2py_form td {
+        padding: 0px 0px 0px 0px;
+    }    
+
+    .web2py_htmltable .dropdown-menu {
+        position: relative;
+    }    
 }

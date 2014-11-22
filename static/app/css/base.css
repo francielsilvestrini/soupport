@@ -336,3 +336,18 @@ div.onx-navbar .span2 {
 .web2py_htmltable table {
   min-width: 100%;
 }
+
+.web2py_htmltable .row-empty {
+    border-top-style: none;
+}
+
+table .select_col {
+    word-wrap: break-word;
+    width: 80px;
+    max-width: 80px;    
+    text-align:center;
+}
+
+div.comment-form form {
+    margin-right: 20px;
+}

@@ -6,9 +6,12 @@
     </div>
     <div class="span4">
         <div class="pull-right">
-            <a href="{{= URL(c='tasks', f='solicitation.html', args=['edit', record.id])}}" class="btn btn-small"><i class="icon-pencil"></i>{{= T('Edit')}}</a>
+            <a href="{{= URL(c='tasks', f='solicitation.html', args=['update', record.id])}}" 
+                class="btn btn-small"><i class="icon-pencil"></i>{{= T('Edit')}}</a>
             {{if not request.vars.get('oplink'):}}
-            <a href="{{= URL(c='tasks', f='solicitation.html', args=['remove', record.id])}}" class="btn btn-small"><i class="icon-trash"></i></a>
+            <a href="{{= URL(c='tasks', f='solicitation.html', args=['delete', record.id],
+                vars=dict(next=URL(f='index.html') ))}}" 
+                class="btn btn-small"><i class="icon-trash"></i></a>
             {{pass}}
         </div>
     </div>

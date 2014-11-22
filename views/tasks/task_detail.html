@@ -1,5 +1,15 @@
 {{extend 'layouts/form.html'}}
 
+{{ 
+owner_table = record.owner_table
+owner_key  = record.owner_key
+}}
+
+{{if record.owner_table == 'solicitation':}}
+    {{= LOAD(f='solicitation_preview.load', vars=dict(oplink=record.owner_key), ajax=True)}}    
+    <hr/>
+{{pass}}
+
 <div class="row-fluid">
     <div class="span8">
         <h3>{{= field_rep(db.task.status, record.status, record)}}
@@ -8,8 +18,8 @@
     </div>
     <div class="span4">
         <div class="pull-right">
-            <a href="{{= URL(c='tasks', f='task.html', args=['edit', record.id])}}" class="btn btn-small"><i class="icon-pencil"></i>{{= T('Edit')}}</a>
-            <a href="{{= URL(c='tasks', f='task.html', args=['remove', record.id])}}" class="btn btn-small"><i class="icon-trash"></i></a>
+            <a href="{{= URL(c='tasks', f='task.html', args=['update', record.id])}}" class="btn btn-small"><i class="icon-pencil"></i>{{= T('Edit')}}</a>
+            <a href="{{= URL(c='tasks', f='task.html', args=['delete', record.id])}}" class="btn btn-small"><i class="icon-trash"></i></a>
         </div>
     </div>
 </div>
@@ -67,15 +77,6 @@
 {{include 'tasks/tests_frame.html'}}
 {{pass}}
 
-{{ 
-owner_table = record.owner_table
-owner_key  = record.owner_key
-}}
-
-{{if record.owner_table == 'solicitation':}}
-    {{= LOAD(f='solicitation_preview.load', vars=dict(oplink=record.owner_key), ajax=True)}}    
-    <hr/>
-{{pass}}
 
 {{include 'attachments/attachments_frame.html'}}
 

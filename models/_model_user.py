@@ -14,6 +14,7 @@ class UserModel(ModelBase):
             Field('about', 'text', label=T('About Me')),
             ]
         auth.define_tables(username=True, signature=False)
+
         return
 
     def create_defaults(self):

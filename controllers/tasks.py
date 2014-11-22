@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from onx_views import ONXFORM 
  
 query_my_tasks = (db.task.user_task == auth.user_id) & (db.task.status.belongs('analysis','development','test') )
 
@@ -183,173 +184,64 @@ def waiting_tests():
     return content
 
 
-def _get_crud_id():
-    if not request.args(1) or not request.args[1].isdigit():
-        raise HTTP(404)
-    return int(request.args[1])
+@auth.requires(lambda: auth_has_access())
+def solicitation():
+    session.page.reset_files()
 
+    def do_manager_extra_links(self, row):
+        menu = [A(SPAN(T('Detail')), _href=URL(f='solicitation_detail', args=[row.id]))]
+        return menu
 
-def app_crud(table, **attr):
-    action = request.args(0) or ''
-    if not action in ('new','edit', 'remove', 'delete'):
-        raise HTTP(404)
+    def do_grid_orderby(self):
+        return ~db.solicitation.id
 
-    if action == 'new':
-        response.subtitle = T('New Record')
-        content = crud.create(table, **attr)
-    else:
-        id = _get_crud_id()
+    def do_form_success(form):
+        tags = form.vars.get('tags', '')
+        for name in tags.split(','):
+            record = db(db.tag.name == name).select().first()
+            if not record:
+                db.tag.insert(name=name)        
+        return
 
-        if isinstance(table._format,str):
-            registro = table._format % table[id]
-        else:
-            registro = table._format(table[id])
+    def do_form_after_init(self, form, action):
+        if action in ['new', 'update']:
+            txt = form.elements('#solicitation_content_txt')
+            if txt:
+                txt[0] ['_class'] = 'span10'
+        return
 
-        if action == 'remove':
-            response.subtitle = T('Confirm delete "')+ registro +'" ?'
-            content = crud.read(table, id)
-        elif action == 'delete':
-            crud.delete(table, id, **attr)
-        else:
-            response.subtitle = T('Editing: ')+ registro
-            content = crud.update(table, id, deletable=False, **attr)
-    response.title = T(table._plural)    
+    def do_navegate(self, nav, action):
+        nav.next = URL(f='index') if action == 'delete' else URL(f='solicitation_detail')+'/[id]'
+        return nav
+
+    oform = ONXFORM(db.solicitation)
+    oform.customize.on_manager_extra_links = do_manager_extra_links
+    oform.customize.on_grid_orderby = do_grid_orderby
+    oform.customize.on_after_init = do_form_after_init
+    oform.customize.on_navegate = do_navegate
+    oform.customize.on_form_success = do_form_success
+
+    content = oform.get_current_action()
+
+    breadcrumbs_add()    
     return content
 
 
-from gluon.dal import Table
-def app_crud_grid(table, controller=request.controller, function=request.function, **attr):
-    exportclasses = dict(
-        csv_with_hidden_cols=False,
-        json=False,
-        tsv_with_hidden_cols=False,
-        tsv=False
-    )
-
-    links = []
-    extra_links = attr.get('extra_links', [])
-    links += [link for link in extra_links]
-
-    if attr.get('show_link_edit', True):
-        caption = '' if len(extra_links) else ' '+T('Edit')
-        links += [lambda row: A(
-            SPAN(_class="icon pen icon-pencil")+ caption,
-            _href=URL(c=controller, f=function, args=['edit', row.id]), 
-            _class="w2p_trap button btn btn-small")]
-
-    if attr.get('show_link_remove', True):
-        links += [lambda row: A(
-            SPAN(_class="icon icon-trash"),
-            _href=URL(c=controller, f=function, args=['remove', row.id]), 
-            _class="w2p_trap button btn btn-small")]
-
-    local_attr = dict(
-        user_signature=False,
-        exportclasses=exportclasses,
-        deletable=False,
-        editable=False,
-        details=False,
-        create=False,
-        links=links,
-        args=[],
-        paginate=25,
-        maxtextlength=50,
-        #maxtextlengths=maxtextlengths,      
-        #field_id=None,
-        #left=None,
-        #headers={},
-        #orderby=None,
-        #groupby=None,
-        #searchable=True,
-        #sortable=True,
-        #selectable=None,
-        #csv=True,
-        #links_in_grid=True,
-        #upload='<default>',
-        #onvalidation=None,
-        #oncreate=None,
-        #onupdate=None,
-        #ondelete=None,
-        #sorter_icons=(XML('&#x2191;'), XML('&#x2193;')),
-        #ui = 'web2py',
-        #showbuttontext=True,
-        #_class="web2py_grid",
-        #formname='web2py_grid',
-        #search_widget='default',
-        #ignore_rw = False,
-        #formstyle = 'table3cols',
-        #formargs={},
-        #createargs={},
-        #editargs={},
-        #viewargs={},
-        #buttons_placement = 'right',
-        #links_placement = 'right'
-        )
-    local_attr.update(attr)
-
-    for kname in ['extra_links', 'show_link_edit', 'show_link_remove']:
-        if local_attr.has_key(kname):
-            del local_attr[kname]
-
-    grid = SQLFORM.grid(table, **local_attr)
-    if isinstance(table, Table):
-        response.title = T(table._plural)    
-        response.subtitle = T('Listing')
-    return grid
-
-
-def solicitation_accept(form):
-    tags = form.vars.get('tags', '')
-    for name in tags.split(','):
-        record = db(db.tag.name == name).select().first()
-        if not record:
-            db.tag.insert(name=name)        
-    return
-
-
-@auth.requires_login()
-def solicitation():
-    session.page.reset_files()
-    action = request.args(0) or ''
-
-    if action == '':
-        extra_links =  [lambda row: A(
-            SPAN(_class="icon icon-eye-open")+' '+T('Detail'),
-            _href=URL(f='solicitation_detail', args=[row.id]), 
-            _class="w2p_trap button btn btn-small")]
-        content = app_crud_grid(db.solicitation, 
-            controller=request.controller, 
-            function=request.function,
-            **dict(extra_links=extra_links, orderby=~db.solicitation.id) )
-    else:
-        attr = dict(
-            next=URL(f='index') if action == 'delete' else URL(f='solicitation_detail')+'/[id]',
-            )
-
-        if action == 'new':
-            content = crud.create(db.solicitation, onaccept=lambda form:solicitation_accept(form), **attr)
-            response.title = T(db.solicitation._plural)    
-            response.subtitle = T('New Record')
-        else:
-            if action == 'edit':
-                row = db(db.solicitation.id == _get_crud_id()).select().first()
-                attr['onaccept'] = lambda form:solicitation_accept(form)
-            content = app_crud(db.solicitation, **attr)
-    breadcrumbs_add()
-    return dict(content=content)
-
-
-@auth.requires_login()
+@auth.requires(lambda: auth_has_access())
 def solicitation_detail():
+    session.page.reset_files()
     if not request.args(0) or not request.args[0].isdigit():
         raise HTTP(404)
     id = int(request.args[0])
 
     record = db(db.solicitation.id == id).select().first()
 
+    from h5_widgets import NicEditorWidget
+    NicEditorWidget.widget_files()
+
     response.title = T(db.solicitation._plural)    
     response.subtitle = T('Detail')
-    breadcrumbs_add()
+    breadcrumbs_add(title=record.subject)
     return dict(record=record)
 
 
@@ -368,59 +260,83 @@ def solicitation_preview():
     return dict(record=record)
 
 
-@auth.requires_login()
-def releases():
-    response.view = 'others/generic_crud.html'
-    action = request.args(0) or ''
+def _task_oform():
 
-    if action == '':
-        content = app_crud_grid(db.releases, controller=request.controller, function=request.function)
-    else:
-        content = app_crud(db.releases)
-    return dict(content=content)
+    def do_manager_extra_links(self, row):
+        menu = [A(SPAN(T('Detail')), _href=URL(f='task_detail', args=[row.id])),
+            A(SPAN(T('Flag as Released')), _href=URL(args=['flag_as_released', row.id]))]
+        return menu
 
+    def do_grid_orderby(self):
+        return ~db.task.id
 
-@auth.requires_login()
-def task():
-    action = request.args(0) or ''
-
-    if action == 'flag_as_released':
-        id = int(request.args(1) or 0)
-        record = db(db.task.id == id).select().first()
-        if record:
-            record.update_record(final_release=record.test_release, status='released')
-        next = request.vars.get('next', URL(c='task', f='my_tasks'))
-        redirect(next)
-    elif action == '':
-        extra_links =  [lambda row: A(
-            SPAN(_class="icon icon-eye-open")+' '+T('Detail'),
-            _href=URL(f='task_detail', args=[row.id]), 
-            _class="w2p_trap button btn btn-small")]
-        content = app_crud_grid(db.task, 
-            controller=request.controller, 
-            function=request.function,
-            **dict(extra_links=extra_links,orderby=~db.task.id) )
-    else:
-        attr = dict(
-            next=URL(f='index') if action == 'delete' else URL(f='task_detail')+'/[id]',
-            fields=['user_task', 'priority', 'status', 'what'],
-            )
-        if request.vars.get('next'):
-            attr['next'] = request.vars['next']
-        
-        if action == 'delete':
-            del attr['fields']
-        elif action == 'new':#spare task
+    def do_form_before_init(self, action):
+        if action in ['new']:
             db.task.owner_table.default = 'task'
             db.task.owner_key.default = uuid.uuid4()
+        return
 
-        content = app_crud(db.task, **attr)
-        if action == 'edit':
-            response.subtitle = T('Editing...')
-    return dict(content=content)
+    def do_form_after_init(self, form, action):
+        if action in ['new', 'update']:
+            txt = form.elements('#task_what')
+            if txt:
+                txt[0] ['_style'] = 'width:%s;'% '300px' if self.is_modal else '80%'
+        return
+
+    def do_fields_list(self, action):
+        fields=None
+        if action in ['new', 'update']:
+            fields=['user_task', 'priority', 'status', 'what']
+        elif action in ['select']:
+            hidden_fields = ['user_task', 'priority', 'final_release']
+            fields = [f for f in db.task if f.readable and (not f.name in hidden_fields)]
+        return fields
+
+    def do_navegate(self, nav, action):
+        nav.next = URL(f='my_tasks') if action == 'delete' else URL(f='task_detail')+'/[id]'
+        return nav
+
+    oform = ONXFORM(db.task)
+    oform.customize.on_manager_extra_links = do_manager_extra_links
+    oform.customize.on_grid_orderby = do_grid_orderby
+    oform.customize.on_before_init = do_form_before_init
+    oform.customize.on_after_init = do_form_after_init
+    oform.customize.on_navegate = do_navegate
+    oform.customize.on_fields_list = do_fields_list
+
+    return oform
 
 
-@auth.requires_login()
+@auth.requires(lambda: auth_has_access())
+def task():
+    session.page.reset_files()
+
+    def action_flag_as_released():
+        action = request.args(0) or ''
+        if action == 'flag_as_released':
+            next = session.breadcrumbs.last_url()
+            try:
+                id = int(request.args(1) or 0)
+                record = db(db.task.id == id).select().first()
+                if record:
+                    record.update_record(final_release=record.test_release, status='released')
+            except Exception, e:
+                raise e
+            finally:
+                redirect(next)
+        return
+
+    #testa e executa a action, se executada será redirecionda
+    action_flag_as_released()
+
+    oform = _task_oform()
+    content = oform.get_current_action()
+
+    breadcrumbs_add()    
+    return content
+
+
+@auth.requires(lambda: auth_has_access())
 def solicitation_to_task():
     owner_key = request.args(0) or ''
     solicitation = db(db.solicitation.oplink == owner_key).select().first()
@@ -453,28 +369,55 @@ def tasks_list():
 
 
 def tasks_modal_form():
-    owner_table = getlist(request.args, 0)
-    owner_key  = getlist(request.args, 1)
+    owner_table = request.args(0)
+    owner_key  = request.args(1)
     if not (owner_table and owner_key):
-        response.view = 'others/gadget_error.html'        
+        response.view = 'others/gadget_error.html'
         return dict(msg='task form dont work!')
+    is_aceito = False
+
+    def do_form_before_init(self, action):
+        if action in ['new']:
+            db.task.owner_table.default = owner_table
+            db.task.owner_key.default = owner_key
+        return
+
+    def do_form_success(form):
+        is_aceito = True
+        if owner_table == 'solicitation':
+            db(db.solicitation.oplink == owner_key).update(is_new=False)
+        response.js = """
+            $('#dialog_modal').modal('hide');
+            web2py_component('%s','tasks_list');
+            """ % URL(f='tasks_list.load', args=[owner_table, owner_key])
+        return
 
     edit_id = request.vars.get('edit', 0)
         
     db.task.owner_table.default = owner_table
     db.task.owner_key.default = owner_key
 
-    form = SQLFORM(db.task, edit_id, fields=['user_task', 'priority', 'status', 'what'])
+    from gluon.storage import List
+    _old_args = List(request.args)
+    _old_vars = dict(request.vars)
+    request.args = List()
+    request.args.append('update' if edit_id > 0 else 'new')
+    request.args.append(edit_id)
 
-    if form.process().accepted:
-        if owner_table == 'solicitation':
-            db(db.solicitation.oplink == owner_key).update(is_new=False)
-        response.js = "$('#dialog_modal').modal('hide'); web2py_component('%s','tasks_list');" % URL(f='tasks_list.load', args=[owner_table, owner_key])
+    oform = _task_oform()
+    oform.customize.on_form_success = do_form_success
+    oform.customize.on_before_init = do_form_before_init
+    oform.is_modal = True
+    oform.modal_cancel_onclick = "$('#dialog_modal').modal('hide');"
 
-    return dict(form=form)
+    content = oform.get_current_action()
+
+    request.args = _old_args
+    request.vars = _old_vars
+    return content
 
 
-@auth.requires_login()
+@auth.requires(lambda: auth_has_access())
 def task_detail():
     if not request.args(0) or not request.args[0].isdigit():
         raise HTTP(404)
@@ -489,8 +432,9 @@ def task_detail():
     response.subtitle = T('Detail')
 
     from h5_widgets import NicEditorWidget
-    NicEditorWidget().widget_files()
+    NicEditorWidget.widget_files()
 
+    breadcrumbs_add()    
     return dict(record=record,has_test=has_test)
 
 
@@ -522,7 +466,7 @@ def task_detail_form():
     return dict(form=form)
 
 
-@auth.requires_login()
+@auth.requires(lambda: auth_has_access())
 def tests():
     if not request.args(0) or not request.args[0].isdigit():
         raise HTTP(404)
@@ -556,6 +500,7 @@ def tests():
         next_task = next_test.task
     else:
         next_task = None
+    breadcrumbs_add()    
     return dict(record=record,next_test=next_task, form=form, has_test=has_test)
 
 
@@ -572,7 +517,7 @@ def tests_list():
     return dict(tests=tests)
 
 
-@auth.requires_login()
+@auth.requires(lambda: auth_has_access())
 def release_history():
     orderby = (~db.releases.is_final | ~db.releases.id)
     releases = db(db.releases.id > 0).select(orderby=orderby)
@@ -594,7 +539,7 @@ def release_history():
 
 
 
-@auth.requires_login()
+@auth.requires(lambda: auth_has_access())
 def test_history():
     orderby = (~db.releases.is_final | ~db.releases.id)
     releases = db(db.releases.id > 0).select(orderby=orderby)
@@ -611,3 +556,10 @@ def test_history():
     response.subtitle = T('Report')
     response.view = 'default/release_history.html'        
     return dict(releases=releases, history=history)
+
+
+@auth.requires(lambda: auth_has_access())
+def releases():
+    content = ONXFORM.make(db.releases)
+    breadcrumbs_add()
+    return content

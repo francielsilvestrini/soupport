@@ -36,7 +36,7 @@
                 <a href="{{= URL(c='tasks', f='task_detail.html', args=[row.id])}}" class="btn btn-small">
                     <i class="icon-eye-open"></i>&nbsp;{{= T('Detail')}}</a>
                 <a id="task_{{= row.id}}" href="javascript:void(0);" class="btn btn-small edit-task"><i class="icon-pencil"></i></a>
-                <a href="{{= URL(c='tasks', f='task.html', args=['remove', row.id])}}" class="btn btn-small"><i class="icon-trash"></i></a>
+                <a href="{{= URL(c='tasks', f='task.html', args=['delete', row.id])}}" class="btn btn-small"><i class="icon-trash"></i></a>
             </div>
         </div>
     </div>

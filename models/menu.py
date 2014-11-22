@@ -41,7 +41,7 @@ def create_menus():
         item = Storage(
             caption=caption,
             icon=icon,
-            url=URL(c=controller, f=function, vars=dict(origin='menu'), anchor='MENU'),
+            url=URL(c=controller, f=function, vars=dict(origin='menu')),
             new_record=(T('New %s'%caption),  URL(c=controller, f=function, args=['new'], vars=dict(origin='menu'))),
         )
         menus[name] = item

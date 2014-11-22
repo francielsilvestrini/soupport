@@ -39,5 +39,12 @@ $(function(){
             $('#sidebar').show('fast');
         });
 
+        var tboby =  $(".web2py_htmltable>table>tbody");
+        if(tboby) {
+            $(tboby).append('<tr><td class="row-empty">&nbsp;</td></tr>');
+            $(tboby).append('<tr><td class="row-empty">&nbsp;</td></tr>');
+            $(tboby).append('<tr><td class="row-empty">&nbsp;</td></tr>');
+        }
+        
     });
 });

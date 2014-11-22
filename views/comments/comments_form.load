@@ -4,7 +4,7 @@ owner_key  = getlist(request.args, 1)
 is_reply = request.vars.get('reply') != None
 }}
 
-<div id="comment_form">
+<div id="comment_form" class="comment-form">
     <div class="row-fluid">
         <div class="span1">
             <div style="width:64px; height:64px; max-width:64px; overflow:hidden;">

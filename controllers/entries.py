@@ -11,6 +11,7 @@ def index():
 
 @auth.requires(lambda: auth_has_access())
 def customer():
+    db.customer.note.readable = request.args(0) == 'delete'
     content = ONXFORM.make(db.customer)
     breadcrumbs_add()
     return content

@@ -11,6 +11,7 @@ def index():
     menus += [(T('Admin'), URL(f='admin'))]
     menus += [(T('Database'), URL(f='database'))]
     menus += [(T('Clear Cache'), URL(f='clear_cache'))]
+    menus += [(T('Users'), URL(f='users'))]
     return dict(menus=menus)
 
 
@@ -89,5 +90,14 @@ def clear_cache():
     return
 
 
+@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+def users():
+    menus = []
+    menus += [(T('Users'), URL(c='user', f='auth_user'))]
+    menus += [(T('Users Group'), URL(c='user', f='auth_group'))]
+    response.breadcrumbs = T('Users')
+    breadcrumbs_add()    
+    response.view = 'painel/index.html'
+    return dict(menus=menus)
 
 

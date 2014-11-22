@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from onx_views import ONXFORM 
 
 
 def user():
@@ -25,41 +26,50 @@ def user():
 
 @auth.requires(auth.has_membership(role=ADMIN_ROLE))
 def auth_user():
-    action = request.args(0) or ''
+    def do_manager_extra_links(self, row):
+        menu = [A(
+                SPAN(T('Groups')),
+                _href=URL(f='groups', args=['auth_user', row.id]))]
+        return menu
 
-    if action == '':
-        content = app_crud_grid(db.auth_user)
-    else:
-        attr = dict()
-        if action == 'new':
-            attr['next'] = URL(c='user', f='auth_user', args=['edit'])+'/[id]'
-        else:
-            next = URL(c='user', f='auth_user')
+    db.auth_user.photo.readable=False
+    db.auth_user.birthday.readable=False
+    db.auth_user.about.readable=False
 
-        content = app_crud(db.auth_user, **attr)
-    return dict(content=content)
+    oform = ONXFORM(db.auth_user)
+    oform.customize.on_manager_extra_links = do_manager_extra_links
+    content = oform.get_current_action()
+
+    breadcrumbs_add()   
+    return content
 
 
 @auth.requires(auth.has_membership(role=ADMIN_ROLE))
 def auth_group():
-    action = request.args(0) or ''
+    def do_manager_extra_links(self, row):
+        menu = [A(
+                SPAN(T('Members')),
+                _href=URL(f='groups', args=['auth_group', row.id]))]
+        return menu
 
-    if action == '':
-        content = app_crud_grid(db.auth_group)
-    else:
-        content = app_crud(db.auth_group, **dict(next=URL(c='user', f='auth_group')))
-    return dict(content=content)
+    oform = ONXFORM(db.auth_group)
+    oform.customize.on_manager_extra_links = do_manager_extra_links
+    content = oform.get_current_action()
+
+    breadcrumbs_add()    
+    return content
 
 
-def auth_groups():
+@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+def groups():
     owner_table = getlist(request.args, 0)
     owner_key  = getlist(request.args, 1)
     if not (owner_table and owner_key and owner_key.isdigit()):
         response.view = 'others/gadget_error.html'        
         return dict(msg='access control groups dont work!')
 
-    def getContentLocal():
-        if owner_table == 'user':
+    def get_content_local():
+        if owner_table == 'auth_user':
             return [(row.auth_group.id, row.auth_group.role, row.auth_membership.id or 0) for row in 
                 db().select(db.auth_group.ALL, db.auth_membership.id, 
                     left=db.auth_membership.on((db.auth_membership.group_id==db.auth_group.id) & (db.auth_membership.user_id == int(owner_key))))]
@@ -68,14 +78,26 @@ def auth_groups():
                 db().select(db.auth_user.ALL, db.auth_membership.id, 
                     left=db.auth_membership.on((db.auth_membership.user_id==db.auth_user.id) & (db.auth_membership.group_id == int(owner_key))))]
 
-    content = getContentLocal()
+    def get_owner_name():
+        if owner_table == 'auth_user':
+            name = db.auth_user._format % db(db.auth_user.id == int(owner_key)).select().first()
+        else:
+            name = db.auth_group._format % db(db.auth_group.id == int(owner_key)).select().first()
+        return name
+
+    content = get_content_local()
     fields = [Field('record_'+str(k), 'boolean') for k, d, m in content]
-    buttons = [INPUT(_type='submit', _value=T('Connect'), _class='btn')]
+
+    buttons = [
+        INPUT(_type='submit', _value=T('Connect'), _class='btn btn-success'),
+        A(T('Cancel'), _class='btn', _href=URL(f=owner_table)),
+        ]    
+
     form = SQLFORM.factory(*fields, buttons=buttons)
     if form.process(formname='auth_groups_form').accepted:
         for k, d, m in content:
             user_id, group_id = k, int(owner_key)
-            if owner_table == 'user':
+            if owner_table == 'auth_user':
                 user_id, group_id = int(owner_key), k
 
             checked = form.vars.get('record_'+str(k), False)
@@ -84,5 +106,8 @@ def auth_groups():
                     db.auth_membership.insert(user_id=user_id, group_id=group_id)
                 else:
                     db(db.auth_membership.id==m).delete()
-        content = getContentLocal()
+        redirect(URL(f=owner_table))
+    response.title = T('Groups') if owner_table == 'auth_user' else T('Members')
+    response.subtitle = get_owner_name()
+    breadcrumbs_add(title=response.title)    
     return dict(form=form, content=content)
