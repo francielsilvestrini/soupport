@@ -81,6 +81,7 @@ class NicEditorWidget(TextWidget):
     def widget(self, field, value, **attributes):
         NicEditorWidget.widget_files()
 
+        attributes['_class'] = 'span10'
         wgt_default = TextWidget.widget(field, value, **attributes)
         wgt_id = wgt_default.attributes.get('_id', 'no_id')
 
@@ -119,7 +120,8 @@ class LookupWidget(OptionsWidget):
     def widget(self, field, value, **attributes):
         LookupWidget.widget_files()
         
-        attributes['_style'] = 'width: 316px; height: 20px; margin-bottom: 14px;'
+        attributes['_class'] = 'span6'
+        attributes['_style'] = 'height: 20px; margin-bottom: 14px;'
         wgt_default = OptionsWidget.widget(field, value, **attributes)
         wgt_id = wgt_default.attributes.get('_id', 'no_id')
 
@@ -148,7 +150,9 @@ class MaskWidget(StringWidget):
 
     def widget(self, field, value, **attributes):
         MaskWidget.widget_files()
-        
+
+        attributes['_class'] = 'span4 string'
+        attributes['_placeholder'] = self.mask
         wgt_default = StringWidget.widget(field, value, **attributes)
         wgt_id = wgt_default.attributes.get('_id', 'no_id')
 
@@ -161,7 +165,7 @@ class MaskWidget(StringWidget):
             ''' % dict(field_name=wgt_id, mask=self.mask)
         jq_script=SCRIPT(js, _type="text/javascript")
 
-        wrapper = DIV(_class="MaskWidget") 
+        wrapper = DIV(_class="onx-widget MaskWidget") 
         wrapper.components.extend([wgt_default, jq_script])
         return wrapper
 

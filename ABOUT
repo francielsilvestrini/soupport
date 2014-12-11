@@ -1,56 +1,28 @@
-SOUPPORT
+SOUPPORT 
 
-/MUL --> management of user licenses
-	/platform    --> exemplo onnix erp (onnix erp e onnix fiscal)
-		#modules --> 02,04,08,16,32...
-	/contract    --> contrato entre o cliente e a plataforma
-		#modules --> modulos liberados no contrato
-	/history     --> historico do contrato eas liberações
-	
+zip -r filename.zip foldername/
+rm -rf foldername/
 
+enviar para github
+git add --all
+git commit -m "comentario"
+git push origin master
 
-
-
-onnixsistemas.com.br/A --> administração/desenvolvimento/solicitacoes/financeiro
-onnixsistemas.com.br/B
-	/dashbord --> resultados
-	/objects  --> config, cadastro de objetos
-	/others   --> outros cadastros e configs
-	/default  --> em teste ou ainda nao definidos
-	/history  --> historico do objeto
-	/sales_order
-	/object_mng
-	/comments --> gestao de comentarios
-	/attatchments --> 
-
-	/ToDo        --> lembretes ou coisas para fazer
-	/Message     --> mensagem de outro usuario
-	/Notify  	 --> notificação do sistema
-	/HistoryNote --> notas de historico, para o cliente no caso
-	/Bookmarks   --> links para sites do governo por exemplo
-	/Calendar    --> agendamento de eventos, ToDo pode gerar?
-	/Chat        --> bate papo com usuario do sistema
-	/SendMail    --> envio de email
-	/Ticket      --> criacao de tickets pelo cliente
-	/Tutorial    --> manual de como configurar o sistema por exemplo
+atualizar na kinghost
+git pull origin master
 
 
 
 GESTÃO DE EQUIPAMENTOS
-
+====== == ============
 Sistema para gerenciar despesas e receitas de equipamentos como: maquinas, veiculos, imoveis e objetos mensuravies.
-
 Um objeto pode ser novo ou usado, com prazo de validade, depreciavel ou valorizavel, prestador de serviço, operavel ou autonomo.
-
 Um objeto pode ser divido em partes independentes. Exemplo: um reboque faz parte de um caminhao, uma concha faz parte de um trator. Essas partes são gerenciadas de forma independente.
-
 Um objeto deve ser equipado, exemplo, um veiculo tem extintor, roda dianteria direita, roda dianteira esquerda, etc. Esses equipamentos tem validade, podem ser substituidos ou sofrer manutenção. Cada tipo de objeto terá suas propriedades, casa propriedade terá um tipo. Pneu dianteiro esquerdo deve aceitar ser equipado somente com itens do tipo pneu.
-
 Cada objeto tem suas proprias caracteristicas. Podem gerar receitas com fretes, alugueis, etc.
-
 Manutenção preventiva, agendada ou vencimento.
-
-Baixa de objetos por desuso, acidente, roubo, etc.
+Baixa de objetos por desuso, acidente, roubo, etc. sinistro
+Registrar dominio para o projeto.
 
 
 RESULTADOS ESPERADOS:
@@ -61,8 +33,6 @@ Saber quais manutenções estão vencidas ou a vencer.
 Historico dos objetos.
 Resultado por conta, exemplo gasto com combustivel de todos os objetos.
 Durabilidade de equipamentos
-
-
 
 
 Cadastrar tipo de itens (pneu, extintor, oleo motor, fluido de freio)
@@ -92,7 +62,6 @@ onnixsistemas.com.br/B
 	/Tutorial    --> manual de como configurar o sistema por exemplo
 	
 
-
 1) cadastrar um objeto, definir sua caracteristicas.
 2) equipar o objeto criado
 3) definir suas partes
@@ -115,45 +84,86 @@ Ao  acessar o GE dever verificar se o cliente esta pagando as mensalidades ou es
 Se vencido ou nao pago deverá redirecionar para www.onnixsistemas.com.br/A/accont?lic=hash, depois do login com qqr usuario do grupo admin
 
 
-MODELS
-no db.py criar chamadas para models especificos dos controllers exemplo: ModelComments.definetables()
-
-STATICS
-somente quando for algo bem especifico
-	/comments/js
-	/comments/css
-
-====================
-
-auth/login
-auth/user
+/MUL --> management of user licenses
+	/platform    --> exemplo onnix erp (onnix erp e onnix fiscal)
+		#modules --> 02,04,08,16,32...
+	/contract    --> contrato entre o cliente e a plataforma
+		#modules --> modulos liberados no contrato
+	/history     --> historico do contrato eas liberações
+	
 
 
+GESTÃO DE FROTA
+====== == =====
+cadastro do veiculo
+id
+placa
+descricao
+modelo
+grupo
+inicio do controle
+hodometro inicial
 
-zip -r filename.zip foldername/
-rm -rf foldername/
-
-enviar para github
-git add --all
-git commit -m "comentario"
-git push origin master
-
-atualizar na kinghost
-git pull origin master
-
-
-Novo projeto de gestao
-conexao com bd
-definicao do banco do projeto
-criacao do menu de acesso
-validação de permissao de usuario
+>> combustivel principal
+combustivel
+capacidade do tanque
+tipo do consumo: km/lt | lt/hr
+consumo padrao
 
 
-soupport
-	crm
-	task
-	mul
+#documentacao do veiculo
+veiculo
+chassi
+renavan
 
-ge
-	crm
-	equipaments
+
+
+
+unidade de medida/carga
+
+
+
+#inventory
+id
+nunber
+description
+is_active
+type -> vehicle
+
+#vehicle
+id
+inventory_id
+model_id
+renavan
+chassi
+docs
+odometer_start
+odometer_current
+acquisition_date
+car_value
+
+>additional properties
+seats number
+doors number
+color
+
+> engine options
+transmission
+fuel type
+co2 emissions
+horsepower
+horsepower taxation
+power
+
+
+
+
+#supply
+#fine
+#sinistro
+#historico_uso mudança do hodometro
+
+
+
+
+

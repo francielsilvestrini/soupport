@@ -61,7 +61,16 @@ def formstyle_onx(form, fields):
         # wrappers
         _help = SPAN(help, _class='help-block')
         # embed _help into _controls
-        _controls = DIV(controls, _help, _class='controls')
+
+        if isinstance(controls, DIV):
+            wgt = controls.elements('.onx-widget')        
+            if wgt:
+                controls.insert(1,_help)
+                _controls = DIV(controls, _class='controls')
+            else:
+                _controls = DIV(controls, _help, _class='controls')
+        else:
+            _controls = DIV(controls, _help, _class='controls')
         # submit unflag by default
         _submit = False
 
@@ -84,7 +93,7 @@ def formstyle_onx(form, fields):
             controls.add_class('span4')
 
         if isinstance(controls, TEXTAREA):
-            controls.add_class('span4')
+            controls['_class'] = 'text span6'
 
         if isinstance(label, LABEL):
             label['_class'] = 'control-label'
@@ -158,14 +167,11 @@ class ONXFORM(object):
         vredirect = url_vars.get('redirect')
         vnext = url_vars.get('next') or url_vars.get('_next')
         vprevious= url_vars.get('previous') or url_vars.get('_previous')
-        if 'breadcrumbs' in session:
-            last_url = session.breadcrumbs.last_url()
-        else:
-            last_url = None
-        current_url = URL(c=request.controller, f=request.function, vars=url_vars)
+
+        current_url = URL(r=request, vars=url_vars)
         
-        next = vnext or vredirect or last_url or current_url
-        previous = vprevious or vredirect or last_url or current_url
+        next = vnext or vredirect or current_url
+        previous = vprevious or current_url
 
         navegate = Storage(
             next=next,
@@ -200,18 +206,23 @@ class ONXFORM(object):
         buttons = self._form_buttons()
 
         self.customize.on_before_init(self, action)
-        form = SQLFORM(
-            self.table,
-            buttons=buttons,
-            formstyle=formstyle_onx,
-            fields=self.customize.on_fields_list(self, action),
-            )
-        self.customize.on_after_init(self, form, action)
 
         attr = dict()
         if not self.is_modal:
             attr['next'] = self.nav.next
         attr['onsuccess'] = self.customize.on_form_success
+        if attr.get('next'):
+            hidden = dict(_next=attr.get('next'))
+        else:
+            hidden = None           
+        form = SQLFORM(
+            self.table,
+            buttons=buttons,
+            formstyle=formstyle_onx,
+            fields=self.customize.on_fields_list(self, action),
+            hidden=hidden
+            )
+        self.customize.on_after_init(self, form, action)
 
         if form.process(**attr).accepted:
             response.flash = T('Record Created')
@@ -284,6 +295,16 @@ class ONXFORM(object):
 
         buttons = self._form_buttons()
 
+        attr = dict()
+        if not self.is_modal:
+            attr['next'] = self.nav.next
+        attr['onsuccess'] = self.customize.on_form_success
+
+        if attr.get('next'):
+            hidden = dict(_next=attr.get('next'))
+        else:
+            hidden = None        
+
         self.customize.on_before_init(self, action)
         form = SQLFORM(
             table,
@@ -292,13 +313,9 @@ class ONXFORM(object):
             deletable=False,
             formstyle=formstyle_onx,
             fields=self.customize.on_fields_list(self, action),
+            hidden=hidden
             )
         self.customize.on_after_init(self, form, action)
-
-        attr = dict()
-        if not self.is_modal:
-            attr['next'] = self.nav.next
-        attr['onsuccess'] = self.customize.on_form_success
 
         if form.process(**attr).accepted:
             response.flash = T('Record Updated')
@@ -401,26 +418,7 @@ class ONXFORM(object):
         links = [lambda row: self.grid_menu(row)]
         return links
 
-
-    def do_grid_select(self):
-        response = current.response
-        T = current.T
-        action = 'select'
-
-        response.title = T(self.table._plural)
-        response.subtitle = T('Listing')
-        response.breadcrumbs = response.title
-
-        exportclasses = dict(
-            csv_with_hidden_cols=False,
-            json=False,
-            tsv_with_hidden_cols=False,
-            tsv=False
-        )    
-
-        links = self.grid_links()
-
-        ui = dict(
+    ui = dict(
             widget='',
             header='',
             content='',
@@ -438,6 +436,23 @@ class ONXFORM(object):
             buttontable='icon rightarrow',
             buttonview='icon magnifier'
             )
+    def do_grid_select(self):
+        response = current.response
+        T = current.T
+        action = 'select'
+
+        response.title = T(self.table._plural)
+        response.subtitle = T('Listing')
+        response.breadcrumbs = response.title
+
+        exportclasses = dict(
+            csv_with_hidden_cols=False,
+            json=False,
+            tsv_with_hidden_cols=False,
+            tsv=False
+        )    
+
+        links = self.grid_links()
 
         self.customize.on_before_init(self, action)
         grid = SQLFORM.grid(
@@ -469,7 +484,7 @@ class ONXFORM(object):
             #onupdate=None,
             #ondelete=None,
             #sorter_icons=(XML('&#x2191;'), XML('&#x2193;')),
-            ui=ui,
+            ui=ONXFORM.ui,
             #showbuttontext=True,
             _class="table table-condensed table-condensed table-hover",
             #formname='web2py_grid',
@@ -492,6 +507,7 @@ class ONXFORM(object):
         request = current.request
 
         action = request.args(0) or 'select'
+
         if action not in ONXFORM.ACTIONS:
             raise HTTP(404, 'Action "%s" not found!' % action)
         return action
@@ -568,3 +584,10 @@ class Breadcrumbs(object):
         else:
             u = None
         return u
+
+    def prior_url(self):
+        if len(self.items)>1:
+            t, u = self.items[-2]
+        else:
+            u = None
+        return u        

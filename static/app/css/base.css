@@ -351,3 +351,31 @@ table .select_col {
 div.comment-form form {
     margin-right: 20px;
 }
+
+.onx-col-header {
+  font-weight: bold;
+  font-size: 85%;
+}
+
+.onx-col-mobile {
+  display: none;
+}
+
+div.thumbnail:hover {
+  border-color: #81A74C;
+  outline: 0;
+  outline: thin dotted \9;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #92C65F;
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #92C65F;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #92C65F;  
+}
+
+@media only screen and (max-width: 700px) {
+    .onx-col-desktop {
+      display: none;
+    }
+    .onx-col-mobile {
+      display: inline-block;
+      width: 30%;
+    }
+}

@@ -1,1 +1,16 @@
 {{extend 'layouts/main.html'}}
+
+<div class="block block-main">
+    <div class="row-fluid">
+        <ul class="thumbnails" style="margin:5px;">
+        {{accordion_menu = project.sidebar.accordion_menu}}
+        {{for caption, url, icon, items in accordion_menu:}}
+            {{for kitem in items:}}
+            <li><a href="{{= kitem.url}}" class="thumbnail">
+                <i class="{{= kitem.icon }}"></i>&nbsp;{{= kitem.caption}}</a>
+            </li>
+            {{pass}}
+        {{pass}}     
+        </ul>
+    </div>
+</div>

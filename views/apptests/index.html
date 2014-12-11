@@ -1,10 +1,21 @@
 {{extend 'layouts/basic.html'}}
 
 
+  {{
 
-  
-  <link rel="stylesheet" type="text/css" href="{{=URL('static','responsive-tables.css')}}" />
-  <script src="{{=URL('static','responsive-tables.js')}}"></script>
+  t0 = '2014-12-03'
+  form = FORM(TABLE(TR
+            (TH('BEG PLAN START DATE'), INPUT(_name='begpstrtdt', _class='date', requires=IS_DATE(), _value=t0, _style="width: 100px;")),
+            (TH('END PLAN START DATE'), INPUT(_name='endpstrtdt', _class='date', requires=IS_DATE(), _value=t0, _style="width: 100px;")),
+            TR('Group',INPUT(_name='group', _id='group', requires=IS_IN_SET(['YES', 'NO']))),         
+            TR('Email Results?',INPUT(_name='emailflg', _id='emailflg', _type='checkbox', _value='0')),
+            TR('Show Query?',INPUT(_name='qryflg', _id='qryflg', _type='checkbox', _value='1', _checked="checked", 
+             _onclick="if(jQuery('#qryflg').prop('checked')) jQuery('#qryinfo').show(); else jQuery('#qryinfo').hide();")),              
+            TR('Show Debug?',INPUT(_name='dbgflg', _id='dbgflg', _type='checkbox', _value='1', _checked="checked",
+             _onclick="if(jQuery('#dbgflg').prop('checked')) jQuery('#dbginfo').show(); else jQuery('#dbginfo').hide();")),
+            TR(INPUT(_type='submit',_value='Submit'))
+            ))
 
+}}
 
-  {{= content}}
+{{= form}}

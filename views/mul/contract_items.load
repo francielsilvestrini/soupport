@@ -1,0 +1,80 @@
+{{if len(content):}}
+    {{row = content[0]}}
+<div class="row-fluid onx-col-header onx-col-desktop">
+    <div class="span5">
+        {{= row.label.product_id}}
+    </div>
+    <div class="span1">
+        {{= row.label.is_active}}
+    </div>
+    <div class="span2">
+        {{= row.label.validate}}
+    </div>
+    <div class="span3">
+        {{= row.label.licence_key}}
+    </div>
+    <div class="span1">
+    </div>
+</div>
+{{pass}}
+
+{{for row in content:}}
+<div class="row-fluid onx-row">
+    <div class="span5">
+        <span class="onx-col-header onx-col-mobile">{{= row.label.product_id}}</span>
+        <a id="item_{{=row.id}}" href="javascript:void(0);" class="edit-item">
+        {{= row.repr.product_id}}
+        </a>
+    </div>
+    <div class="span1">
+        <span class="onx-col-header onx-col-mobile">{{= row.label.is_active}}</span>
+        {{= row.repr.is_active}}
+    </div>
+    <div class="span2">
+        <span class="onx-col-header onx-col-mobile">{{= row.label.validate}}</span>
+        {{= row.repr.validate}}
+    </div>
+    <div class="span3">
+        <span class="onx-col-header onx-col-mobile">{{= row.label.licence_key}}</span>
+        {{= row.repr.licence_key}}
+    </div>
+    <div class="span1">
+        <div class="pull-right">
+            <a href="javascript:void(0);"
+                title="{{= T('Remove Item')}}" 
+                data-placement="buttom"
+                data-toggle="tooltip"
+                onclick="contract_item_remove({{= row.id}})"
+                class="btn btn-small">
+                <i class="icon icon-trash"></i>
+            </a>
+        </div>
+    </div>
+</div>
+{{pass}}
+{{if len(content) == 0:}}
+<div class="well">
+    {{= T('Click in "Add Item" to add...') }}
+</div>
+{{pass}}
+
+{{contract_id = request.args[0]}}
+<script type="text/javascript">
+$(document).ready(function() {
+    $(".edit-item").click(function () {
+        var str = $(this).get(0).id;
+        var id = str.split("_")[1];
+        var parent = $("#dialog_modal-label").parent();
+        $("#dialog_modal-label").remove();
+        $(parent).append("<h3 id='dialog_modal-label'>{{= T('Contract Item')}}</h3>");
+
+        $.web2py.component("{{= URL(f='contract_item.load', args=[contract_id])}}/"+id, "dialog_modal-form");
+        $("#dialog_modal").modal("show");
+    });      
+
+});        
+function contract_item_remove(record_id) {
+    var url = '{{= URL(f="contract_item_remove", args=[contract_id])}}/'+record_id;
+    ajax(url, [], '');
+}
+</script>

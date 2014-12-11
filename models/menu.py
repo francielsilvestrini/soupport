@@ -113,6 +113,20 @@ def create_menus():
         function='auth_user',
         apps=['soupport'],
         )
+    append_menu(
+        name='mul_product', 
+        caption=T('Product'), 
+        controller='mul', 
+        function='product',
+        apps=['soupport'],
+        ) 
+    append_menu(
+        name='mul_contract', 
+        caption=T('Contract'), 
+        controller='mul', 
+        function='contract',
+        apps=['soupport'],
+        )             
     return
 
 
@@ -166,6 +180,24 @@ def sidebar_entries():
     return Storage(toplinks=toplinks, accordion_menu=accordion_menu)
 
 
+def sidebar_mul():
+    toplinks = [
+        (T('Home'), URL(c='mul', f='index'), 'icon-home'),
+        ]
+
+    accordion_menu = [
+        (T('MUL'), 'accordion_entries', 'icon-folder-open',  [
+            menus.mul_product,
+            menus.mul_contract,
+            menus.customer,
+
+            ]),
+
+        ]
+
+    return Storage(toplinks=toplinks, accordion_menu=accordion_menu)
+
+
 #projects = {'project_name':(caption, index_page, admin_required, navbar),}
 response.projects = Storage(
     tasks=Storage(
@@ -192,6 +224,6 @@ response.projects = Storage(
         caption=T('Management of User Licenses'),
         url=URL(c='mul', f='index'),
         admin_required=False, 
-        sidebar=None),
+        sidebar=sidebar_mul()),
     )
 response.project_default = 'activity'

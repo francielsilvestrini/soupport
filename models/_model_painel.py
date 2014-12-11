@@ -9,6 +9,7 @@ class PainelModel(ModelBase):
         db.define_table('painel',
             Field('name', 'string', label=T('Name')),
             Field('last_update', 'integer', label=T('DB Update Sequence')),
+            Field('winning_factor', 'date', label=T('Winning Factor')),            
             migrate='painel.table',
             format='%(name)s')
         db.painel.name.default = 'Painel'

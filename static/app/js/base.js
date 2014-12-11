@@ -8,7 +8,8 @@ $(function(){
 
         $('.tooltip-top').tooltip({ placement: 'top' });
 
-        $("a[data-toggle='tooltip']").tooltip({ placement: 'top' });
+        $("a[data-toggle='tooltip']").tooltip({ });
+        $("span[data-toggle='tooltip']").tooltip({ });
 
         $("a[data-action='launchFullscreen']").click(function () {
             if (screenfull.isFullscreen) {

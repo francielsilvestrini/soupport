@@ -24,8 +24,8 @@ auth.settings.logout_next = URL(c='default', f='index')
 from gluon.tools import Crud
 crud = Crud(db)
 
-#from gluon.tools import Service
-#service = Service()
+from gluon.tools import Service
+service = Service()
 
 #from gluon.tools import PluginManager
 #plugins = PluginManager()
