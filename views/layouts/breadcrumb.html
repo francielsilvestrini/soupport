@@ -22,3 +22,15 @@
         </ul>
     </div>
 </div>
+
+<!-- page alert -->
+<div class="row-fluid">
+{{for title, alert, alert_class in response.page_alerts:}}
+    <div class="alert alert-{{= alert_class}}" style="margin-bottom: 0px; margin-top: 10px;" >
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <h4>{{= XML(title)}}</h4>
+        <p>{{= XML(alert)}}</p>
+    </div>
+{{pass}}
+</div>
+<!-- /page alert -->

@@ -1,0 +1,69 @@
+{{extend 'layouts/main.html'}}
+
+<!-- main view -->
+{{
+    target = 'components'
+    owner_table = request.args[0]
+    owner_key = request.args[1]
+    item_selected = int( request.vars.get('selected', 0) )
+    new_vars = ONXFORM.get_new_vars(request.get_vars)
+}}
+<div class="row-fluid">
+    <div class="{{= 'span6' if len(controls) else 'span12'}}">
+
+    <div class="block">
+        
+        <div class="navbar navbar-inner block-header">
+            <div class="muted pull-left" style="padding-top:0px;">{{= caption}}</div>
+            <div class="pull-right">
+                <a class="btn btn-primary {{=target}}-edit"
+                    href="javascript:void(0);"
+                    data-id="0">
+                    {{= T('Add Component')}}
+                </a>
+            </div>
+        </div>
+
+        <div class="block-record collapse in" style="padding:10px;">
+            <div class="row-fluid"> 
+            {{if len(items):}}
+                <ul class="nav nav-pills nav-stacked">
+                {{for row in items:}}
+                {{new_vars['selected'] = row.id}}
+                    <li {{= 'class=active' if item_selected == row.id else ''}}>
+                        <a href="{{= URL(args=[owner_table, owner_key], vars=new_vars)}}">
+                        {{= row.repr.component_id}}
+                        </a>
+                    </li>
+                {{pass}}
+                </ul>
+            {{else:}}
+                <div class="well">{{= T('No components managed')}}</div>
+            {{pass}}
+            </div>    
+        </div>
+    </div>
+
+
+    </div>
+    {{if len(controls):}}
+    <div class="span6">
+        {{for ctrl in controls:}}
+        {{= ctrl}}
+        {{pass}}
+    </div>
+    {{pass}}
+</div>
+
+<script type="text/javascript">
+$(document).ready (function () {
+    $(".{{= target}}-edit").click(function () {
+        var item_id = $(this).attr("data-id");
+        $("#dialog_modal-label").text("{{= T('Add Component')}}");
+        $.web2py.component("{{= URL(f='add_component.load', args=request.args)}}/"+item_id, "dialog_modal-form");
+        $("#dialog_modal").modal("show");
+    });      
+  
+});
+</script>
+<!-- /main view -->

@@ -24,9 +24,7 @@
                 <ul class="dropdown-menu">
                 {{for k in response.projects:}}
                     {{prj = response.projects[k]}}
-                    {{if not prj.get('admin_required', False) or auth.has_membership(role=ADMIN_ROLE):}}
                     <li><a href="{{= prj.get('url')}}">{{= prj.get('caption')}}</a></li>
-                    {{pass}}
                 {{pass}}
                 </ul>
             </div>

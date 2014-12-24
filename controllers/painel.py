@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from onx_views import ONXFORM 
-
 
 @auth.requires(auth.has_membership(role=ADMIN_ROLE))
 def index():
@@ -12,6 +10,7 @@ def index():
     menus += [(T('Database'), URL(f='database'))]
     menus += [(T('Clear Cache'), URL(f='clear_cache'))]
     menus += [(T('Users'), URL(f='users'))]
+    menus += [(T('Development'), URL(f='development'))]
     return dict(menus=menus)
 
 
@@ -101,3 +100,42 @@ def users():
     return dict(menus=menus)
 
 
+@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+def development():
+    menus = []
+    menus += [(T('Translate'), URL(f='translate'))]
+    response.breadcrumbs = T('Development')
+    breadcrumbs_add()    
+    response.view = 'painel/index.html'
+    return dict(menus=menus)
+
+
+@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+def translate():
+    response.breadcrumbs = T('Translate')
+    breadcrumbs_add()    
+
+    fname = os.path.join(request.folder, 'languages','pt-br.py')
+    ins = open( fname, "r" )
+    array = []
+    separator = '\': \''
+    for i, line in enumerate(filter(lambda s: separator in s, ins)):
+
+        fields = line.split('\': \'')
+        original = fields[0][1:]
+        language = fields[1][0:-3]
+
+        array.append( (i, original, language) )
+    ins.close()
+
+    rows = []
+    for i, original, language in array:
+        rows += [TR(
+            P(original),
+            TEXTAREA(language, _name='key_%s'%i)
+            )]
+    form = FORM(TABLE(rows, _class='table table-bordered'), INPUT(_type='submit'))
+    if form.process().accepted:
+        print 'sucess'
+
+    return dict(content=form)

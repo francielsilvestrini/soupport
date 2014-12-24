@@ -1,0 +1,43 @@
+{{extend 'layouts/child.load'}}
+
+{{block declare_vars}}
+{{
+    target = request.function
+    parent_id = request.args(1)
+    captions = (T('Groove Annotation'), T('Groove Annotation'))
+    caption_new_btn = T('Add Annotation')
+    url_edit = URL(c='tire_control', f=target, args=['edit',parent_id] )    
+    url_remove = URL(c='tire_control', f=target, args=['remove', parent_id])
+}}
+{{end}}
+
+<table class="table table-condensed table-hover">
+    <thead>
+        <tr>
+            {{if len(content):}}
+            <th>{{= content[0].label.annotation_date}}</th>
+            <th>{{= content[0].label.groove}}</th>
+            <th>{{= content[0].label.vehicle_id}}</th>
+            <th>{{= content[0].label.odometer}}</th>
+            <th>{{= content[0].label.distance}}</th>
+            <th>{{= content[0].label.note}}</th>
+            <th></th>
+            {{pass}}
+        </tr>
+    </thead>
+    <tbody>
+        {{for row in content:}}
+        <tr>
+            <td>{{= row.repr.annotation_date}}</td>
+            <td>{{= row.repr.groove}}</td>
+            <td>{{= row.repr.vehicle_id}}</td>
+            <td>{{= row.repr.odometer}}</td>
+            <td>{{= row.repr.distance}}</td>
+            <td>{{= row.repr.note}}</td>
+            <td>
+                {{include 'others/child_item_buttons.html'}}
+            </td>
+        </tr>
+        {{pass}}
+    </tbody>
+</table>

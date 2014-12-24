@@ -1,0 +1,22 @@
+{{extend 'others/form_children.html'}}
+
+
+{{block footer_form}}
+    {{super}}
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $("#O1_inventory_item_item_type").change(function() {
+            var value = $(this).val();
+            if (value == 'tire') {
+                $("#O1_inventory_item_initial_groove__row").show();
+                $("#O1_inventory_item_end_groove__row").show();
+            } else {
+                $("#O1_inventory_item_initial_groove__row").hide();
+                $("#O1_inventory_item_end_groove__row").hide();
+            }
+        });
+        $("#O1_inventory_item_item_type").trigger("change");
+    });
+    </script>
+{{end}}

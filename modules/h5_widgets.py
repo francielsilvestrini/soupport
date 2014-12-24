@@ -111,6 +111,10 @@ class NicEditorWidget(TextWidget):
 from gluon.sqlhtml import OptionsWidget
 class LookupWidget(OptionsWidget):
 
+    def __init__(self, width=None):
+        self.width = width
+        return
+
     @staticmethod
     def widget_files():
         current.session.page.header_files['select2.css'] = URL('static','assets/select2-3.5.1/select2.css')
@@ -120,8 +124,12 @@ class LookupWidget(OptionsWidget):
     def widget(self, field, value, **attributes):
         LookupWidget.widget_files()
         
-        attributes['_class'] = 'span6'
+        if not self.width:
+            attributes['_class'] = 'span6'
         attributes['_style'] = 'height: 20px; margin-bottom: 14px;'
+        if self.width:
+            attributes['_style'] += 'width:%s;' % self.width
+
         wgt_default = OptionsWidget.widget(field, value, **attributes)
         wgt_id = wgt_default.attributes.get('_id', 'no_id')
 

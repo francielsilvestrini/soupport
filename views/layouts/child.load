@@ -1,0 +1,47 @@
+{{block declare_vars}}
+
+{{end}}
+
+<!-- {{= target}} -->
+<div id="{{= target}}-load" class="row-fluid">
+        <div class="block">
+            <div class="navbar navbar-inner block-header">
+                <div class="muted pull-left">{{= captions[0]}}</div>
+                <div class="pull-right">
+                    {{if caption_new_btn:}}
+                    <a class="btn btn-primary {{= target}}-edit"
+                        href="javascript:void(0);"
+                        data-id="0">
+                        {{= caption_new_btn}}
+                    </a>
+                    {{pass}}
+                </div>
+            </div>
+            <div class="block-record collapse in">
+                {{include}}
+            </div>
+        </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready (function () {
+    $(".{{= target}}-edit").click(function () {
+        $("#dialog_modal-label").text("{{= captions[1]}}");
+        var item_id = $(this).attr("data-id");
+        $.web2py.component("{{= url_edit}}/"+item_id, "dialog_modal-form");
+        $("#dialog_modal").modal("show");
+    });      
+    $(".{{= target}}-remove").confirm({
+        text: w2p_ajax_confirm_message,
+        title: "{{= captions[1]}}",
+        confirm: function(button) {
+            var item_id = $(button).attr("data-id");
+            var url = "{{= url_remove}}/"+item_id;
+            ajax(url, [], '');
+        },
+    });
+
+    $("a[data-toggle='tooltip']").tooltip({ });    
+});
+</script>
+<!-- /{{= target}} -->

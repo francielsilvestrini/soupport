@@ -18,22 +18,22 @@ only screen and (max-width: 700px),
         z-index: 1;
     }
 
-    div:not(.calendar) table, 
-    div:not(.calendar) thead, 
-    div:not(.calendar) tbody, 
-    div:not(.calendar) th, 
-    div:not(.calendar) td, 
-    div:not(.calendar) tr {
+    div.resp-table table, 
+    div.resp-table thead, 
+    div.resp-table tbody, 
+    div.resp-table th, 
+    div.resp-table td, 
+    div.resp-table tr {
         display: block;
     }
 
-    div:not(.calendar) thead tr {
+    div.resp-table thead tr {
         position: absolute;
         top: -9999px;
         left: -9999px;
     }
 
-    div:not(.calendar) td {
+    div.resp-table td {
         border: none;
         position: relative;
         padding: 0px 0px 0px 45%;
@@ -42,19 +42,19 @@ only screen and (max-width: 700px),
         width: 60%;
     }
     
-    div:not(.calendar) form td {
+    div.resp-table form td {
         padding: 0px 0px 0px 0px;
         width: auto;
         overflow: visible;
         text-overflow: ;
     }
     
-    div:not(.calendar) tr { 
+    div.resp-table tr { 
         border-bottom: 1px solid #eee; 
         margin-bottom: 3px;
     }
     
-    div:not(.calendar) form tr { 
+    div.resp-table form tr { 
         border-bottom: none; 
         margin-bottom: 0;
     }

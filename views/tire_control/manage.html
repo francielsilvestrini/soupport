@@ -1,0 +1,58 @@
+{{extend 'layouts/main.html'}}
+
+<!-- main view -->
+<div class="row-fluid">
+    <div class="{{= 'span6' if len(tire_controls) else 'span12'}}">
+
+    <div class="block">
+        
+        <div class="navbar navbar-inner block-header">
+            <div id="teste" class="brand pull-left">
+                <a href="{{=URL(c='fleet', f='vehicle', args=['read', control.O2_vehicle.id])}}">
+                {{= control.O2_vehicle.repr.licence_plate}} <small>&nbsp;{{= control.O2_vehicle.repr.description}}</small>
+                </a>
+            </div>            
+            <div class="pull-right">
+                <ul id="odometer_tab" class="nav nav-tabs">
+                    <li class="dropdown">
+                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class='fa fa-bars'></i></a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="{{= URL(c='tire_control', f='groove_annotation_print', args=[control.O3_tire_control.id], vars=request.vars)}}">
+                                    {{= T('Print Groove Annotation')}}
+                                </a>
+                            </li>
+                            <li>
+                                {{
+                                new_vars = ONXFORM.get_new_vars(request.get_vars, remove_keys=['option', 'selected'])
+                                new_vars['redirect'] = current_url()
+                                }}
+                                <a href="{{= URL(c='tire_control', f='change_chassi', vars=new_vars)}}">
+                                {{= T('Change Chassi')}}</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="block-record collapse in">
+            <p class="muted"><small>{{= control.O3_chassi.name }}</small></p>
+            <div class="tc-layout">
+                {{= table}}
+            </div>
+        </div>
+    </div>
+
+
+    </div>
+    {{if len(tire_controls):}}
+    <div class="span6">
+        {{for ctrl in tire_controls:}}
+        {{= ctrl}}
+        {{pass}}
+    </div>
+    {{pass}}
+</div>
+<!-- /main view -->

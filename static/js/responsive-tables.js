@@ -11,26 +11,26 @@ jQuery(window).resize(function() {
 
 function set_table_headers(){
 	if (jQuery(document).width() < 700) {
-		jQuery("div").not("form").children("table").each(function() {
-	   	curtable = jQuery(this);
-	   	curtable.find("td:empty").html("&nbsp;");
-	   	curhead = curtable.find("thead > tr > th");
-	   	if (curhead.length > 0) {
-	   		tdcount = curtable.find("tbody > tr:eq(0) > td").length
-	   		for (index = 1; index <= tdcount; index++){
-	   			curth = curhead.eq(index-1).html();
-		   		curth = (curth != null) ? curth : '&nbsp;';
-		   		curtable.find("tbody > tr > td:nth-of-type("+index+")")
-		   			.before('<span class="resp-header">' + curth + '</span>');
-	   		}
-		}
-		else {
-			curtable.find("td").css({
-			'padding-left': '0',
-        	'width': 'auto',
-        	'left': '3px'
-			});
-		}
+		jQuery("div.resp-table").not("form").children("table").each(function() {
+		   	curtable = jQuery(this);
+		   	curtable.find("td:empty").html("&nbsp;");
+		   	curhead = curtable.find("thead > tr > th");
+		   	if (curhead.length > 0) {
+		   		tdcount = curtable.find("tbody > tr:eq(0) > td").length
+		   		for (index = 1; index <= tdcount; index++){
+		   			curth = curhead.eq(index-1).html();
+			   		curth = (curth != null) ? curth : '&nbsp;';
+			   		curtable.find("tbody > tr > td:nth-of-type("+index+")")
+			   			.before('<span class="resp-header">' + curth + '</span>');
+		   		}
+			}
+			else {
+				curtable.find("td").css({
+				'padding-left': '0',
+	        	'width': 'auto',
+	        	'left': '3px'
+				});
+			}
 	   	});
 	}
 }

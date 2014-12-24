@@ -1,0 +1,16 @@
+{{extend 'layouts/form.html'}}
+
+{{= content}}
+
+{{block footer_form}}
+
+{{if request.args(0) in['read']:}}
+    {{children = globals().get('children', None) }}
+    {{if children:}}
+        {{for child in children:}}
+            {{= child}}
+        {{pass}}
+    {{pass}}
+{{pass}}
+
+{{end}}

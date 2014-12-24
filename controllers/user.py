@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from onx_views import ONXFORM 
 
 
 def user():

@@ -1,0 +1,107 @@
+name;subsystem;unit;type
+Álcool;Combustíveis;lt;fuel
+Diesel;Combustíveis;lt;fuel
+Energia Elétrica;Combustíveis;lt;fuel
+Gasolina;Combustíveis;lt;fuel
+GLP;Combustíveis;lt;fuel
+GNV;Combustíveis;lt;fuel
+Óleo do motor;Motor;lt;lubricant
+Fluido de arrefecimento;Arrefecimento;lt;lubricant
+Fluido de freio;Freios;lt;lubricant
+Distribuidor de combustíveis;Abastecimento de Combustível;km;material
+Carburador;Abastecimento de combustível;km;material
+Cárter;Motor;km;material
+Freio motor;Motor;km;material
+Fluido de embreagem;Motor;km;material
+Pistão;Motor;km;material
+Bomba de óleo;Motor;km;material
+Filtro de óleo;Motor;km;material
+Correia dentada;Motor;km;material
+Pedal da embreagem;Câmbio;km;material
+Disco de embreagem;Câmbio;km;material
+Catalisador;Escape;km;material
+Escape e suporte de fixação;Escape;km;material
+Diferencial;Transmissão;km;material
+Cardam;Transmissão;km;material
+Planetárias;Transmissão;km;material
+Mangueira de refrigeração;Arrefecimento;km;material
+Radiador;Arrefecimento;km;material
+Tanque de água;Arrefecimento;km;material
+Filtro de ar;Arrefecimento;km;material
+Duto de ar;Arrefecimento;km;material
+Turbina;Arrefecimento;km;material
+Compressor de ar;Arrefecimento;km;material
+Lonas de freio;Freios;km;material
+Pedal de freio;Freios;km;material
+Tambor de freio;Freios;km;material
+Pastilhas de freio;Freios;km;material
+Rolamentos;Freios;km;material
+Freio a tambor;Freios;km;material
+Disco de freio;Freios;km;material
+Válvula estacionária;Freios;km;material
+Câmara;Rodas e pneus;km;material
+Roda;Rodas e pneus;km;material
+Protetor;Rodas e pneus;km;material
+Bico;Rodas e pneus;km;material
+Pneus;Rodas e pneus;km;material
+Amortecedor;Suspensão;km;material
+Mola parabólica;Suspensão;km;material
+Erguedor de eixo;Suspensão;km;material
+Balança;Suspensão;km;material
+Correias e tensores;Suspensão;km;material
+Feixe de molas;Suspensão;km;material
+Caixa de direção;Direção;km;material
+Portas;Funilaria;km;material
+Vidros;Funilaria;km;material
+Terminal de direção (Bucha);Direção;km;material
+Barra estabilizadora;Direção;km;material
+Vela de ignição;Armazenamento elétrico;km;material
+Caixa de ignição;Armazenamento elétrico;km;material
+Distribuidor;Armazenamento elétrico;km;material
+Baterias;Armazenamento elétrico;km;material
+Motor de partida;Armazenamento elétrico;km;material
+Alternador;Armazenamento elétrico;km;material
+Starter;Armazenamento elétrico;km;material
+Iluminação traseira;Iluminação;km;material
+Farol;Iluminação;km;material
+Iluminação lateral;Iluminação;km;material
+Horímetro;Indicadores e medidores;km;material
+Bomba de Combustível;Indicadores e medidores;km;material
+Tacógrafo (hodômetro);Indicadores e medidores;km;material
+Chave de seta;Indicadores e medidores;km;material
+Alarme e sirene;Indicadores e medidores;km;material
+Painel de comando;Indicadores e medidores;km;material
+Termostato;Indicadores e medidores;km;material
+Retrovisores;Funilaria;km;material
+Motor da janela;Funilaria;km;material
+Para-brisa;Funilaria;km;material
+Capô;Funilaria;km;material
+Palheta do para-brisa;Funilaria;km;material
+Teto;Funilaria;km;material
+Filtro de Combustível;Abastecimento de combustível;km;material
+Mangueiras de combustível;Abastecimento de combustível;km;material
+Mão-de-obra mecânico;Mão-de-obra;hr;service
+Mão-de-obra funileiro;Mão-de-obra;hr;service
+Mão-de-obra borracheiro;Mão-de-obra;hr;service
+Mão-de-obra eletricista;Mão-de-obra;hr;service
+Mão-de-obra de limpeza;Mão-de-obra;hr;service
+Mão-de-obra;Mão-de-obra;hr;service
+Lavação externa;Atividades;hr;service
+Pintura;Atividades;hr;service
+Cristalização;Atividades;hr;service
+Polimento;Atividades;hr;service
+Higienização interna;Atividades;hr;service
+Estacionamento;Despesas de viagens;$;expense
+Pedágio;Despesas de viagens;$;expense
+Telefone;Despesas de viagens;$;expense
+Alimentação;Despesas de viagens;$;expense
+Hospedagem;Despesas de viagens;$;expense
+Diária para Motorista;Despesas de viagens;$;expense
+Comissão Motorista;Despesas de viagens;$;expense
+Salário Motorista;Encargos;$;expense
+Seguros Veículo (Cavalo e Carreta);Encargos;$;expense
+Taxa de Licenciamento e Inspeções;Encargos;$;expense
+Multa;Encargos;$;expense
+IPVA;Encargos;$;expense
+Serviço de Despachante;Encargos;$;expense
+Rastreador;Acessórios;un;material

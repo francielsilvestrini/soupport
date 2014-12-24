@@ -1,0 +1,26 @@
+
+<div class="nav nav-collapse collapse">
+    <ul class="nav nav-list bs-docs-sidenav">
+        {{selected = request.vars.get('vehicle', '0')}}
+        {{for row in content:}}
+            <li {{= 'class=active' if selected == str(row.id) else ''}} >
+                <a href="{{= URL(c='fleet', f='dashboard.html', vars={'vehicle':row.id})}}"
+                    title="{{= row.repr.description}}" 
+                    data-placement="right"
+                    data-toggle="tooltip">                
+                    <i class="icon-chevron-right"></i>
+                    {{= row.repr.licence_plate}}
+                    <span class="badge pull-right" style="background-color: {{=row.status.repr.color}};">&nbsp;</span>
+                    <small class="muted pull-right">{{= row.status.repr.status}}</small>
+                </a>
+            </li>
+        {{pass}}
+    </ul>
+</div>
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $("a[data-toggle='tooltip']").tooltip({ });
+}); 
+</script>

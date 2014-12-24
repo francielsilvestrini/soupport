@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from onx_views import ONXFORM
-
 
 @auth.requires(lambda: auth_has_access())
 def index():

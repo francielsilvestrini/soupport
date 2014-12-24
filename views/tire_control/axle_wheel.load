@@ -1,0 +1,35 @@
+{{extend 'layouts/child.load'}}
+
+{{block declare_vars}}
+{{
+    target = request.function
+    parent_id = request.args(1)
+    captions = (T('Axle Wheels'), T('Axle Wheel'))
+    caption_new_btn = T('Add Wheel')
+    url_edit = URL(f=target, args=['edit',parent_id] )    
+    url_remove = URL(f=target, args=['remove', parent_id])
+}}
+{{end}}
+
+<table class="table table-condensed table-hover">
+    <thead>
+        <tr>
+            {{if len(content):}}
+            <th>{{= content[0].label.side}}</th>
+            <th>{{= content[0].label.position}}</th>
+            <th></th>
+            {{pass}}
+        </tr>
+    </thead>
+    <tbody>
+        {{for row in content:}}
+        <tr>
+            <td>{{= row.repr.side}}</td>
+            <td>{{= row.repr.position}}</td>
+            <td>
+                {{include 'others/child_item_buttons.html'}}
+            </td>
+        </tr>
+        {{pass}}
+    </tbody>
+</table>

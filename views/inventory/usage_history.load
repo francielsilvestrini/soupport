@@ -1,0 +1,35 @@
+{{extend 'layouts/child.load'}}
+
+{{block declare_vars}}
+{{
+    target = request.function
+    parent_id = request.args(1)
+    captions = (T('Usage History'), T('Usage History'))
+    caption_new_btn = None
+    url_edit = None
+    url_remove = None
+}}
+{{end}}
+
+<table class="table table-condensed table-hover">
+    <thead>
+        <tr>
+            {{if len(content):}}
+            <th>{{= T('Destination')}}</th>
+            <th>{{= content[0].label.usage_start}}</th>
+            <th>{{= content[0].label.usage_end}}</th>
+            <th>{{= content[0].label.status_end}}</th>
+            {{pass}}
+        </tr>
+    </thead>
+    <tbody>
+        {{for row in content:}}
+        <tr>
+            <td><a href="{{= row.repr.owner_link}}">{{= row.repr.owner_key}}</a></td>
+            <td>{{= row.repr.usage_start}}</td>
+            <td>{{= row.repr.usage_end}}</td>
+            <td>{{= row.repr.status_end}}</td>
+        </tr>
+        {{pass}}
+    </tbody>
+</table>

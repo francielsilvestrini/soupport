@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from onx_views import ONXFORM 
  
 query_my_tasks = (db.task.user_task == auth.user_id) & (db.task.status.belongs('analysis','development','test') )
 

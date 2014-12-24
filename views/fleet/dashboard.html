@@ -1,0 +1,397 @@
+{{extend 'layouts/main.html'}}
+
+<style type="text/css">
+    div.block-record {min-height:210px;}
+    div.chart-view {height: 185px;}
+</style>
+
+<!-- main view -->
+<div class="row-fluid">
+    <div class="block">
+        
+        <div class="navbar navbar-inner block-header">
+            <div class="brand pull-left">
+                <a href="{{=URL(c='fleet', f='vehicle', args=['read', record.id])}}">
+                {{= record.repr.licence_plate}} <small>&nbsp;{{= record.repr.description}}</small>
+                </a>
+            </div>            
+            <div class="pull-right" style="margin-top: 0px;padding-top: 0px;">
+                <div class="btn-group" style="margin-top: 0px;padding-top: 10px;">
+                    <a class="btn-status dropdown-toggle" 
+                        title="{{= record.status.repr.note}}" 
+                        data-toggle="dropdown" style="background-color: {{=record.status.repr.color}};"
+                        id="main_status"
+                        >
+                        {{= record.status.repr.status}}&nbsp;<span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        {{for k in status_list:}}
+                        <li {{= 'class=disabled' if k == record.status.status else ''}}>
+                            <a href="{{= URL(c='fleet', f='change_status', args=[k], vars=request.vars)}}">
+                                {{= status_list[k]}}</a>
+                        </li>
+                        {{pass}}
+                        <li class="divider"></li>
+                        <li><a onclick="add_status_note({{=record.status.id}});" href="javascript:void(0);">{{= T('Add status note')}}</a></li>
+                    </ul>
+                </div>            
+            </div>
+        </div>
+
+
+        <div class="block-record collapse in">
+            <div class="span6">
+                <a href="#">planejamento de manutenção</a><br>
+                <a href="#">solicitacao de serviço</a><br>
+                <a href="#">apontamento de despesas</a><br>
+                <a href="#">ordem de reforma</a><br>
+                <a href="#">durabilidade</a><br>
+                <a href="#">custos</a><br>
+                <a href="#">desperdicios e economias</a><br>
+                <a href="#">apontamento de sulcos</a><br>
+                <a href="#">apontamento de sulcos</a><br>
+                <a href="#">gerenciamento de vencimento (licenciamento/seguro/etc)</a><br>
+                <a href="#">analise de lubrificantes(amostra, aparencia, odor, etc)</a><br>
+
+
+            </div>
+            <div class="span3">
+                <div class="chart easyPieChart" data-percent="83" style="width: 110px; height: 110px; line-height: 110px;">83%<canvas width="110" height="110"></canvas></div>
+                <div class="chart-bottom-heading"><span class="label label-info">Users</span>
+
+                </div>
+            </div>
+            <div class="span3">
+                <div class="pull-right" style="padding:8px;">
+                    <a href="{{= URL(c='tire_control', f='manage', vars=request.get_vars)}}" class="btn btn-info">{{= T('Tire Control')}}</a>
+                    <a href="{{= URL(c='inventory', f='components', args=['O2_vehicle', record.id], vars=request.get_vars)}}" 
+                        class="btn btn-info">{{= T('Component Control')}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /main view -->
+
+<div class="row-fluid">
+    <div class="span6">
+        <!-- refueling -->
+        <div class="block">
+            <div class="navbar navbar-inner block-header">
+                <div class="muted pull-left">{{= T('Refueling')}}</div>
+                <div class="pull-right">
+                    <ul id="refueling_tab" class="nav nav-tabs">
+                        <li class="active"><a href="#refueling_statistics" data-toggle="tab">{{=T('Statistics')}}</a></li>
+                        <li class=""><a href="#refueling_data" data-toggle="tab">{{=T('Data')}}</a></li>
+                        <li class="dropdown">
+                            <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class='fa fa-bars'></i></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{= URL(c='fleet', f='refueling', args='new', vars=request.vars)}}">
+                                    {{= T('New Refueling')}}
+                                </a></li>
+                                <li><a href="{{= URL(c='fleet', f='refueling', vars=request.vars)}}">
+                                    {{= T('Show History')}}
+                                </a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+            <div class="block-record collapse in">
+                <div id="refueling_tab" class="tab-content">
+                    <div class="tab-pane active in fade" id="refueling_statistics">
+                        <div class="row-fluid" style="overflow:hidden;">
+                            <div class="span6 chart">
+                                <span class="onx-col-header">{{= T('Average (km/lt)')}}</span>
+                                <div id="refueling-stats-average" class="chart-view"></div>
+                            </div>
+                            <div class="span6 chart">
+                                <span class="onx-col-header">{{= T('Distance (km)')}}</span>
+                                <div id="refueling-stats-distance" class="chart-view"></div>
+                            </div>
+                        </div>
+                    </div>
+              
+                    <div class="tab-pane fade" id="refueling_data">
+                        <table class="table table-condensed table-hover">
+                            <thead>
+                                <tr>
+                                    {{if len(refueling):}}
+                                    {{row = refueling[0]}}
+                                    <th>{{= row.label.refueling_date}}</th>
+                                    <th>{{= row.label.fuel_id}}</th>
+                                    <th>{{= row.label.odometer}}</th>
+                                    <th>{{= row.label.liters}}</th>
+                                    <th>{{= row.label.distance}}</th>
+                                    <th>{{= row.label.average}}</th>
+                                    {{pass}}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{for row in refueling:}}
+                                <tr>
+                                    <td>{{= row.repr.refueling_date}}</td>
+                                    <td>{{= row.repr.fuel_id}}</td>
+                                    <td>{{= row.repr.odometer}}</td>
+                                    <td>{{= row.repr.liters}}</td>
+                                    <td>{{= row.repr.distance}}</td>
+                                    <td>{{= row.repr.average}}</td>
+                                </tr>
+                                {{pass}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /refueling -->
+    </div>
+
+    <div class="span6">
+        <!-- block -->
+        <div class="block">
+            <div class="navbar navbar-inner block-header">
+                <div class="muted pull-left">Orders</div>
+                <div class="pull-right"><span class="badge badge-info">752</span>
+
+                </div>
+            </div>
+            <div class="block-record collapse in">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Product</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Coat</td>
+                            <td>02/02/2013</td>
+                            <td>$25.12</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Jacket</td>
+                            <td>01/02/2013</td>
+                            <td>$335.00</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Shoes</td>
+                            <td>01/02/2013</td>
+                            <td>$29.99</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- /block -->
+    </div>
+</div>
+<div class="row-fluid">
+    <div class="span6">
+        <!-- odometer -->
+        <div id="status_history" class="block">
+            <div class="navbar navbar-inner block-header">
+                <div class="muted pull-left">{{= T('Odometer History')}}</div>
+                <div class="pull-right">
+                    <ul id="odometer_tab" class="nav nav-tabs">
+                        <li class="dropdown">
+                            <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class='fa fa-bars'></i></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{= URL(c='fleet', f='odometer', vars=request.vars)}}">
+                                    {{= T('Show All')}}
+                                </a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="block-record collapse in">
+                <table class="table table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            {{if len(odometer):}}
+                            <th>{{= odometer[0].label.odometer_date}}</th>
+                            <th>{{= odometer[0].label.odometer}}</th>
+                            <th>{{= odometer[0].label.status}}</th>
+                            <th>{{= odometer[0].label.note}}</th>
+                            {{pass}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{for row in odometer:}}
+                        <tr>
+                            <td>{{= row.repr.odometer_date}}</td>
+                            <td>{{= row.repr.odometer}}</td>
+                            <td>{{= row.repr.status}}</td>
+                            <td>{{= row.repr.note}}</td>
+                        </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- /odometer -->
+    </div>
+    <div class="span6">
+        <!-- status history -->
+        <div id="status_history" class="block">
+            <div class="navbar navbar-inner block-header">
+                <div class="muted pull-left">{{= T('Status History')}}</div>
+                <div class="pull-right" style="margin-top: 0px;padding-top: 0px;">
+                    <div class="btn-group" style="margin-top: 0px;padding-top: 10px;">
+                        <a class="btn-status dropdown-toggle" 
+                            data-toggle="dropdown" style="background-color: {{=record.status.repr.color}};">
+                            {{= record.status.repr.status}}&nbsp;<span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            {{for k in status_list:}}
+                            <li {{= 'class=disabled' if k == record.status.status else ''}}>
+                                <a href="{{= URL(c='fleet', f='change_status', args=[k], vars=request.vars)}}">
+                                    {{= status_list[k]}}</a>
+                            </li>
+                            {{pass}}
+                        </ul>
+                    </div>            
+                </div>
+            </div>
+            <div class="block-record collapse in">
+                <table class="table table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            {{if len(status_history):}}
+                            <th>{{= status_history[0].label.status}}</th>
+                            <th>{{= status_history[0].label.updated_on}}</th>
+                            <th>{{= status_history[0].label.note}}</th>
+                            {{pass}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{for row in status_history:}}
+                        <tr>
+                            <td>{{= row.repr.status}}</td>
+                            <td>{{= row.repr.updated_on}}</td>
+                            {{if row.repr.note == '':}}
+                                <td>
+                                    <a onclick="add_status_note({{=row.id}});" href="javascript:void(0);">{{= T('Add status note')}}</a>
+                                </td>
+                            {{else:}}
+                                <td>
+                                    <a onclick="add_status_note({{=row.id}});" href="javascript:void(0);"
+                                        title="{{= T('Add status note')}}" 
+                                        data-toggle="tooltip">
+                                        {{= row.repr.note}}
+                                    </a>
+                                </td>
+                            {{pass}}
+                        </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- /status history -->
+    </div>
+</div>
+<div class="row-fluid">
+    <!-- block -->
+    <div class="block">
+        <div class="navbar navbar-inner block-header">
+            <div class="muted pull-left">Gallery</div>
+            <div class="pull-right"><span class="badge badge-info">1,462</span>
+
+            </div>
+        </div>
+        <div class="block-record collapse in">
+            <div class="row-fluid padd-bottom">
+              <div class="span3">
+                  <a href="#" class="thumbnail">
+                      a
+                  </a>
+              </div>
+              <div class="span3">
+                  <a href="#" class="thumbnail">
+                    q
+                  </a>
+              </div>
+            </div>
+        </div>
+    </div>
+    <!-- /block -->
+</div>
+
+
+<script type="text/javascript">
+
+function add_status_note(status_id) {
+    var parent = $("#dialog_modal-label").parent();
+    $("#dialog_modal-label").remove();
+    $(parent).append("<h3 id='dialog_modal-label'>{{= T('Add status note')}}</h3>");
+
+    $.web2py.component("{{= URL(f='add_status_note.load')}}/"+status_id, "dialog_modal-form");
+    $("#dialog_modal").modal("show");
+}
+
+
+$(document).ready(function() {
+    $("#main_status").tooltip();
+
+    var refueling_data = [
+    {{for row in reversed(refueling):}}
+        {period: "{{= row.refueling_date.strftime('%d/%m')}}", distance: {{= row.distance}}, distance_standard: {{= row.distance_standard}} },
+    {{pass}}
+    ];
+    Morris.Bar({
+        element: "refueling-stats-distance",
+        data: refueling_data,
+        xkey: "period",
+        ykeys: ["distance", "distance_standard"],
+        labels: ["{{= T('Distance')}}", "Standard"],
+        barRatio: 0.4,
+        xLabelMargin: 10,
+        hideHover: "auto",
+        barColors: ["#3d88ba", "#a6e182"]
+    });
+
+    refueling_data = [
+    {{for key, row in enumerate(reversed(refueling)):}}
+        {key_id: "{{= key}}  {{= '%s (%s)' % (row.repr.fuel_id, row.repr.type_average) }}", 
+         average: {{= row.average}}, 
+         standard: {{= row.average_standard}} },
+    {{pass}}
+    ];
+
+    Morris.Line({
+        element: "refueling-stats-average",
+        data: refueling_data,
+        xkey: "key_id",
+        ykeys: ["average", "standard"],
+        labels: ["{{= T('Average')}}", "{{= T('Standard')}}"],
+        hideHover: "auto",
+        lineColors: ["#3d88ba", "#a6e182"],
+        xLabelFormat: function (x) {
+            var year = x.getFullYear();
+            return year -1900;
+        },        
+
+    });
+
+}); 
+
+</script>
+
+{{block scripts}}
+  {{super}}
+  <script src="{{=URL('static','assets/morris/jquery.knob.js')}}"></script>
+  <script src="{{=URL('static','assets/morris/raphael-min.js')}}"></script>
+  <link rel="stylesheet" href="{{=URL('static','assets/morris/morris.css')}}">
+  <script src="{{=URL('static','assets/morris/morris.min.js')}}"></script>
+{{end}}

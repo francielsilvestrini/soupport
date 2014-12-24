@@ -1,0 +1,15 @@
+<!-- life cycle -->
+<div class="block">
+    <div class="navbar navbar-inner block-header">
+        <div class="muted pull-left">{{= T('Life Cycle')}}</div>
+        <div class="pull-right">
+        </div>
+    </div>
+    <div class="block-record collapse in">
+        <div class="row-fluid">
+
+
+        </div>
+    </div>
+</div>
+<!-- /life cycle -->   

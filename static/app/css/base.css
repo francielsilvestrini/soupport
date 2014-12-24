@@ -353,22 +353,59 @@ div.comment-form form {
 }
 
 .onx-col-header {
-  font-weight: bold;
-  font-size: 85%;
+    font-weight: bold;
+    font-size: 85%;
 }
 
 .onx-col-mobile {
-  display: none;
+    display: none;
 }
 
 div.thumbnail:hover {
-  border-color: #81A74C;
-  outline: 0;
-  outline: thin dotted \9;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #92C65F;
-  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #92C65F;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #92C65F;  
+    border-color: #81A74C;
+    outline: 0;
+    outline: thin dotted \9;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #92C65F;
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #92C65F;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #92C65F;  
 }
+
+
+a.btn-status {
+    display: inline-block;
+    color: #ffffff;
+    background-color: #FFAD33;
+    border: 1px solid #ffffff;
+    font-weight: bold;
+    font-size: 11px;
+    text-align: center;
+    padding: 10px;
+    padding-top: 1px;
+    padding-bottom: 2px;
+    text-decoration: none;
+    margin-left: 1px;
+    border-radius: 5px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    vertical-align: baseline;
+    text-shadow: 1px 1px 1px black;
+}
+a.btn-status:hover {
+    text-decoration: none;
+}
+a.btn-status span  {
+    vertical-align: middle;
+}
+a.btn-status:hover {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+div.block-header div.pull-right {
+    padding-top: 0px;
+}
+
 
 @media only screen and (max-width: 700px) {
     .onx-col-desktop {
@@ -379,3 +416,4 @@ div.thumbnail:hover {
       width: 30%;
     }
 }
+

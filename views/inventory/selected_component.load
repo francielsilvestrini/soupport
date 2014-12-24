@@ -1,0 +1,34 @@
+<!-- selected component -->
+<div class="block">
+    <div class="navbar navbar-inner block-header">
+        <div class="brand pull-left">
+            <a href="{{=URL(c='inventory', f='inventory_item', args=['read', record.O1_inventory_item.id])}}">
+            {{= record.O1_inventory_item.repr.number}} <small>&nbsp;{{= record.O1_inventory_item.repr.description}}</small>
+            </a>
+        </div>            
+        <div class="pull-right">
+        </div>
+    </div>
+    <div class="block-record collapse in" style="padding:10px;">
+        <div class="row-fluid">
+            <a id="selected_component-remove"
+                href="javascript:void(0);">
+                {{= T('Remove Component')}}
+            </a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready (function () {
+    $("#selected_component-remove").confirm({
+        text: w2p_ajax_confirm_message,
+        title: "{{= T('Remove Component')}}",
+        confirm: function(button) {
+            var url = "{{= URL(f='remove_component', args=request.args, vars=request.vars)}}";
+            ajax(url, [], '');
+        },
+    });
+});
+</script>
+<!-- /selected component -->   

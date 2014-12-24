@@ -1,29 +1,35 @@
-<div class="nav nav-collapse collapse">
-    <ul class="nav nav-list bs-docs-sidenav">
-    {{toplinks = project.sidebar.toplinks}}
-    {{for caption, url, icon in toplinks:}}
-        <li><a href="{{= url}}">
-            <i class="{{= icon }}"></i>&nbsp;
-            {{= caption}}</a>
-        </li>
-    {{pass}}
-    </ul>
-</div>
+{{toplinks = project.sidebar.toplinks}}
+{{if isinstance(toplinks, list):}}
+    <div class="nav nav-collapse collapse">
+        <ul class="nav nav-list bs-docs-sidenav">
+        {{toplinks = project.sidebar.toplinks}}
+        {{for cap, url, icon in toplinks:}}
+            <li><a href="{{= url}}">
+                <i class="{{= icon }}"></i>&nbsp;
+                {{= cap}}</a>
+            </li>
+        {{pass}}
+        </ul>
+    </div>
+{{else:}}
+{{= toplinks}}
+{{pass}}
 
 <div class="nav nav-collapse">
     {{accordion_menu = project.sidebar.accordion_menu}}
     <div class="accordion bs-docs-sidenav" id="accordion_menu">
-        {{for caption, url, icon, items in accordion_menu:}}
+        {{is_first = True}}
+        {{for cap, url, icon, menus in accordion_menu:}}
         <div class="accordion-group">
             <div class="accordion-heading">
                 <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_menu" href="#{{=url}}">
-                    <i class="{{= icon}}"></i>&nbsp;{{= caption}}
+                    <i class="{{= icon}}"></i>&nbsp;{{= cap}}
                 </a>
             </div>
-            <div id="{{= url}}" class="accordion-body collapse {{= 'in' if len(accordion_menu) == 1 else ''}}">
+            <div id="{{= url}}" class="accordion-body collapse {{= 'in' if is_first else ''}}">
                 <div class="accordion-inner">
                     <ul class="nav nav-list bs-docs-sidenav nav-collapse collapse">
-                    {{for kitem in items:}}
+                    {{for kitem in menus:}}
                         <li><a href="{{= kitem.url}}">
                             <i class="{{= kitem.icon }}"></i>&nbsp;{{= kitem.caption}}</a>
                         </li>
@@ -31,7 +37,8 @@
                     </ul>
                 </div>
             </div>
-        </div>   
+        </div>  
+        {{is_first = False}} 
         {{pass}}
     </div>
 </div>

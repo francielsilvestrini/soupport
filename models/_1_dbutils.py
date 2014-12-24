@@ -55,7 +55,10 @@ def field_rep(field, value, row):
 
     return value
     '''
-    return represent(field, value, row)
+    rep = represent(field, value, row)
+    if str(rep) == 'None':
+        rep = ' '
+    return rep
 
 class ONXREPR(object):
 
@@ -64,7 +67,7 @@ class ONXREPR(object):
         row.repr = Storage()
         row.label = Storage()
         for f in table:
-            row.repr[f.name] = represent(f, row[f.name], row)
+            row.repr[f.name] = field_rep(f, row[f.name], row)
             row.label[f.name] = f.label
         return
 
@@ -93,3 +96,15 @@ class ONXREPR(object):
 
 
 ###############################################################################
+
+class DBUTIL(object):
+
+    @staticmethod
+    def last_id(table, query):
+        max = table['id'].max()
+        max_id = db(query).select(max).first()[max]
+        return max_id        
+
+###############################################################################
+
+        

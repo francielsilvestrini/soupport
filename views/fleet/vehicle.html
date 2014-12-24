@@ -1,0 +1,47 @@
+{{extend 'layouts/form.html'}}
+
+{{block navbuttons}}
+    {{super}}    
+    {{if request.args(0) in['new', 'update']:}}
+
+    <div>
+        <ul class="nav nav-pills">
+            <li id="simple_view" class="active">
+                <a href="#">{{=T('Simplified view')}}</a>
+            </li>
+            <li id="advanced_view" >
+                <a href="#">{{=T('Advanced view')}}</a>
+            </li>
+        </ul>
+    </div>  
+    {{pass}}
+{{end}}
+
+{{= content}}
+
+
+{{block footer_form}}
+{{if request.args(0) in['read', 'update']:}}
+{{= LOAD(c='fleet', f='vehicle_fuel.load', args=request.args(1), ajax=True)}}
+{{pass}}
+{{end}}
+
+
+
+
+<script type="text/javascript">
+jQuery(document).ready(function(){
+    jQuery('div[id^="O2_vehicle_bio_"]').hide();
+    
+    jQuery('#simple_view').click(function(){
+        jQuery('#simple_view').attr('class','active');
+        jQuery('#advanced_view').attr('class','inactive');
+        jQuery('div[id^="O2_vehicle_bio_"]').hide();
+    });
+    jQuery('#advanced_view').click(function(){
+        jQuery('#advanced_view').attr('class','active');
+        jQuery('#simple_view').attr('class','inactive');
+        jQuery('div[id^="O2_vehicle_bio_"]').show();
+    });
+});
+</script>
