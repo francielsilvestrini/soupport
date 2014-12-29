@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 
+def _get_vehicle():
+    vehicle_id = int( request.vars['vehicle'] )
+    vehicle = db(db.vehicle.id == vehicle_id).select().first()
+    ONXREPR.row_repr(vehicle, db.vehicle)
+    return vehicle
+
+
 @auth.requires(lambda: auth_has_access())
 def index():
     session.project = 'fleet'
@@ -8,15 +15,8 @@ def index():
 
 
 @auth.requires(lambda: auth_has_access())
-def inventory_item():
-    content = ONXFORM.make(db.O1_inventory_item)
-    breadcrumbs_add()
-    return content
-
-
-@auth.requires(lambda: auth_has_access())
 def vehicle_type():
-    content = ONXFORM.make(db.O2_vehicle_type)
+    content = ONXFORM.make(db.vehicle_type)
     breadcrumbs_add()
     return content
 
@@ -26,21 +26,12 @@ def vehicle():
     def do_fields_list(self, action):
         fields=[]
         if action in ['select']:
-            for f in db.O2_vehicle:
+            for f in db.vehicle:
                 if f.readable and getattr(f, 'show_grid', True):
                     fields += [f]
         elif action in ['read']:
-            fields += ['licence_plate', 'description', 'odometer']
+            fields += ['licence_plate', 'description', 'current_odometer']
         return fields if len(fields) else None
-
-    def do_form_success(form):
-        id = int(form.vars.get('id', 0))
-        if db(db.O2_vehicle_status.vehicle_id == id).count() == 0:
-            defs = table_default_values(db.O2_vehicle_status)
-            defs['vehicle_id'] = id
-            defs['status'] = 'at_home'
-            db.O2_vehicle_status.insert(**defs)
-        return
 
     def do_form_buttons(self, action, buttons):
         btns = buttons
@@ -52,7 +43,7 @@ def vehicle():
                 A(T('Edit'), _class='btn btn-primary', _href=URL(c='fleet', f='vehicle', args=['update', _id], vars=_vars)),
                 SPAN(' '),
                 A(T('Cancel'), _class='btn', _href=_vars['redirect']),
-                ]                
+                ]
         return btns
 
     def do_navegate(self, nav, action):
@@ -60,12 +51,37 @@ def vehicle():
             nav.next = URL(c='fleet', f='vehicle', args=['read', '[id]'], url_encode=False)
         return
 
-    oform = ONXFORM(db.O2_vehicle)
+    def do_before_init(self, action):
+        if action == 'new':
+            db.vehicle.accumulated_odometer.compute = lambda row: row.current_odometer
+        else:
+            db.vehicle.current_odometer.writable = False
+
+        return
+
+    def do_form_success(form):
+        id = int(form.vars.get('id', 0))
+        if db(db.vehicle_status.vehicle_id == id).count() == 0:
+            VehicleModel.vehicle_status_change(id, 'at_home', T('Begin control'))
+        if db(db.vehicle_odometer.vehicle_id == id).count() == 0:
+            VehicleModel.vehicle_odometer_change(
+                vehicle_id=id,
+                odometer_status='normal',
+                odometer=float(form.vars['current_odometer']),
+                note=T('Begin control'),
+                owner_table='vehicle',
+                owner_key=id,
+                owner_link=URL(f='vehicle', args=['read', id])
+                )
+        return
+
+    oform = ONXFORM(db.vehicle)
     oform.view_layout = 'fleet/vehicle.html'
     oform.customize.on_fields_list = do_fields_list
     oform.customize.on_form_success = do_form_success
     oform.customize.on_form_buttons = do_form_buttons
     oform.customize.on_navegate = do_navegate
+    oform.customize.on_before_init = do_before_init
     oform.child_controls = True
     oform.save_and_add_enabled = False
     content = oform.get_current_action()
@@ -77,13 +93,13 @@ def vehicle_fuel():
     try:
         parent_id = int(request.args(0))
     except Exception, e:
-        response.view = 'others/load_error.html'        
+        response.view = 'others/load_error.html'
         return dict(msg=T('ERROR: %s') % str(e) )
 
-    rows = db(db.O2_vehicle_fuel.vehicle_id==parent_id).select()
+    rows = db(db.vehicle_fuel.vehicle_id==parent_id).select()
     for row in rows:
-        ONXREPR.row_repr(row, db.O2_vehicle_fuel)    
-    return dict(content=rows)       
+        ONXREPR.row_repr(row, db.vehicle_fuel)
+    return dict(content=rows)
 
 
 def vehicle_fuel_edit():
@@ -91,19 +107,19 @@ def vehicle_fuel_edit():
         parent_id = int(request.args(0))
         item_id = int(request.args(1))
     except Exception, e:
-        response.view = 'others/load_error.html'        
+        response.view = 'others/load_error.html'
         return dict(msg=T('ERROR: %s') % str(e) )
 
-    db.O2_vehicle_fuel.vehicle_id.default = parent_id
-    db.O2_vehicle_fuel.vehicle_id.writable = False
-    form = SQLFORM(db.O2_vehicle_fuel, item_id)
+    db.vehicle_fuel.vehicle_id.default = parent_id
+    db.vehicle_fuel.vehicle_id.writable = False
+    form = SQLFORM(db.vehicle_fuel, item_id)
     if form.process().accepted:
         response.js = """
             $('#dialog_modal').modal('hide');
             web2py_component('%s','vehicle_fuel-load');
             """ % URL(f='vehicle_fuel.load', args=[parent_id])
     response.view = 'others/generic_modal.load'
-    return dict(content=form)       
+    return dict(content=form)
 
 
 def vehicle_fuel_remove():
@@ -111,11 +127,11 @@ def vehicle_fuel_remove():
         parent_id = int(request.args(0))
         item_id = int(request.args(1))
     except Exception, e:
-        response.view = 'others/load_error.html'        
+        response.view = 'others/load_error.html'
         return dict(msg=T('ERROR: %s') % str(e) )
 
-    db(db.O2_vehicle_fuel.id == item_id).delete()
-    response.flash=T('Removed with success!')   
+    db(db.vehicle_fuel.id == item_id).delete()
+    response.flash=T('Removed with success!')
     response.js = """
         web2py_component('%s','vehicle_fuel-load');
         """ % URL(f='vehicle_fuel.load', args=[parent_id])
@@ -127,16 +143,13 @@ def change_status():
     try:
         vehicle_id = int( request.vars['vehicle'] )
         status = str( request.args[0] )
-        if not status in O2Model.vehicle_status.keys():
+        if not status in VehicleModel.vehicle_status.keys():
             raise Exception(T('Status not found!'))
     except Exception, e:
-        response.view = 'others/gadget_error.html'        
+        response.view = 'others/gadget_error.html'
         return dict(msg=T('ERROR: %s') % str(e) )
 
-    defs = table_default_values(db.O2_vehicle_status)
-    defs['vehicle_id'] = vehicle_id
-    defs['status'] = status
-    db.O2_vehicle_status.insert(**defs)
+    VehicleModel.vehicle_status_change(vehicle_id, status, None)
     redirect(URL(f='dashboard', vars=request.vars))
     return
 
@@ -145,29 +158,29 @@ def add_status_note():
     try:
         status_id = int(request.args(0))
     except Exception, e:
-        response.view = 'others/load_error.html'        
+        response.view = 'others/load_error.html'
         return dict(msg=T('ERROR: %s') % str(e) )
 
-    db.O2_vehicle_status.vehicle_id.writable=False
-    db.O2_vehicle_status.status.writable=False
-    form = SQLFORM(db.O2_vehicle_status, status_id)
+    db.vehicle_status.vehicle_id.writable=False
+    db.vehicle_status.status.writable=False
+    form = SQLFORM(db.vehicle_status, status_id)
     if form.process().accepted:
         response.js = """
             window.location.reload(true);
             """
     response.view = 'others/generic_modal.load'
-    return dict(content=form)    
+    return dict(content=form)
 
 
 def toplinks():
-    rows = db(db.O2_vehicle.is_active == True).select(orderby=db.O2_vehicle.licence_plate)
+    rows = db(db.vehicle.is_active == True).select(orderby=db.vehicle.licence_plate)
     if rows:
         for row in rows:
-            ONXREPR.row_repr(row, db.O2_vehicle)
-            last_id = DBUTIL.last_id(db.O2_vehicle_status, db.O2_vehicle_status.vehicle_id == row.id)
-            row_status = db(db.O2_vehicle_status.id == last_id).select().first()
-            ONXREPR.row_repr(row_status, db.O2_vehicle_status)
-            row_status.repr.color = O2Model.vehicle_status_color[row_status.status]
+            ONXREPR.row_repr(row, db.vehicle)
+            last_id = DBUTIL.last_id(db.vehicle_status, db.vehicle_status.vehicle_id == row.id)
+            row_status = db(db.vehicle_status.id == last_id).select().first()
+            ONXREPR.row_repr(row_status, db.vehicle_status)
+            row_status.repr.color = VehicleModel.vehicle_status_color[row_status.status]
             row.status = row_status
     return dict(content=rows)
 
@@ -176,37 +189,41 @@ def toplinks():
 def dashboard():
     try:
         vehicle_id = int( request.vars['vehicle'] )
-        record = db(db.O2_vehicle.id == vehicle_id).select().first()
+        record = db(db.vehicle.id == vehicle_id).select().first()
         if not record:
             raise Exception(T('Record not found!'))
     except Exception, e:
-        response.view = 'others/gadget_error.html'        
+        response.view = 'others/gadget_error.html'
         return dict(msg=T('ERROR: %s') % str(e) )
 
-    ONXREPR.row_repr(record, db.O2_vehicle)
+    ONXREPR.row_repr(record, db.vehicle)
 
-    last_id = DBUTIL.last_id(db.O2_vehicle_status, db.O2_vehicle_status.vehicle_id == record.id)
-    row_status = db(db.O2_vehicle_status.id == last_id).select().first()
-    ONXREPR.row_repr(row_status, db.O2_vehicle_status)
-    row_status.repr.color = O2Model.vehicle_status_color[row_status.status]
+    control = db(db.maintenance_control.vehicle_id == record.id).select().first()
+    record.maintenance_control_id = control.id if control else 0
+
+
+    last_id = DBUTIL.last_id(db.vehicle_status, db.vehicle_status.vehicle_id == record.id)
+    row_status = db(db.vehicle_status.id == last_id).select().first()
+    ONXREPR.row_repr(row_status, db.vehicle_status)
+    row_status.repr.color = VehicleModel.vehicle_status_color[row_status.status]
     record.status = row_status
 
-    status_history = db(db.O2_vehicle_status.vehicle_id==vehicle_id).select(orderby=~db.O2_vehicle_status.id, limitby=(0,5))
+    status_history = db(db.vehicle_status.vehicle_id==vehicle_id).select(orderby=~db.vehicle_status.id, limitby=(0,5))
     for row in status_history:
-        ONXREPR.row_repr(row, db.O2_vehicle_status)    
+        ONXREPR.row_repr(row, db.vehicle_status)
 
-    refueling = db(db.O2_vehicle_refueling.vehicle_id==vehicle_id).select(
-        orderby=~db.O2_vehicle_refueling.id, limitby=(0,5))
+    refueling = db(db.vehicle_refueling.vehicle_id==vehicle_id).select(
+        orderby=~db.vehicle_refueling.id, limitby=(0,5))
     for row in refueling:
-        ONXREPR.row_repr(row, db.O2_vehicle_refueling)
+        ONXREPR.row_repr(row, db.vehicle_refueling)
 
-    odometer = db(db.O2_vehicle_odometer.vehicle_id == vehicle_id).select(orderby=~db.O2_vehicle_odometer.id, limitby=(0,5))
+    odometer = db(db.vehicle_odometer.vehicle_id == vehicle_id).select(orderby=~db.vehicle_odometer.id, limitby=(0,5))
     for row in odometer:
-        ONXREPR.row_repr(row, db.O2_vehicle_odometer)
+        ONXREPR.row_repr(row, db.vehicle_odometer)
 
     content = dict(
         record=record,
-        status_list=O2Model.vehicle_status,
+        status_list=VehicleModel.vehicle_status,
         status_history=status_history,
         refueling=refueling,
         odometer=odometer,)
@@ -222,23 +239,13 @@ def dashboard():
 @auth.requires(lambda: auth_has_access())
 def refueling():
     try:
-        vehicle_id = int( request.vars['vehicle'] )
-        fuel = db(db.O2_vehicle_fuel.vehicle_id == vehicle_id).select().first()
+        vehicle = _get_vehicle()
+        fuel = db(db.vehicle_fuel.vehicle_id == vehicle.id).select().first()
         if not fuel:
             raise Exception(T('Fuel not defined!'))
     except Exception, e:
-        response.view = 'others/gadget_error.html'        
+        response.view = 'others/gadget_error.html'
         return dict(msg=T('ERROR: %s') % str(e) )
-
-    def do_form_success(form):
-        item_id = int(form.vars.get('id'))
-        odometer = float(form.vars.get('odometer'))
-        status = form.vars.get('odometer_status')
-
-        O2Model.odometer_change(
-            'O2_vehicle_refueling', item_id, vehicle_id, odometer, 
-            status, T('Refueling'))
-        return
 
     def do_navegate(self, nav, action):
         nav.next = URL(c='fleet', f='dashboard', vars=request.get_vars)
@@ -246,26 +253,52 @@ def refueling():
         return
 
     def do_grid_query(self):
-        return (db.O2_vehicle_refueling.vehicle_id == vehicle_id)
+        return (db.vehicle_refueling.vehicle_id == vehicle.id)
 
-    old_id = DBUTIL.last_id(db.O2_vehicle_refueling, db.O2_vehicle_fuel.vehicle_id == vehicle_id)
-    old_refueling = db(db.O2_vehicle_refueling.id == old_id).select().first()
 
-    db.O2_vehicle_refueling.vehicle_id.default = vehicle_id
-    db.O2_vehicle_refueling.vehicle_id.writable = False
-    db.O2_vehicle_refueling.fuel_id.requires = IS_IN_DB(
-        db(db.O2_vehicle_fuel.vehicle_id == vehicle_id), 
-        db.O2_vehicle_fuel, 
-        db.O2_vehicle_fuel._format)
-    db.O2_vehicle_refueling.fuel_id.default = fuel.id
-    if old_refueling:
-        db.O2_vehicle_refueling.old_odometer.default = old_refueling.odometer
-    else:
-        vehicle = db(db.O2_vehicle.id == vehicle_id).select().first()
-        db.O2_vehicle_refueling.old_odometer.default = vehicle.odometer
-    db.O2_vehicle_refueling.old_odometer.writable = False
+    def do_form_success(form):
+        item_id = int(form.vars.get('id'))
+        if db((db.vehicle_odometer.owner_table == 'vehicle_refueling')\
+        & (db.vehicle_odometer.owner_key == str(item_id))).count() == 0:
+            odometer = float(form.vars.get('current_odometer'))
 
-    oform = ONXFORM(db.O2_vehicle_refueling)
+            bus = VehicleModel.vehicle_odometer_change(
+                vehicle_id=vehicle.id,
+                odometer_status='normal',
+                odometer=odometer,
+                note=T('Refueling'),
+                owner_table='vehicle_refueling',
+                owner_key=item_id,
+                owner_link=URL(vars=request.get_vars),
+                )
+
+            item = db.vehicle_refueling[item_id]
+            current_refueling = bus['accumulated']
+            distance = current_refueling - item.old_refueling
+            average = round(distance / item.liters, 3)
+
+            item.update_record(
+                current_refueling=current_refueling,
+                distance=distance,
+                average=average)
+        return
+
+    db.vehicle_refueling.vehicle_id.default = vehicle.id
+    db.vehicle_refueling.vehicle_id.writable = False
+    db.vehicle_refueling.fuel_id.requires = IS_IN_DB(
+        db(db.vehicle_fuel.vehicle_id == vehicle.id),
+        db.vehicle_fuel,
+        db.vehicle_fuel._format)
+    db.vehicle_refueling.fuel_id.default = fuel.id
+    db.vehicle_refueling.current_odometer.comment = T('Vehicle Odometer: %s %s') % (vehicle.current_odometer, vehicle.repr.odometer_unit_id)
+    db.vehicle_refueling.current_odometer.requires = IS_FLOAT_IN_RANGE(vehicle.current_odometer, None)
+
+    db.vehicle_refueling.old_refueling.default = 0.0
+    old_id = DBUTIL.last_id(db.vehicle_refueling, db.vehicle_refueling.vehicle_id == vehicle.id)
+    if old_id:
+        db.vehicle_refueling.old_refueling.default = db.vehicle_refueling[old_id].current_refueling
+
+    oform = ONXFORM(db.vehicle_refueling)
     oform.view_layout = 'fleet/refueling.html'
     oform.customize.on_form_success = do_form_success
     oform.customize.on_navegate = do_navegate
@@ -281,7 +314,7 @@ def odometer():
     try:
         vehicle_id = int( request.vars['vehicle'] )
     except Exception, e:
-        response.view = 'others/gadget_error.html'        
+        response.view = 'others/gadget_error.html'
         return dict(msg=T('ERROR: %s') % str(e) )
 
     def do_navegate(self, nav, action):
@@ -290,15 +323,66 @@ def odometer():
         return
 
     def do_grid_query(self):
-        return (db.O2_vehicle_odometer.vehicle_id == vehicle_id)
+        return (db.vehicle_odometer.vehicle_id == vehicle_id)
 
-    db.O2_vehicle_odometer.vehicle_id.default = vehicle_id
-    db.O2_vehicle_odometer.vehicle_id.writable = False
+    db.vehicle_odometer.vehicle_id.default = vehicle_id
+    db.vehicle_odometer.vehicle_id.writable = False
 
-    oform = ONXFORM(db.O2_vehicle_odometer)
+    oform = ONXFORM(db.vehicle_odometer)
     oform.customize.on_navegate = do_navegate
     oform.customize.on_grid_query = do_grid_query
 
     content = oform.get_current_action()
     breadcrumbs_add()
-    return content    
+    return content
+
+
+@auth.requires(lambda: auth_has_access())
+def reset_odometer():
+    try:
+        vehicle = _get_vehicle()
+    except Exception, e:
+        response.view = 'others/gadget_error.html'
+        return dict(msg=T('ERROR: %s') % str(e) )
+
+    def do_form_success(form):
+        odometer = float(form.vars['odometer'])
+        VehicleModel.vehicle_odometer_change(
+            vehicle_id=vehicle.id,
+            odometer_status='odometer_reset',
+            odometer=odometer,
+            note=form.vars['note'],
+            owner_table=None,
+            owner_key=None,
+            owner_link=None,
+            )
+        VehicleModel.vehicle_odometer_change(
+            vehicle_id=vehicle.id,
+            odometer_status='normal',
+            odometer=0.00,
+            note=T('Restarted'),
+            owner_table=None,
+            owner_key=None,
+            owner_link=None,
+            )
+        Maintenance.odometer_reseted(vehicle.id, odometer)
+        return
+
+    db.vehicle_odometer.vehicle_id.default = vehicle.id
+    db.vehicle_odometer.vehicle_id.writable = False
+    db.vehicle_odometer.odometer.comment = T('Vehicle Odometer: %s %s') % (vehicle.current_odometer, vehicle.repr.odometer_unit_id)
+    db.vehicle_odometer.odometer.requires = IS_FLOAT_IN_RANGE(vehicle.current_odometer, None)
+
+    form = SQLFORM.factory(
+        db.vehicle_odometer.vehicle_id,
+        db.vehicle_odometer.odometer,
+        db.vehicle_odometer.note,
+        formstyle=formstyle_onx,
+        _class='form-horizontal onx-form')
+    if form.process(onsuccess=do_form_success).accepted:
+        redirect( URL(c='fleet', f='dashboard', vars=request.get_vars) )
+
+    response.view = 'others/generic_crud.html'
+    response.title = T('Reset Odometer')
+    breadcrumbs_add(response.title)
+    return dict(content=form)

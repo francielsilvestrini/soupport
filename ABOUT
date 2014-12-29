@@ -1,13 +1,178 @@
+criar um plano de manutencao para o veiculo
+ao atualizar odometro do veiculo calcular necessidade de manutenção
+ao realizar manutenção do item do plano, zerar contador
+se estiver proximo a necessidade exibir aviso
+
+
+novo plano por veiculo
+	selecionar veiculo
+	selecionar modelo
+	importar os itens do modelo
+
+gerenciamento do plano de manutenção
+	editação por item
+		odometro anterior
+		odometro atual
+
+
+
+contador
+	reinicio
+	contador_atual
+	contador_acumulado
+	unidade_de_medida
+
+contador veiculo abc1234
+2 - 000500 - 002900
+
+1 - 000100 - 000100 - km - n - x
+1 - 001000 - 001100 - km - n - a
+1 - 001500 - 001600 - km - n - p1
+1 - 002300 - 002400 - km - r - a
+2 - 000000 - 002400 - km - n - x
+2 - 000250 - 002650 - km - n - p1
+2 - 000500 - 002900 - km - n - a
+2 - 001200 - 003600 - km - n - a
+2 - 001800 - 004200 - km - n - p1
+2 - 002400 - 004800 - km - n - a
+2 - 003100 - 005400 - km - n - a
+2 - 003100 - 005400 - km - n - p1
+- broken
+2 - 003700 - 006000 - km - n - x
+3 - 000000 - 006000 - km - n - x
+3 - 000700 - 006700 - km - n - a
+3 - 000800 - 006800 - km - n - p1
+
+abastecimento
+000000 - 001000 - 250lt -    0km - 0,00km/lt
+001100 - 002300 - 300lt - 1100km - 3,67km/lt
+002400 - 000500 - 280lt - 1300km - 4,64km/lt
+002900 - 001200 - 100lt -  500km - 5,00km/lt
+003600 - 002400 - 150lt -  700km - 4,67km/lt
+004800 - 003100 - 200lt - 1200km - 6,00km/lt
+005400 - 000700 - 100lt -  600km - 5,00km/lt
+
+pneus
+001100 - 001500 - 000km
+001600 - 000250 - 500km
+002650 - 001800 - 1050km
+004200 - 003100 - 1350km
+005400 - 000800 - 1200km
+
+
+    '''
+
+pneu
+    aplicacao/rodizio
+    deposito
+    reparo
+    reforma
+    desativacao
+    apontamento de sulco
+    suspensao de eixo
+
+
+    comprador
+    fatura ref
+    fornecedor
+    bandeira
+    notas
+    pago com adintamento
+    >> apontamento de custo
+
+
+    #veiculo_manutencao
+    tipo da manutencao
+    hodometro
+    valor total
+    data
+    comprador
+    fornecedor
+    fatura ref
+    >> manutencao realizada
+        manutencao
+        valor
+        >> apontamento de garantia
+    >> apontamento de custo
+
+
+    #veiculo_viagem
+    data
+    situacao
+    motivo
+    >> receitas da viagem
+        cliente
+        data
+        valor
+        carga
+        **tara, peso, capacidade % de ocupacao
+        >>ratear custos
+    >> adiantamento pode ser multiplos por viagem
+        >> lancamentos
+            data
+            valor
+            historico
+        data_acerto
+        saldo
+        >> abastecimento
+        >> despesas
+
+
+
+    #veiculo_rodagem
+    data_saida
+    hodometro_saida
+    motorista
+    rota
+    motivo
+    data_entrada
+    hodometro_entrada
+
+layout
+    nome:  truck 2 eixos
+    eixo 1, dianteiro
+        pneu 1, lado direito, pos 1
+        pneu 2, lado esquerdo, pos 1
+    eixo 2, traseiro
+        pneu 3, lado direito, pos 1
+        pneu 4, lado direito, pos 2
+        pneu 5, lado esquerdo, pos 1
+        pneu 6, lado esquerdo, pos 2
+
+
+layout
+    eixo
+        dianteiro
+            posicao
 
 
 
 
-data| documento | valor | historico | 
+
+
+
+    '''
 
 
 
 
-SOUPPORT 
+
+
+
+
+
+SOUPPORT
+
+        "All Autocomplete",
+        "ColorPicker",
+        "Emmet",
+        "HTML5",
+        "HTMLBeautify",
+        "jQuery",
+        "LoremIpsum",
+        "Package Control",
+        "SublimeRope",
+        "Tagify"
 
 zip -r filename.zip foldername/
 rm -rf foldername/
@@ -58,7 +223,7 @@ onnixsistemas.com.br/B
 	/sales_order
 	/object_mng
 	/comments --> gestao de comentarios
-	/attatchments --> 
+	/attatchments -->
 
 	/ToDo        --> lembretes ou coisas para fazer
 	/HistoryNote --> notas de historico, para o cliente no caso
@@ -69,7 +234,7 @@ onnixsistemas.com.br/B
 	/SendMail    --> envio de email
 	/Ticket      --> criacao de tickets pelo cliente
 	/Tutorial    --> manual de como configurar o sistema por exemplo
-	
+
 
 1) cadastrar um objeto, definir sua caracteristicas.
 2) equipar o objeto criado
@@ -99,7 +264,7 @@ Se vencido ou nao pago deverá redirecionar para www.onnixsistemas.com.br/A/acco
 	/contract    --> contrato entre o cliente e a plataforma
 		#modules --> modulos liberados no contrato
 	/history     --> historico do contrato eas liberações
-	
+
 
 
 GESTÃO DE FROTA

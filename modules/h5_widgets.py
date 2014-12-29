@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from gluon.sqlhtml import StringWidget, MultipleOptionsWidget
-from gluon.html import INPUT, SCRIPT, DIV, URL
+from gluon.html import INPUT, SCRIPT, DIV, URL, A, I
 from gluon.globals import current
 
 
@@ -39,7 +39,7 @@ class TagsInputWidget(StringWidget):
                         url: '%(url_tags_json)s',
                         filter: function(list) {
                             return $.map(list, function(tagname) {
-                                return { name: tagname }; 
+                                return { name: tagname };
                             });
                         }
                     }
@@ -65,7 +65,7 @@ class TagsInputWidget(StringWidget):
             ''' % {'wgt_id':wgt_id, 'url_tags_json':self.url}
         jq_script=SCRIPT(js, _type="text/javascript")
 
-        wrapper = DIV(_class="TagsInputWidget") 
+        wrapper = DIV(_class="TagsInputWidget")
         wrapper.components.extend([wgt_default, jq_script])
         return wrapper
 
@@ -95,7 +95,7 @@ class NicEditorWidget(TextWidget):
                 wysiwygfield.panelInstance("%(field_name)s");
                 jQuery('input[type=submit]').click(function(){
                     wysiwygfield.panelInstance("%(field_name)s");});
-            }); 
+            });
             ''' % {
                 'field_name':wgt_id,
                 'iconsPath':URL(c='static', f='assets/nicEdit/nicEditorIcons.gif'),
@@ -103,7 +103,7 @@ class NicEditorWidget(TextWidget):
             }
         jq_script=SCRIPT(js, _type="text/javascript")
 
-        wrapper = DIV(_class="NicEditorWidget") 
+        wrapper = DIV(_class="NicEditorWidget")
         wrapper.components.extend([wgt_default, jq_script])
         return wrapper
 
@@ -111,8 +111,9 @@ class NicEditorWidget(TextWidget):
 from gluon.sqlhtml import OptionsWidget
 class LookupWidget(OptionsWidget):
 
-    def __init__(self, width=None):
+    def __init__(self, width=None, add_new=None):
         self.width = width
+        self.add_new = add_new
         return
 
     @staticmethod
@@ -123,9 +124,9 @@ class LookupWidget(OptionsWidget):
 
     def widget(self, field, value, **attributes):
         LookupWidget.widget_files()
-        
+
         if not self.width:
-            attributes['_class'] = 'span6'
+            attributes['_class'] = 'span4'
         attributes['_style'] = 'height: 20px; margin-bottom: 14px;'
         if self.width:
             attributes['_style'] += 'width:%s;' % self.width
@@ -136,16 +137,27 @@ class LookupWidget(OptionsWidget):
         js = '''
             jQuery(document).ready(function(){
                 jQuery('#%(field_name)s').select2();
-            }); 
+            });
             ''' % {'field_name':wgt_id}
         jq_script=SCRIPT(js, _type="text/javascript")
 
-        wrapper = DIV(_class="LookupWidget") 
-        wrapper.components.extend([wgt_default, jq_script])
+        btn_new = ''
+        if self.add_new:
+            btn_new = A(
+                I(_class='fa fa-plus-circle'),
+                _href=self.add_new,
+                _class='btn btn-small',
+                _title=current.T('New record'),
+                _style='margin-top: 0px; margin-left:3px;',
+                **{'_data-toggle':'tooltip'}
+                )
+
+        wrapper = DIV(_class="LookupWidget")
+        wrapper.components.extend([wgt_default, btn_new, jq_script])
         return wrapper
 
 
-class MaskWidget(StringWidget):  
+class MaskWidget(StringWidget):
 
     def __init__(self, mask):
         self.mask = mask
@@ -166,25 +178,25 @@ class MaskWidget(StringWidget):
 
         js = '''
             jQuery(document).ready(function(){
-                jQuery('#%(field_name)s').each( function(){ 
-                    jQuery(this).mask('%(mask)s'); 
-                });  
-            }); 
+                jQuery('#%(field_name)s').each( function(){
+                    jQuery(this).mask('%(mask)s');
+                });
+            });
             ''' % dict(field_name=wgt_id, mask=self.mask)
         jq_script=SCRIPT(js, _type="text/javascript")
 
-        wrapper = DIV(_class="onx-widget MaskWidget") 
+        wrapper = DIV(_class="onx-widget MaskWidget")
         wrapper.components.extend([wgt_default, jq_script])
         return wrapper
 
 
-class H5ColorWidget(StringWidget):  
+class H5ColorWidget(StringWidget):
     def widget(self, field, value, **attr):
         attr['_type'] = 'color'
         return StringWidget.widget(field, value, **attr)
 
 
-class H5EmailWidget(StringWidget):  
+class H5EmailWidget(StringWidget):
     def widget(self, field, value, **attr):
         attr['_type'] = 'email'
         return StringWidget.widget(field, value, **attr)
@@ -202,5 +214,5 @@ search
 tel
 time
 url
-week        
+week
 '''

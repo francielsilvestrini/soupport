@@ -2,10 +2,10 @@
 <div class="block">
     <div class="navbar navbar-inner block-header">
         <div class="brand pull-left">
-            <a href="{{=URL(c='inventory', f='inventory_item', args=['read', record.O1_inventory_item.id])}}">
-            {{= record.O1_inventory_item.repr.number}} <small>&nbsp;{{= record.O1_inventory_item.repr.description}}</small>
+            <a href="{{=URL(c='inventory', f='inventory_item', args=['read', record.inventory_item.id])}}">
+            {{= record.inventory_item.repr.number}} <small>&nbsp;{{= record.inventory_item.repr.description}}</small>
             </a>
-        </div>            
+        </div>
         <div class="pull-right">
         </div>
     </div>
@@ -31,4 +31,4 @@ $(document).ready (function () {
     });
 });
 </script>
-<!-- /selected component -->   
+<!-- /selected component -->

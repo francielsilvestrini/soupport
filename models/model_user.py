@@ -19,6 +19,13 @@ class UserModel(ModelBase):
 
 
     def create_defaults(self):
+        def _auth_user_default():
+            a = globals().get('auth')
+            if a and a.user_id > 0:
+                return a.user_id
+            else:
+                return None
+
         sf = db.Table(db, 'signature',
             Field('oplink', 'string', label=T('Op Link'), default=uuid.uuid4, writable=False, readable=False),
             Field('created_on', 'datetime', default=request.now, writable=False, readable=False),
@@ -35,7 +42,7 @@ class UserModel(ModelBase):
             else:
                 group_id = db.auth_group.insert(role=ADMIN_ROLE, description=T('Admin'))
 
-            defaults = my_default_values(db.auth_user)
+            defaults = table_default_values(db.auth_user)
             defaults['first_name'] = 'Admin'
             defaults['last_name'] = 'Admin'
             defaults['email'] = 'admin@admin.app'
@@ -53,9 +60,3 @@ def auth_has_access(c=request.controller, f=request.function):
     # é o contrario de permitido, se tiver significa bloqueado
     return not auth.has_permission(c,f)
 
-def _auth_user_default():
-    a = globals().get('auth')
-    if a and a.user_id > 0:
-        return a.user_id
-    else:
-        return None

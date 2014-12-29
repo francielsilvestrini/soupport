@@ -2,34 +2,27 @@
 <div class="block">
     <div class="navbar navbar-inner block-header">
         <div class="brand pull-left">
-            <a href="{{=URL(c='inventory', f='inventory_item', args=['read', record.O1_inventory_item.id])}}">
-            {{= record.O1_inventory_item.repr.number}} <small>&nbsp;{{= record.O1_inventory_item.repr.description}}</small>
+            <a href="{{=URL(c='inventory', f='inventory_item', args=['read', record.inventory_item.id])}}">
+            {{= record.inventory_item.repr.number}} <small>&nbsp;{{= record.inventory_item.repr.description}}</small>
             </a>
-        </div> 
-        <div class="pull-right">
+        </div>
+        <div class="pull-right" style="padding-top:10px">
+            <a id="selected_tire-remove"
+                href="javascript:void(0);">
+                {{= T('Remove Tire')}}
+            </a>
         </div>
     </div>
     <div class="block-record collapse in" style="padding:10px">
         <div class="row-fluid">
             <div class="span6">
                 <span class="onx-col-header">{{= T('Axle')}}</span>
-                <div>{{= T('Position %(axle_position)s, Sequence %(axle_sequence)s') % record.O3_tire_control_item.repr}}</div>
+                <div>{{= T('Position %(axle_position)s, Sequence %(axle_sequence)s') % record.tire_control_item.repr}}</div>
             </div>
             <div class="span6">
                 <span class="onx-col-header">{{= T('Wheel')}}</span>
-                <div>{{= T('Side %(wheel_side)s, Position %(wheel_position)s') % record.O3_tire_control_item.repr}}</div>
+                <div>{{= T('Side %(wheel_side)s, Position %(wheel_position)s') % record.tire_control_item.repr}}</div>
             </div>
-        </div>
-        <div class="row-fluid">
-            <a id="selected_tire-remove"
-                href="javascript:void(0);">
-                {{= T('Remove Tire')}}
-            </a>
-        </div>
-        <div class="row-fluid">
-            <a href="{{= URL(c='tire_control', f='groove_annotation.html', args=[record.O3_tire_control_item.tire_control_id], vars=request.get_vars)}}">
-                {{= T('Groove Annotation')}}
-            </a>
         </div>
     </div>
 </div>
@@ -46,4 +39,4 @@ $(document).ready (function () {
     });
 });
 </script>
-<!-- /selected tire -->   
+<!-- /selected tire -->

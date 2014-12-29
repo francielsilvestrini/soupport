@@ -1,0 +1,25 @@
+<table class="table table-condensed table-hover">
+    <thead>
+        <tr>
+            {{if len(content):}}
+            <th>{{= content[0].label.service_id}}</th>
+            <th>{{= content[0].label.last_maintenance}}</th>
+            <th>{{= content[0].label.next_maintenance}}</th>
+            <th style="min-width:100px;"></th>
+            <th></th>
+            {{pass}}
+        </tr>
+    </thead>
+    <tbody>
+        {{for row in content:}}
+        <tr>
+            <td>{{= row.repr.service_id}}</td>
+            <td>{{= row.repr.last_maintenance}}</td>
+            <td>{{= row.repr.next_maintenance}}</td>
+            <td>{{= row.repr.bar}}</td>
+            <td>
+            </td>
+        </tr>
+        {{pass}}
+    </tbody>
+</table>

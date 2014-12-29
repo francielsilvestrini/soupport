@@ -7,55 +7,55 @@
     <div class="row-fluid">
         <div class="span2">
             <span class="onx-col-header">{{= T('Average')}}</span>
-            <div id="O2_vehicle_refueling_average">
+            <div id="vehicle_refueling_average">
                 0.000 km/lt
-            </div>  
+            </div>
         </div>
     </div>
 
     <script type="text/javascript">
     jQuery(document).ready(function(){
         function average_calc() {
-            var value = $("#O2_vehicle_refueling_distance").val();
+            var value = $("#vehicle_refueling_distance").val();
             var distance = parseFloat(value).toFixed(3);
 
-            value = $("#O2_vehicle_refueling_liters").val();
+            value = $("#vehicle_refueling_liters").val();
             var liters = parseFloat(value).toFixed(3);
-            var average = parseFloat(distance/liters).toFixed(3);            
-            $("#O2_vehicle_refueling_average").text( average+" km/lt");
+            var average = parseFloat(distance/liters).toFixed(3);
+            $("#vehicle_refueling_average").text( average+" km/lt");
         }
 
 
-        $("#O2_vehicle_refueling_odometer").change(function() {
-            var old = $("#O2_vehicle_refueling_old_odometer__row>div").first().text();                
-            
-            var value = $("#O2_vehicle_refueling_odometer").val();
+        $("#vehicle_refueling_odometer").change(function() {
+            var old = $("#vehicle_refueling_old_odometer__row>div").first().text();
+
+            var value = $("#vehicle_refueling_odometer").val();
             var distance = parseFloat(value - old).toFixed(3);
             if (distance > 0.0) {
-                $("#O2_vehicle_refueling_distance").val(distance);
+                $("#vehicle_refueling_distance").val(distance);
             }
             average_calc();
         });
-        $("#O2_vehicle_refueling_distance").change(function() {
+        $("#vehicle_refueling_distance").change(function() {
             average_calc();
         });
-        $("#O2_vehicle_refueling_liters").change(function() {
+        $("#vehicle_refueling_liters").change(function() {
             average_calc();
         });
 
-        $("#O2_vehicle_refueling_liter_price").change(function() {
-            var liters = $("#O2_vehicle_refueling_liters").val();
+        $("#vehicle_refueling_liter_price").change(function() {
+            var liters = $("#vehicle_refueling_liters").val();
             var value = $(this).val();
             var total = parseFloat(liters * value).toFixed(2);
-            $("#O2_vehicle_refueling_total_price").val(total);
+            $("#vehicle_refueling_total_price").val(total);
         });
-        $("#O2_vehicle_refueling_total_price").change(function() {
-            var liters = $("#O2_vehicle_refueling_liters").val();
+        $("#vehicle_refueling_total_price").change(function() {
+            var liters = $("#vehicle_refueling_liters").val();
             var value = $(this).val();
             var price = parseFloat(value / liters).toFixed(4);
-            $("#O2_vehicle_refueling_liter_price").val(price);
+            $("#vehicle_refueling_liter_price").val(price);
         });
-        
+
 
         average_calc();
     });

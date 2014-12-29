@@ -5,13 +5,13 @@
     <div class="{{= 'span6' if len(tire_controls) else 'span12'}}">
 
     <div class="block">
-        
+
         <div class="navbar navbar-inner block-header">
             <div id="teste" class="brand pull-left">
-                <a href="{{=URL(c='fleet', f='vehicle', args=['read', control.O2_vehicle.id])}}">
-                {{= control.O2_vehicle.repr.licence_plate}} <small>&nbsp;{{= control.O2_vehicle.repr.description}}</small>
+                <a href="{{=URL(c='fleet', f='vehicle', args=['read', control.vehicle.id])}}">
+                {{= control.vehicle.repr.licence_plate}} <small>&nbsp;{{= control.vehicle.repr.description}}</small>
                 </a>
-            </div>            
+            </div>
             <div class="pull-right">
                 <ul id="odometer_tab" class="nav nav-tabs">
                     <li class="dropdown">
@@ -19,10 +19,16 @@
                             <i class='fa fa-bars'></i></a>
                         <ul class="dropdown-menu">
                             <li>
-                                <a href="{{= URL(c='tire_control', f='groove_annotation_print', args=[control.O3_tire_control.id], vars=request.vars)}}">
+                                <a href="{{= URL(c='tire_control', f='groove_annotation.html', args=[control.tire_control.id], vars=request.get_vars)}}">
+                                    {{= T('Groove Annotation')}}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{= URL(c='tire_control', f='groove_annotation_print', args=[control.tire_control.id], vars=request.vars)}}">
                                     {{= T('Print Groove Annotation')}}
                                 </a>
                             </li>
+                            <li class="divider"></li>
                             <li>
                                 {{
                                 new_vars = ONXFORM.get_new_vars(request.get_vars, remove_keys=['option', 'selected'])
@@ -38,7 +44,7 @@
         </div>
 
         <div class="block-record collapse in">
-            <p class="muted"><small>{{= control.O3_chassi.name }}</small></p>
+            <p class="muted"><small>{{= control.chassi.name }}</small></p>
             <div class="tc-layout">
                 {{= table}}
             </div>

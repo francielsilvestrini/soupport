@@ -15,7 +15,7 @@ owner_fields = db.Table(db, 'owner',
 
 
 from onx_views import PageConfig
-if not 'page' in session: 
+if not 'page' in session:
     session.page = PageConfig()
 
 response.generic_patterns = []
@@ -42,7 +42,7 @@ _models_class += [EntriesModel]
 _models_class += [TasksModel]
 _models_class += [MULModel]
 
-_models_class += [O1Model, O2Model, O3Model]
+_models_class += [InventoryModel, VehicleModel, TireControlModel, MaintenanceModel]
 
 
 from gluon.storage import Storage

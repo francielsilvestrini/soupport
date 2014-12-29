@@ -1,0 +1,41 @@
+{{extend 'layouts/child.load'}}
+
+{{block declare_vars}}
+{{
+    target = request.function
+    parent_id = request.args(1)
+    captions = (T('Maintenance Item'), T('Maintenance Item'))
+    caption_new_btn = T('Add Item')
+    url_edit = URL(f=target, args=['edit',parent_id] )
+    url_remove = URL(f=target, args=['remove', parent_id])
+}}
+{{end}}
+
+<table class="table table-condensed table-hover">
+    <thead>
+        <tr>
+            {{if len(content):}}
+            <th>{{= content[0].label.service_id}}</th>
+            <th>{{= content[0].label.maintenance_interval}}</th>
+            <th>{{= content[0].label.notify_with}}</th>
+            <th>{{= content[0].label.last_maintenance}}</th>
+            <th>{{= content[0].label.next_maintenance}}</th>
+            <th></th>
+            {{pass}}
+        </tr>
+    </thead>
+    <tbody>
+        {{for row in content:}}
+        <tr>
+            <td>{{= row.repr.service_id}}</td>
+            <td>{{= row.repr.maintenance_interval}}</td>
+            <td>{{= row.repr.notify_with}}</td>
+            <td>{{= row.repr.last_maintenance}}</td>
+            <td>{{= row.repr.next_maintenance}}</td>
+            <td>
+                {{include 'others/child_item_buttons.html'}}
+            </td>
+        </tr>
+        {{pass}}
+    </tbody>
+</table>

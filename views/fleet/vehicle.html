@@ -1,7 +1,7 @@
 {{extend 'layouts/form.html'}}
 
 {{block navbuttons}}
-    {{super}}    
+    {{super}}
     {{if request.args(0) in['new', 'update']:}}
 
     <div>
@@ -13,7 +13,7 @@
                 <a href="#">{{=T('Advanced view')}}</a>
             </li>
         </ul>
-    </div>  
+    </div>
     {{pass}}
 {{end}}
 
@@ -31,17 +31,17 @@
 
 <script type="text/javascript">
 jQuery(document).ready(function(){
-    jQuery('div[id^="O2_vehicle_bio_"]').hide();
-    
+    jQuery('div[id^="vehicle_bio_"]').hide();
+
     jQuery('#simple_view').click(function(){
         jQuery('#simple_view').attr('class','active');
         jQuery('#advanced_view').attr('class','inactive');
-        jQuery('div[id^="O2_vehicle_bio_"]').hide();
+        jQuery('div[id^="vehicle_bio_"]').hide();
     });
     jQuery('#advanced_view').click(function(){
         jQuery('#advanced_view').attr('class','active');
         jQuery('#simple_view').attr('class','inactive');
-        jQuery('div[id^="O2_vehicle_bio_"]').show();
+        jQuery('div[id^="vehicle_bio_"]').show();
     });
 });
 </script>

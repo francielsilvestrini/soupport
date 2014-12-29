@@ -11,9 +11,9 @@
             <div class="span12">
                 <div>
                     {{block navbuttons}}
-                        
+
                     {{if request.args(0) == 'remove':}}
-                    <a href="{{= URL(f=request.function, args=['delete', request.args(1)])}}" 
+                    <a href="{{= URL(f=request.function, args=['delete', request.args(1)])}}"
                         class="btn btn-danger">{{=T('Confirm?')}}</a>
                     {{pass}}
 
@@ -32,3 +32,8 @@
 {{block footer_form}}
 {{end}}
 <!-- /footer form -->
+
+
+{{for item in session.breadcrumbs.items:}}
+<div>{{= item }}</div>
+{{pass}}

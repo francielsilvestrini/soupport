@@ -17,7 +17,7 @@ def formstyle_onx(form, fields):
         # embed _help into _controls
 
         if isinstance(controls, DIV):
-            wgt = controls.elements('.onx-widget')        
+            wgt = controls.elements('.onx-widget')
             if wgt:
                 controls.insert(1,_help)
                 _controls = DIV(controls, _class='controls')
@@ -33,7 +33,7 @@ def formstyle_onx(form, fields):
             if controls['_type'] == 'submit':
                 # flag submit button
                 _submit = True
-                controls['_class'] = 'btn btn-primary'
+                controls['_class'] = 'btn btn-success'
             if controls['_type'] == 'file':
                 controls['_class'] = 'input-file'
             if controls['_type'] == 'checkbox':
@@ -54,7 +54,7 @@ def formstyle_onx(form, fields):
 
         if _submit:
             # submit button has unwrapped label and controls, different class
-            parent.append(DIV(label, controls, _class='row-fluid form-actions', _id=id))
+            parent.append(DIV(label, DIV(controls, _class='controls'), _class='row-fluid', _id=id))
             # unflag submit (possible side effect)
             _submit = False
         else:
@@ -67,24 +67,24 @@ class ONXFORM(object):
 
     """
     SQLFORM(
-        table, 
+        table,
         record=None,
-        deletable=False, 
+        deletable=False,
         linkto=None,
-        upload=None, 
-        fields=None, 
+        upload=None,
+        fields=None,
         labels=None,
-        col3={}, 
+        col3={},
         submit_button='Submit',
         delete_label='Check to delete:',
-        showid=True, 
+        showid=True,
         readonly=False,
-        comments=True, 
+        comments=True,
         keepopts=[],
-        ignore_rw=False, 
+        ignore_rw=False,
         record_id=None,
         formstyle='table3cols',
-        buttons=['submit'], 
+        buttons=['submit'],
         separator=': ',
         **attributes)
     """
@@ -162,7 +162,7 @@ class ONXFORM(object):
         new_vars = ONXFORM.get_new_vars(request.get_vars)
         grid_url = URL(args=['select'], vars=new_vars)
         new_record = URL(args=['new'],  vars=new_vars)
-        
+
         next = vnext or vredirect or grid_url
         previous = vprevious or vredirect or grid_url
 
@@ -172,7 +172,7 @@ class ONXFORM(object):
             new_record=new_record,
             )
 
-        self.customize.on_navegate(self, navegate, action)        
+        self.customize.on_navegate(self, navegate, action)
         return navegate
 
     def get_form_buttons(self, action, record_id):
@@ -190,29 +190,29 @@ class ONXFORM(object):
         if action in ['new', 'update']:
             btn_save = ONXFORM.get_btn_save()
             if self.save_and_add_enabled and not self.is_modal:
-                btn_save_and_add = A(I(_class='fa fa-plus'), 
-                    _title=T('Save and Add'), 
-                    _class='btn', 
-                    _href='javascript:void(0);', 
+                btn_save_and_add = A(I(_class='fa fa-plus'),
+                    _title=T('Save and Add'),
+                    _class='btn',
+                    _href='javascript:void(0);',
                     _onclick='submit_and_add(this);',
                     **{'_data-toggle':'tooltip'})
 
         if action in ['read']:
             new_vars['previous'] = URL(args=request.args, vars=request.get_vars)
             new_vars['origin'] = 'read'
-            btn_edit = A(T('Edit'), 
+            btn_edit = A(T('Edit'),
                 _class='btn btn-primary',
                 _style='margin-right:8px;',
                 _href=URL(args=['update', record_id], vars=new_vars))
-            btn_new = A(I(_class='fa fa-plus'), 
-                    _title=T('New Record'), 
-                    _class='btn', 
-                    _href=URL(args=['new'], vars=new_vars), 
+            btn_new = A(I(_class='fa fa-plus'),
+                    _title=T('New Record'),
+                    _class='btn',
+                    _href=URL(args=['new'], vars=new_vars),
                     **{'_data-toggle':'tooltip'})
 
         if action in ['delete']:
-            btn_delete = A(T('Delete'), 
-                _class='btn btn-danger', 
+            btn_delete = A(T('Delete'),
+                _class='btn btn-danger',
                 _style='margin-right:8px;',
                 _href=URL(args=request.args, vars=request.get_vars))
 
@@ -222,14 +222,14 @@ class ONXFORM(object):
             if self.is_modal:
                 if self.modal_cancel_onclick:
                     btn_cancel = A(
-                        T('Cancel'), 
-                        _class='btn', 
-                        _href='javascript:void(0);', 
+                        T('Cancel'),
+                        _class='btn',
+                        _href='javascript:void(0);',
                         _style='margin-right:8px;',
                         _onclick=self.modal_cancel_onclick)
             else:
-                btn_cancel = A(T('Cancel'), 
-                    _class='btn', 
+                btn_cancel = A(T('Cancel'),
+                    _class='btn',
                     _style='margin-right:8px;',
                     _href=self.nav.previous)
 
@@ -248,7 +248,7 @@ class ONXFORM(object):
                 btns.append(buttons[k])
         return btns
 
-    def js_submit_and_add(self): 
+    def js_submit_and_add(self):
         js = '''
             function submit_and_add(e) {
                 var url = "%(url)s";
@@ -282,7 +282,7 @@ class ONXFORM(object):
 
         response.title = T(self.table._plural)
         response.subtitle = T('New Record')
-        response.breadcrumbs = response.subtitle
+        response.breadcrumbs = '+'+response.title
 
         buttons = self.get_form_buttons(action, 0)
 
@@ -295,6 +295,8 @@ class ONXFORM(object):
             hidden['_next'] = request.post_vars['_next']
         if hidden.get('_next'):
             attr['next'] = hidden['_next']
+
+        print attr
 
         form = SQLFORM(
             self.table,
@@ -325,7 +327,7 @@ class ONXFORM(object):
         record = None
         if isinstance(record_id, str):
             record_id = int(record_id)
-        
+
         record = table[ record_id ]
         if not record: raise HTTP(404, 'Record ID invalid!')
 
@@ -343,7 +345,7 @@ class ONXFORM(object):
 
         self.customize.on_before_init(self, action)
         form = SQLFORM(
-            table, 
+            table,
             record=record,
             readonly=True,
             formstyle=formstyle_onx,
@@ -364,7 +366,7 @@ class ONXFORM(object):
         record = None
         if isinstance(record_id, str):
             record_id = int(record_id)
-        
+
         record = table[ record_id ]
         if not record: raise HTTP(404, 'Record ID invalid!')
 
@@ -389,7 +391,7 @@ class ONXFORM(object):
         form = SQLFORM(
             table,
             record=record,
-            buttons=buttons, 
+            buttons=buttons,
             deletable=False,
             formstyle=formstyle_onx,
             fields=self.customize.on_fields_list(self, action),
@@ -439,11 +441,11 @@ class ONXFORM(object):
             response.breadcrumbs = T('Delete Record')
 
             request.args.append('confirmed')
-            buttons = self.get_form_buttons(action, record_id) 
+            buttons = self.get_form_buttons(action, record_id)
 
             self.customize.on_before_init(self, action)
             form = SQLFORM(
-                table, 
+                table,
                 record=record,
                 readonly=True,
                 formstyle=formstyle_onx,
@@ -479,7 +481,7 @@ class ONXFORM(object):
         extra = self.customize.on_manager_extra_links(self, row)
         if len(extra):
             menu += [LI(_class='divider')]
-            menu += extra        
+            menu += extra
         return menu
 
 
@@ -492,7 +494,7 @@ class ONXFORM(object):
             BUTTON(
             SPAN(_class='fa fa-bars'), SPAN(' '),
             SPAN(caption),
-            _href='javascript:void(0);', 
+            _href='javascript:void(0);',
             _class='btn btn-small dropdown-toggle',
             **{'_data-toggle':'dropdown', '_aria-expanded':'false'}),
             UL(self.manager_menu(row), _class='dropdown-menu stay-open pull-right', _role='menu'),
@@ -538,7 +540,7 @@ class ONXFORM(object):
             json=False,
             tsv_with_hidden_cols=False,
             tsv=False
-        )    
+        )
 
         links = self.grid_links()
 
@@ -592,7 +594,7 @@ class ONXFORM(object):
             #viewargs={},
             #buttons_placement = 'right',
             #links_placement = 'right',
-            )    
+            )
         self.customize.on_after_init(self, grid, action)
         return dict(content=grid)
 
@@ -650,7 +652,8 @@ class ONXFORM(object):
 
 
     @staticmethod
-    def child_item(action, parent_id, item_id, table_item, target, list_url, on_get_content):
+    def child_item(action, parent_id, item_id, table_item,
+        target, list_url, on_get_content, onsuccess=None):
         response = current.response
 
         if action == 'list':
@@ -661,7 +664,9 @@ class ONXFORM(object):
             response.view = 'others/generic_modal.load'
 
             content = on_get_content(action, item_id)
-            if content.process().accepted:
+            attr = dict(onsuccess=onsuccess)
+
+            if content.process(**attr).accepted:
                 response.js = "$('#dialog_modal').modal('hide');" if item_id > 0 else ""
                 response.js += "web2py_component('%s','%s-load');" % (list_url, target)
             return dict(content=content)
@@ -672,7 +677,7 @@ class ONXFORM(object):
                 db(table_item.id == item_id).delete()
                 content = True
             if content == True:
-                response.flash=T('Removed with success!')   
+                response.flash=T('Removed with success!')
                 response.js = "web2py_component('%s','%s-load');" % (list_url, target)
             return
 

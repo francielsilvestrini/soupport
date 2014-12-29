@@ -8,17 +8,17 @@
 <!-- main view -->
 <div class="row-fluid">
     <div class="block">
-        
+
         <div class="navbar navbar-inner block-header">
             <div class="brand pull-left">
                 <a href="{{=URL(c='fleet', f='vehicle', args=['read', record.id])}}">
                 {{= record.repr.licence_plate}} <small>&nbsp;{{= record.repr.description}}</small>
                 </a>
-            </div>            
+            </div>
             <div class="pull-right" style="margin-top: 0px;padding-top: 0px;">
                 <div class="btn-group" style="margin-top: 0px;padding-top: 10px;">
-                    <a class="btn-status dropdown-toggle" 
-                        title="{{= record.status.repr.note}}" 
+                    <a class="btn-status dropdown-toggle"
+                        title="{{= record.status.repr.note}}"
                         data-toggle="dropdown" style="background-color: {{=record.status.repr.color}};"
                         id="main_status"
                         >
@@ -34,13 +34,14 @@
                         <li class="divider"></li>
                         <li><a onclick="add_status_note({{=record.status.id}});" href="javascript:void(0);">{{= T('Add status note')}}</a></li>
                     </ul>
-                </div>            
+                </div>
             </div>
         </div>
 
 
         <div class="block-record collapse in">
-            <div class="span6">
+            <div class="span9">
+            <!--
                 <a href="#">planejamento de manutenção</a><br>
                 <a href="#">solicitacao de serviço</a><br>
                 <a href="#">apontamento de despesas</a><br>
@@ -48,24 +49,21 @@
                 <a href="#">durabilidade</a><br>
                 <a href="#">custos</a><br>
                 <a href="#">desperdicios e economias</a><br>
-                <a href="#">apontamento de sulcos</a><br>
-                <a href="#">apontamento de sulcos</a><br>
                 <a href="#">gerenciamento de vencimento (licenciamento/seguro/etc)</a><br>
                 <a href="#">analise de lubrificantes(amostra, aparencia, odor, etc)</a><br>
 
-
-            </div>
-            <div class="span3">
                 <div class="chart easyPieChart" data-percent="83" style="width: 110px; height: 110px; line-height: 110px;">83%<canvas width="110" height="110"></canvas></div>
                 <div class="chart-bottom-heading"><span class="label label-info">Users</span>
 
                 </div>
+            -->
             </div>
             <div class="span3">
                 <div class="pull-right" style="padding:8px;">
                     <a href="{{= URL(c='tire_control', f='manage', vars=request.get_vars)}}" class="btn btn-info">{{= T('Tire Control')}}</a>
-                    <a href="{{= URL(c='inventory', f='components', args=['O2_vehicle', record.id], vars=request.get_vars)}}" 
+                    <a href="{{= URL(c='inventory', f='components', args=['vehicle', record.id], vars=request.get_vars)}}"
                         class="btn btn-info">{{= T('Component Control')}}</a>
+
                 </div>
             </div>
         </div>
@@ -113,7 +111,7 @@
                             </div>
                         </div>
                     </div>
-              
+
                     <div class="tab-pane fade" id="refueling_data">
                         <table class="table table-condensed table-hover">
                             <thead>
@@ -122,7 +120,7 @@
                                     {{row = refueling[0]}}
                                     <th>{{= row.label.refueling_date}}</th>
                                     <th>{{= row.label.fuel_id}}</th>
-                                    <th>{{= row.label.odometer}}</th>
+                                    <th>{{= row.label.odometer_current}}</th>
                                     <th>{{= row.label.liters}}</th>
                                     <th>{{= row.label.distance}}</th>
                                     <th>{{= row.label.average}}</th>
@@ -134,7 +132,7 @@
                                 <tr>
                                     <td>{{= row.repr.refueling_date}}</td>
                                     <td>{{= row.repr.fuel_id}}</td>
-                                    <td>{{= row.repr.odometer}}</td>
+                                    <td>{{= row.repr.odometer_current}}</td>
                                     <td>{{= row.repr.liters}}</td>
                                     <td>{{= row.repr.distance}}</td>
                                     <td>{{= row.repr.average}}</td>
@@ -153,42 +151,12 @@
         <!-- block -->
         <div class="block">
             <div class="navbar navbar-inner block-header">
-                <div class="muted pull-left">Orders</div>
-                <div class="pull-right"><span class="badge badge-info">752</span>
+                <div class="muted pull-left">#</div>
+                <div class="pull-right">
 
                 </div>
             </div>
             <div class="block-record collapse in">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Product</th>
-                            <th>Date</th>
-                            <th>Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Coat</td>
-                            <td>02/02/2013</td>
-                            <td>$25.12</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Jacket</td>
-                            <td>01/02/2013</td>
-                            <td>$335.00</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Shoes</td>
-                            <td>01/02/2013</td>
-                            <td>$29.99</td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </div>
         <!-- /block -->
@@ -208,6 +176,9 @@
                             <ul class="dropdown-menu">
                                 <li><a href="{{= URL(c='fleet', f='odometer', vars=request.vars)}}">
                                     {{= T('Show All')}}
+                                </a></li>
+                                <li><a href="{{= URL(c='fleet', f='reset_odometer', vars=request.vars)}}">
+                                    {{= T('Reset Odometer')}}
                                 </a></li>
                             </ul>
                         </li>
@@ -248,7 +219,7 @@
                 <div class="muted pull-left">{{= T('Status History')}}</div>
                 <div class="pull-right" style="margin-top: 0px;padding-top: 0px;">
                     <div class="btn-group" style="margin-top: 0px;padding-top: 10px;">
-                        <a class="btn-status dropdown-toggle" 
+                        <a class="btn-status dropdown-toggle"
                             data-toggle="dropdown" style="background-color: {{=record.status.repr.color}};">
                             {{= record.status.repr.status}}&nbsp;<span class="caret"></span>
                         </a>
@@ -260,7 +231,7 @@
                             </li>
                             {{pass}}
                         </ul>
-                    </div>            
+                    </div>
                 </div>
             </div>
             <div class="block-record collapse in">
@@ -286,7 +257,7 @@
                             {{else:}}
                                 <td>
                                     <a onclick="add_status_note({{=row.id}});" href="javascript:void(0);"
-                                        title="{{= T('Add status note')}}" 
+                                        title="{{= T('Add status note')}}"
                                         data-toggle="tooltip">
                                         {{= row.repr.note}}
                                     </a>
@@ -302,30 +273,29 @@
     </div>
 </div>
 <div class="row-fluid">
-    <!-- block -->
+    <!-- maintenance -->
     <div class="block">
         <div class="navbar navbar-inner block-header">
-            <div class="muted pull-left">Gallery</div>
-            <div class="pull-right"><span class="badge badge-info">1,462</span>
-
+            <div class="muted pull-left">{{= T('Maintenance')}}</div>
+            <div class="pull-right">
+                <ul id="maintenance_tab" class="nav nav-tabs">
+                    <li class="dropdown">
+                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class='fa fa-bars'></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{= URL(c='maintenance', f='manage', vars=request.vars)}}">
+                                {{= T('Manager')}}
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
         </div>
         <div class="block-record collapse in">
-            <div class="row-fluid padd-bottom">
-              <div class="span3">
-                  <a href="#" class="thumbnail">
-                      a
-                  </a>
-              </div>
-              <div class="span3">
-                  <a href="#" class="thumbnail">
-                    q
-                  </a>
-              </div>
-            </div>
+            {{= LOAD(c='maintenance', f='maintenance.load', args=['list',record.maintenance_control_id], ajax=True, content=loading)}}
         </div>
     </div>
-    <!-- /block -->
+    <!-- /maintenance -->
 </div>
 
 
@@ -363,8 +333,8 @@ $(document).ready(function() {
 
     refueling_data = [
     {{for key, row in enumerate(reversed(refueling)):}}
-        {key_id: "{{= key}}  {{= '%s (%s)' % (row.repr.fuel_id, row.repr.type_average) }}", 
-         average: {{= row.average}}, 
+        {key_id: "{{= key}}  {{= '%s (%s)' % (row.repr.fuel_id, row.repr.type_average) }}",
+         average: {{= row.average}},
          standard: {{= row.average_standard}} },
     {{pass}}
     ];
@@ -380,11 +350,11 @@ $(document).ready(function() {
         xLabelFormat: function (x) {
             var year = x.getFullYear();
             return year -1900;
-        },        
+        },
 
     });
 
-}); 
+});
 
 </script>
 
