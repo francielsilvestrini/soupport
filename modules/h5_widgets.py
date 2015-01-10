@@ -122,16 +122,19 @@ class LookupWidget(OptionsWidget):
         current.session.page.footer_files['select2.min.js'] = URL('static','assets/select2-3.5.1/select2.min.js')
         return
 
-    def widget(self, field, value, **attributes):
+    def widget(self, field, value):
         LookupWidget.widget_files()
 
-        if not self.width:
-            attributes['_class'] = 'span4'
-        attributes['_style'] = 'height: 20px; margin-bottom: 14px;'
-        if self.width:
-            attributes['_style'] += 'width:%s;' % self.width
+        width = self.width or getattr(field, 'width_lookup', None)
 
-        wgt_default = OptionsWidget.widget(field, value, **attributes)
+        attr = {}
+        if not width:
+            attr['_class'] = 'span4'
+        attr['_style'] = 'height: 20px; margin-bottom: 14px;'
+        if width:
+            attr['_style'] += 'width:%s;' % width
+
+        wgt_default = OptionsWidget.widget(field, value, **attr)
         wgt_id = wgt_default.attributes.get('_id', 'no_id')
 
         js = '''

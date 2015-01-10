@@ -13,11 +13,20 @@ td {width: 50%;}
 <script type="text/javascript">
 $(document).ready(function() {
 
- $('textarea').autosize(); 
+    $('textarea').autosize();
 
+    $(".add-translate").click(function (){
+        var parent = $(this).parent('div').parent('div');
+        var text = $(parent).children('p').children('font');
 
-}); 
+        var item_id = $(this).attr("data-id");
+
+        $("#key_"+item_id).val($(text).text());
+    })
+
+});
 </script>
+
 
 {{block scripts}}
   {{super}}

@@ -53,8 +53,26 @@ class UserModel(ModelBase):
             auth.add_membership(group_id, user_id)
         return
 
+def validate_licence():
+    def session_licence_checked():
+        licence_checked = int(session.get('licence_checked', 0))
+        return licence_checked >= PainelModel.validate_factor(request.now.date())
 
-def auth_has_access(c=request.controller, f=request.function): 
+    try:
+        if not session_licence_checked():
+            MULModel.validate_licence()
+            if not session_licence_checked():
+                auth.settings.on_failed_authorization = URL(c='painel', f='licence')
+                return False
+        else:
+            return True
+    except Exception, e:
+        raise
+
+def auth_has_access(c=request.controller, f=request.function):
+    if not validate_licence():
+        return False
+
     if auth.has_membership(role=ADMIN_ROLE):
         return True
     # é o contrario de permitido, se tiver significa bloqueado

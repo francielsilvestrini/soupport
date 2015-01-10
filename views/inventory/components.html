@@ -6,13 +6,13 @@
     owner_table = request.args[0]
     owner_key = request.args[1]
     item_selected = int( request.vars.get('selected', 0) )
-    new_vars = ONXFORM.get_new_vars(request.get_vars)
+    new_vars = clear_vars_navegate(request.get_vars)
 }}
 <div class="row-fluid">
     <div class="{{= 'span6' if len(controls) else 'span12'}}">
 
     <div class="block">
-        
+
         <div class="navbar navbar-inner block-header">
             <div class="muted pull-left" style="padding-top:0px;">{{= caption}}</div>
             <div class="pull-right">
@@ -25,7 +25,7 @@
         </div>
 
         <div class="block-record collapse in" style="padding:10px;">
-            <div class="row-fluid"> 
+            <div class="row-fluid">
             {{if len(items):}}
                 <ul class="nav nav-pills nav-stacked">
                 {{for row in items:}}
@@ -40,7 +40,7 @@
             {{else:}}
                 <div class="well">{{= T('No components managed')}}</div>
             {{pass}}
-            </div>    
+            </div>
         </div>
     </div>
 
@@ -62,8 +62,8 @@ $(document).ready (function () {
         $("#dialog_modal-label").text("{{= T('Add Component')}}");
         $.web2py.component("{{= URL(f='add_component.load', args=request.args)}}/"+item_id, "dialog_modal-form");
         $("#dialog_modal").modal("show");
-    });      
-  
+    });
+
 });
 </script>
 <!-- /main view -->

@@ -13,44 +13,44 @@ class ProjectFleet(ProjectBase):
     def load_menus(self):
         self.append_menu(
             name='fleet_vehicle_type',
-            caption=T('Vehicle Type'),
+            caption='Vehicle Type',
             controller='fleet',
             function='vehicle_type',
             )
         self.append_menu(
             name='fleet_vehicle',
-            caption=T('Vehicle'),
+            caption='Vehicle',
             controller='fleet',
             function='vehicle',
             )
 
         self.append_menu(
             name='inventory_item',
-            caption=T('Inventory Item'),
+            caption='Inventory Item',
             controller='inventory',
             function='inventory_item',
             )
         self.append_menu(
             name='unit_of_measure',
-            caption=T('Unit of Measure'),
+            caption='Unit of Measure',
             controller='inventory',
             function='unit_of_measure',
             )
         self.append_menu(
             name='system',
-            caption=T('System'),
+            caption='System',
             controller='inventory',
             function='system',
             )
         self.append_menu(
             name='subsystem',
-            caption=T('Subsystem'),
+            caption='Subsystem',
             controller='inventory',
             function='subsystem',
             )
         self.append_menu(
             name='system_item',
-            caption=T('System Item'),
+            caption='System Item',
             controller='inventory',
             function='system_item',
             )

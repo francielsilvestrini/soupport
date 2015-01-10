@@ -20,6 +20,20 @@ class TireControlModel(ModelBase):
         'steppe':T('Steppe'),
     }
 
+    @staticmethod
+    def axle_lookup(field, default):
+        wgt = LookupWidget(
+            add_new=lookup_url_new(c='tire_control', f='axle')
+            ).widget(field, default)
+        return wgt
+
+    @staticmethod
+    def chassi_lookup(field, default):
+        wgt = LookupWidget(
+            add_new=lookup_url_new(c='tire_control', f='chassi')
+            ).widget(field, default)
+        return wgt
+
     def define_tables(self):
         self.validate_required(db, ['vehicle'])
 
@@ -71,26 +85,52 @@ class TireControlModel(ModelBase):
             format='%(id)s')
         db.tire_control.vehicle_id.requires = IS_IN_DB(db, db.vehicle, db.vehicle._format)
         db.tire_control.chassi_id.requires = IS_IN_DB(db, db.chassi, db.chassi._format)
+        db.tire_control.chassi_id.widget = TireControlModel.chassi_lookup
 
+
+        def _tc_item_distance(row):
+            try:
+                item = row.tire_control_item
+                distance = db.vehicle[item.vehicle_id].accumulated_odometer - item.start_control
+                distance = distance if distance >= 0.0 else 0.0
+                return distance
+            except Exception, e:
+                return str(e)
+
+        def _tc_item_full_distance(row):
+            try:
+                item = row.tire_control_item
+                full_distance = _tc_item_distance(row) + db.inventory_item[item.tire_id].use_count
+                return full_distance
+            except Exception, e:
+                return str(e)
 
         db.define_table('tire_control_item',
+            Field('vehicle_id', db.vehicle, label=T('Vehicle')),
             Field('tire_control_id', db.tire_control, label=T('Tire Control')),
             Field('axle_position', 'string', label=T('Axle Position')),
             Field('axle_sequence', 'integer', label=T('Axle Sequence')),
             Field('wheel_side', 'string', label=T('Wheel Side')),
             Field('wheel_position', 'integer', label=T('Wheel Position')),
+            Field('start_date', 'date', label=T('Start Date')),
             Field('tire_id', db.inventory_item, label=T('Tire')),
-            Field('odometer', 'double', label=T('Odometer')),
+            Field('start_odometer', 'double', label=T('Start Odometer')),
+            Field('start_control', 'double', label=T('Start Control'), writable=False, readable=False),
+            Field.Virtual('distance', lambda row: _tc_item_distance(row), label=T('Distance')),
+            Field.Virtual('full_distance', lambda row: _tc_item_full_distance(row), label=T('Full Distance')),
             migrate='tire_control_item.table',
             format='%(id)s')
+        db.tire_control_item.vehicle_id.requires = IS_IN_DB(db, db.vehicle, db.vehicle._format)
         db.tire_control_item.tire_control_id.requires = IS_IN_DB(db, db.tire_control, db.tire_control._format)
         db.tire_control_item.axle_position.requires = IS_IN_SET(TireControlModel.chassi_axle_position)
         db.tire_control_item.axle_position.represent = lambda value, row: TireControlModel.chassi_axle_position.get(value) or value
         db.tire_control_item.wheel_side.requires = IS_IN_SET(TireControlModel.axle_wheel_side)
         db.tire_control_item.wheel_side.represent = lambda value, row: TireControlModel.axle_wheel_side[value]
         db.tire_control_item.tire_id.requires = IS_IN_DB(db(db.inventory_item.item_type == 'tire'), db.inventory_item, db.inventory_item._format)
-        db.tire_control_item.tire_id.widget = LookupWidget().widget
-        db.tire_control_item.odometer.default = 0.0
+        db.tire_control_item.tire_id.widget = InventoryModel.inventory_item_lookup
+        db.tire_control_item.start_date.default = request.now
+        db.tire_control_item.start_odometer.default = 0.0
+        db.tire_control_item.start_control.default = 0.0
 
 
         db.define_table('groove_annotation',
@@ -108,7 +148,7 @@ class TireControlModel(ModelBase):
         db.groove_annotation.annotation_date.default = request.now
         db.groove_annotation.groove.default = 0.0
         db.groove_annotation.vehicle_id.requires = IS_IN_DB(db, db.vehicle, db.vehicle._format)
-        db.groove_annotation.vehicle_id.widget = LookupWidget().widget
+        db.groove_annotation.vehicle_id.widget = VehicleModel.vehicle_lookup
         db.groove_annotation.old_odometer.default = 0.0
         db.groove_annotation.odometer.default = 0.0
         db.groove_annotation.distance.default = 0.0
@@ -126,15 +166,15 @@ class TireControlModel(ModelBase):
     def change_chassi(tc_id):
 
         def find_old_tire(old_items, axle_position, axle_sequence, wheel_side, wheel_position):
-            tire_id = None
+            old_item = None
             for item in old_items:
                 if (item.axle_position == axle_position) \
                 and (item.axle_sequence == axle_sequence) \
                 and (item.wheel_side == wheel_side) \
                 and (item.wheel_position == wheel_position):
-                    tire_id = item.tire_id
+                    old_item = item
                     break
-            return tire_id
+            return old_item
 
 
         old_items = db((db.tire_control_item.tire_control_id == tc_id) & (db.tire_control_item.tire_id != None)).select()
@@ -144,11 +184,11 @@ class TireControlModel(ModelBase):
 
         #change tire status avaliable
         for item in old_items:
-            O1Model.change_item_status(item.tire_id, 'available')
+            InventoryModel.change_item_status(item.tire_id, 'available')
 
         #include new items
-        chassi_id = db.tire_control[tc_id].chassi_id
-        chassi_axles = db(db.chassi_axle.chassi_id == chassi_id).select(
+        tc = db.tire_control[tc_id]
+        chassi_axles = db(db.chassi_axle.chassi_id == tc.chassi_id).select(
             orderby=db.chassi_axle.position|db.chassi_axle.sequence)
 
         for axle in chassi_axles:
@@ -157,16 +197,20 @@ class TireControlModel(ModelBase):
             for wheel in axle_wheels:
                 tc_item = table_default_values(db.tire_control_item)
                 tc_item['tire_control_id'] = tc_id
+                tc_item['vehicle_id'] = tc.vehicle_id
                 tc_item['axle_position'] = axle.position
                 tc_item['axle_sequence'] = axle.sequence
                 tc_item['wheel_side'] = wheel.side
                 tc_item['wheel_position'] = wheel.position
-                tc_item['tire_id'] = find_old_tire(old_items,
-                    axle.position, axle.sequence, wheel.side, wheel.position)
+                old_item = find_old_tire(old_items, axle.position, axle.sequence, wheel.side, wheel.position)
+                if old_item:
+                    tc_item['tire_id'] = old_item.tire_id
+                    tc_item['start_date'] = old_item.start_date
+                    tc_item['start_odometer'] = old_item.start_odometer
+                    tc_item['start_control'] = old_item.start_control
                 db.tire_control_item.insert(**tc_item)
-                if tc_item['tire_id']:
-                    O1Model.change_item_status(tc_item['tire_id'], 'in_use')
-
+                if tc_item.get('tire_id'):
+                    InventoryModel.change_item_status(tc_item['tire_id'], 'in_use')
         return
 
     @staticmethod

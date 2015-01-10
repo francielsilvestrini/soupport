@@ -14,18 +14,22 @@ class CommomModel(ModelBase):
             migrate='attachments.table',
             format='%(name)s')
         db.attachments.file_size.compute = lambda row: path.getsize(path.join(UPLOAD_URLS['attachments'],row.attachment))/1024
+        self.set_table_defaults(db.attachments, 0)
+
 
         db.define_table('comments',
             owner_fields,
             Field('comment_str', 'string', label=T('Comment')),
             migrate='comments.table',
-            format='%(comment)s')   
+            format='%(comment)s')
 
         db.define_table('tag',
             Field('name', 'string', label=T('Name')),
             migrate="tag.table",
             format='%(name)s')
         db.tag.name.requires = [IS_NOT_EMPTY(),IS_NOT_IN_DB(db, 'tag.name')]
+        self.set_table_defaults(db.comments, 0)
+
 
         db.define_table('sequence_ticket',
             Field('target', 'string', label=T('Target')),
@@ -35,6 +39,7 @@ class CommomModel(ModelBase):
             Field('sequence', 'string', label=T('Sequence')),
             migrate="sequence_ticket.table",
             format='%(sequence)s')
+        self.set_table_defaults(db.sequence_ticket, 0)
         return
 
 
@@ -48,13 +53,13 @@ class CommomModel(ModelBase):
                 rep = []
             return DIV(rep)
 
-        field_tags = Field('tags', 'string', 
+        field_tags = Field('tags', 'string',
             label=T('Tags'),
             widget=TagsInputWidget(url=URL(c='tags', f='tag_data.json', host=True)).widget,
             represent=lambda value,row: _tag_represent(value)
             )
 
-        return field_tags                    
+        return field_tags
 
     #--------------------------------------------------------------------------
     # BEGIN BUSINESS RULES
@@ -75,7 +80,7 @@ class CommomModel(ModelBase):
 
         db(db.sequence_ticket.id == ticket_id).update(sequence=sequence)
         return sequence
-        
+
     # END BUSINESS RULES
     #--------------------------------------------------------------------------
 

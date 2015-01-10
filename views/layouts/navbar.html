@@ -1,5 +1,5 @@
 <style type="text/css">
-.popover {
+div#nav-activity>.popover {
     width:400px;
     height:350px;
     max-height: 350px;
@@ -14,7 +14,7 @@
         <div class="span2">
             <span class="label">{{= T('Project')}}</span>
             <div class="btn-group">
-                <a href="javascript:void(0);" 
+                <a href="javascript:void(0);"
                     class="btn btn-small"
                     style="width:100px;"
                     data-toggle="dropdown">
@@ -47,13 +47,13 @@
                                 </select>
                             </form>
                         </div>
-                        <!-- end search menu -->                    
+                        <!-- end search menu -->
 
                         <!-- begin activity button -->
-                        <div class="pull-left">
+                        <div id="nav-activity" class="pull-left">
                             <span>
-                                <a href="javascript:void(0);" 
-                                    class="btn btn-inverse" 
+                                <a href="javascript:void(0);"
+                                    class="btn btn-inverse a-popover"
                                     id="a-activity">
                                     <i class="fa fa-flag"></i>
                                 </a>
@@ -65,13 +65,13 @@
                         <div class="pull-left">
                             <span>
                                 <div class="btn-group">
-                                    <a href="{{= URL(c='user', f='user', args=['profile'])}}" 
+                                    <a href="{{= URL(c='user', f='user', args=['profile'])}}"
                                         class="btn btn-inverse">
                                         <i class="fa fa-user"></i>
                                         <span></span>
                                         {{= auth.user.first_name}}
                                     </a>
-                                    <a href="javascript:void(0);" 
+                                    <a href="javascript:void(0);"
                                         class="btn btn-inverse"
                                         data-toggle="dropdown">
                                         <i class="fa fa-caret-down"></i>
@@ -99,9 +99,9 @@
                         <!-- begin full screen button #screenfull.min.js -->
                         <div class="pull-left">
                             <span>
-                                <a href="javascript:void(0);" 
-                                    class="btn btn-inverse" 
-                                    data-action="launchFullscreen" 
+                                <a href="javascript:void(0);"
+                                    class="btn btn-inverse"
+                                    data-action="launchFullscreen"
                                     title="{{= T('Full Screen')}}">
                                     <i class="fa fa-arrows-alt"></i>
                                 </a>
@@ -122,7 +122,7 @@
             <li class="active"><a href="#tab1" data-toggle="tab-activity-todo">{{= T('To-Do')}}</a></li>
             <li><a href="#tab2" data-toggle="tab-activity-msg">Msg</a></li>
             <li><a href="#tab3" data-toggle="tab-activity-notify">Notify</a></li>
-        </ul>        
+        </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="tab-activity-todo">
                 <div id="todo-content">
@@ -153,7 +153,7 @@
         $('#a-activity').click(function (e) {
             e.preventDefault();
             web2py_component("{{= URL(c='activity', f='todo_box.load') }}","todo-content");
-            $(this).popover('show'); 
+            $(this).popover('show');
         });
 
         $("#menu_search").select2({
@@ -165,10 +165,10 @@
             var s = "http://{{= request.env.http_host}}"+ $(this).val();
             window.location = s;
             //window.location.reload(true);
-        });    
+        });
 
         $('body').on('click', function (e) {
-            $('#a-activity').each(function () {
+            $('.a-popover').each(function () {
                 //the 'is' for buttons that trigger popups
                 //the 'has' for icons within a button that triggers a popup
                 if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
@@ -177,4 +177,4 @@
             });
         });
     });
-</script>  
+</script>

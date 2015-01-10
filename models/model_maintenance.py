@@ -10,6 +10,20 @@ class MaintenanceModel(ModelBase):
         self.crud_controller = 'maintenance'
         return
 
+    @staticmethod
+    def maintenance_service_lookup(field, default):
+        wgt = LookupWidget(
+            add_new=lookup_url_new(c='maintenance', f='maintenance_service')
+            ).widget(field, default)
+        return wgt
+
+    @staticmethod
+    def maintenance_plan_lookup(field, default):
+        wgt = LookupWidget(
+            add_new=lookup_url_new(c='maintenance', f='maintenance_plan')
+            ).widget(field, default)
+        return wgt
+
     def define_tables(self):
 
         self.cruds += ['maintenance_service']
@@ -22,6 +36,7 @@ class MaintenanceModel(ModelBase):
             migrate='maintenance_service.table',
             format='%(name)s')
         db.maintenance_service.subsystem_id.requires = IS_IN_DB(db, db.subsystem, db.subsystem._format)
+        db.maintenance_service.subsystem_id.widget = InventoryModel.subsystem_lookup
         db.maintenance_service.name.requires = [IS_NOT_EMPTY(),IS_NOT_IN_DB(db, 'maintenance_service.name')]
         db.maintenance_service.maintenance_interval.default = 5000.00
         db.maintenance_service.notify_with.default = 500.00
@@ -45,7 +60,8 @@ class MaintenanceModel(ModelBase):
             format='%(id)s')
         db.maintenance_plan_item.plan_id.requires = IS_IN_DB(db, db.maintenance_plan, db.maintenance_plan._format)
         db.maintenance_plan_item.service_id.requires = IS_IN_DB(db, db.maintenance_service, db.maintenance_service._format)
-        db.maintenance_plan_item.service_id.widget = LookupWidget(width='85%', add_new=URL(c='maintenance', f='maintenance_service', args='new')).widget
+        db.maintenance_plan_item.service_id.width_lookup = '85%'
+        db.maintenance_plan_item.service_id.widget = MaintenanceModel.maintenance_service_lookup
 
 
         db.define_table('maintenance_control',
@@ -55,7 +71,7 @@ class MaintenanceModel(ModelBase):
             format='%(id)s')
         db.maintenance_control.vehicle_id.requires = IS_IN_DB(db, db.vehicle, db.vehicle._format)
         db.maintenance_control.plan_id.requires = IS_IN_DB(db, db.maintenance_plan, db.maintenance_plan._format)
-        db.maintenance_control.plan_id.widget = LookupWidget(add_new=URL(c='maintenance', f='maintenance_plan', args='new')).widget
+        db.maintenance_control.plan_id.widget = MaintenanceModel.maintenance_plan_lookup
 
         db.define_table('maintenance_control_item',
             Field('control_id', db.maintenance_control, label=T('Maintenance Control'), writable=False, readable=False),
@@ -71,7 +87,8 @@ class MaintenanceModel(ModelBase):
         db.maintenance_control_item.control_id.requires = IS_IN_DB(db, db.maintenance_control, db.maintenance_control._format)
         db.maintenance_control_item.vehicle_id.requires = IS_IN_DB(db, db.vehicle, db.vehicle._format)
         db.maintenance_control_item.service_id.requires = IS_IN_DB(db, db.maintenance_service, db.maintenance_service._format)
-        db.maintenance_control_item.service_id.widget = LookupWidget(width='90%').widget
+        db.maintenance_control_item.service_id.width_lookup = '80%'
+        db.maintenance_control_item.service_id.widget = MaintenanceModel.maintenance_service_lookup
 
         return
 

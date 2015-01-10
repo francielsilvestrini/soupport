@@ -12,41 +12,41 @@ class ProjectTasks(ProjectBase):
 
     def load_menus(self):
         self.append_menu(
-            name='platform', 
-            caption=T('Platform'), 
-            controller='entries', 
+            name='platform',
+            caption='Platform',
+            controller='entries',
             function='platform',
             )
         self.append_menu(
-            name='customer', 
-            caption=T('Customer'), 
-            controller='entries', 
-            function='customer',        
+            name='customer',
+            caption='Customer',
+            controller='entries',
+            function='customer',
             )
         self.append_menu(
-            name='tag', 
-            caption=T('Tag'), 
-            controller='tags', 
+            name='tag',
+            caption='Tag',
+            controller='tags',
             function='tag',
             )
         self.append_menu(
-            name='solicitation', 
-            caption=T('Solicitation'), 
-            controller='tasks', 
+            name='solicitation',
+            caption='Solicitation',
+            controller='tasks',
             function='solicitation',
             icon='icon-bullhorn',
             )
         self.append_menu(
-            name='task', 
-            caption=T('Task'), 
-            controller='tasks', 
+            name='task',
+            caption='Task',
+            controller='tasks',
             function='task',
             icon='icon-tasks',
             )
         self.append_menu(
-            name='releases', 
-            caption=T('Releases'), 
-            controller='tasks', 
+            name='releases',
+            caption='Releases',
+            controller='tasks',
             function='releases',
             icon='icon-tags',
             )

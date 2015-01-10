@@ -6,7 +6,7 @@ class PageConfig(object):
     Configuração da pagina
 
     A inclusão dos arquivos na pagina funcionariam perfeitamente se não fosse a questão do LOAD.
-    Se em um LOAD tiver widget, o arquivo .js não será adicionado. Por isso deverá ser usado o 
+    Se em um LOAD tiver widget, o arquivo .js não será adicionado. Por isso deverá ser usado o
     metodo CustomWidget().widget_files(), na função do controller
     '''
     def __init__(self, **kwargs):
@@ -15,11 +15,11 @@ class PageConfig(object):
 
     def reset_files(self):
         self.header_files = dict()
-        self.footer_files = dict()      
+        self.footer_files = dict()
         return
 
     def include_files(self, files):
-        css_template = '<link href="%s" rel="stylesheet" type="text/css"/>' 
+        css_template = '<link href="%s" rel="stylesheet" type="text/css"/>'
         js_template = '<script src="%s" type="text/javascript"></script>'
 
         hfiles = []
@@ -30,7 +30,7 @@ class PageConfig(object):
             elif f.endswith('.css'):
                 hfiles.append(css_template % f)
 
-        return XML('\n'.join([f for f in hfiles]))  
+        return XML('\n'.join([f for f in hfiles]))
 
 
     def include_header_files(self):
@@ -57,7 +57,7 @@ class Breadcrumbs(object):
         del self.items[-1]
 
     def delete_item(self, index):
-        while len(self.items) > index: 
+        while len(self.items) > index:
             self.delete_current()
 
     def add(self, title, url, reset=False):
@@ -80,7 +80,7 @@ class Breadcrumbs(object):
             curr_action = curr[4] if len(curr) > 4 else 'select'
             if (last[:4] == curr[:4]) and (last_action != 'select') and (curr_action in Breadcrumbs.crud_actions):
                 self.delete_current()
-           
+
         self.items.append( (title, url) )
         return
 
@@ -96,7 +96,7 @@ class Breadcrumbs(object):
             t, u = self.items[-2]
         else:
             u = None
-        return u        
+        return u
 
     def last_url_parts(self):
         if not self.last_url():

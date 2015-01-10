@@ -2,9 +2,9 @@
 
 class ActivityModel(ModelBase):
     name = 'activity'
-    
+
     TODO_STATUS_SET = {
-        'waiting':T('Waiting'), 
+        'waiting':T('Waiting'),
         'done':T('Done'),
         'canceled':T('Canceled'),
         }
@@ -21,7 +21,7 @@ class ActivityModel(ModelBase):
         def todo_content_rep(value, row):
             import re
             match = re.search('(?P<url>https?://[^\s]+)', value)
-            if match is not None: 
+            if match is not None:
                 url = match.group('url')
                 content = value.replace(url, '')
                 if content == '':
@@ -41,6 +41,7 @@ class ActivityModel(ModelBase):
         db.activity_todo.status.requires = IS_IN_SET(ActivityModel.TODO_STATUS_SET)
         db.activity_todo.status.default = 'waiting'
         db.activity_todo.status.represent = lambda value, row: todo_status_rep(value, row)
+        self.set_table_defaults(db.activity_todo, 0)
 
         '''
 
@@ -64,4 +65,4 @@ class ActivityModel(ModelBase):
             Field('read_status', 'string', label=T('Read Status')),
             Field('for_users', 'list:reference auth_user', label=T('For Users')),
         '''
-        return  
+        return

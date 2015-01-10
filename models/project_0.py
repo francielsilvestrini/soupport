@@ -11,7 +11,7 @@ class ProjectBase(object):
 
         self.caption=T('Project Base'),
         self.home=URL(c='default', f='index'),
-        self.admin_required=False, 
+        self.admin_required=False,
         return
 
 
@@ -22,7 +22,7 @@ class ProjectBase(object):
             new_record=None
 
         item = Storage(
-            caption=caption,
+            caption=T(caption),
             icon=icon,
             url=URL(c=controller, f=function, vars=dict(origin='menu')),
             new_record=new_record,
@@ -34,9 +34,9 @@ class ProjectBase(object):
     def load_menus(self):
         '''
         self.append_menu(
-            name='fleet_inventory_item', 
-            caption=T('Inventory Item'), 
-            controller='fleet', 
+            name='fleet_inventory_item',
+            caption=T('Inventory Item'),
+            controller='fleet',
             function='inventory_item',
             )
         '''

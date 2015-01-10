@@ -128,7 +128,7 @@ def manage():
     control = db(db.maintenance_control.vehicle_id == vehicle.id).select().first()
 
     if not control:
-        new_vars = ONXFORM.get_new_vars(request.get_vars)
+        new_vars = clear_vars_navegate(request.get_vars)
         new_vars['next'] = current_url()
         new_vars['previous'] = bc.last_url()
         redirect(URL(f='create', vars=new_vars))
@@ -250,8 +250,10 @@ def maintenance():
                 if not vehicle:
                     vehicle = _get_vehicle(row.vehicle_id)
                 percent = 100.0
-                if row.next_maintenance > 0.0:
-                    percent = round((vehicle.accumulated_odometer * 100)/row.next_maintenance, 2)
+                diference = row.next_maintenance - vehicle.current_odometer
+                if diference > 0.0:
+                    percent = 100.0 - round((diference * 100)/row.maintenance_interval, 2)
+
                 row.repr.percent = percent
                 row.repr.bar = _get_progress_bar(percent)
             return dict(content=rows)

@@ -1,36 +1,72 @@
-<div class="navbar">
-    <div class="navbar-inner" style="padding-left: .25em;">
-        <ul class="breadcrumb">
-            <li>
-            <a href="javascript:void(0);" title="{{= T('Show/Hide Sidebar')}}" data-toggle="tooltip">&nbsp;
-                <i class="fa fa-arrow-circle-left hide-sidebar" style="display: inline-block;"></i>
-                <i class="fa fa-arrow-circle-right show-sidebar" style="display: none;"></i>
-            </a> <span class="divider">/</span>  
-            </li>
-
-            {{bc = session.get('breadcrumbs', {'items':[]})}}
-            {{for i, (title, url) in enumerate(bc.items):}}
-                {{if i+1 == len(bc.items):}}
-                <li class="active">
-                    {{= title}}
-                {{else:}}
-                <li>
-                    <a href="{{= url}}">{{= title }}</a> <span class="divider">/</span>
-                {{pass}}
-                </li>                
-            {{pass}}
-        </ul>
-    </div>
-</div>
-
-<!-- page alert -->
+{{active_link = request.env.http_host}}
 <div class="row-fluid">
-{{for title, alert, alert_class in response.page_alerts:}}
-    <div class="alert alert-{{= alert_class}}" style="margin-bottom: 0px; margin-top: 10px;" >
-        <button type="button" class="close" data-dismiss="alert">×</button>
-        <h4>{{= XML(title)}}</h4>
-        <p>{{= XML(alert)}}</p>
+    <div class="navbar">
+        <div class="navbar-inner" style="padding-left: .25em;">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="javascript:void(0);" title="{{= T('Show/Hide Sidebar')}}" data-toggle="tooltip">&nbsp;
+                        <i class="fa fa-arrow-circle-left hide-sidebar" style="display: inline-block;"></i>
+                        <i class="fa fa-arrow-circle-right show-sidebar" style="display: none;"></i>
+                    </a> <span class="divider">/</span>
+                </li>
+                {{bc = session.get('breadcrumbs', {'items':[]})}}
+                {{for i, (title, url) in enumerate(bc.items):}}
+                    {{if i+1 == len(bc.items):}}
+                    <li class="active">
+                        {{= title}}
+                        {{active_link = active_link + url}}
+                    {{else:}}
+                    <li>
+                        <a href="{{= url}}">{{= title }}</a> <span class="divider">/</span>
+                    {{pass}}
+                    </li>
+                {{pass}}
+                    <li class="pull-right">
+                        <a href="javascript:void(0);"
+                            style="margin-top: -5px;"
+                            class="btn btn-small a-popover"
+                            title="{{= T('QRCode')}}"
+                            data-toggle="tooltip"
+                            id="a-qrcode">
+                            <i class="fa fa-qrcode"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
-{{pass}}
-</div>
-<!-- /page alert -->
+    <div id="div-qrcode" class="hide">
+        <div id="qrcode"></div>
+    </div>
+    <!-- page alert -->
+    <div class="row-fluid">
+        {{for title, alert, alert_class in response.page_alerts:}}
+        <div class="alert alert-{{= alert_class}}" style="margin-bottom: 0px; margin-top: 10px;" >
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <h4>{{= XML(title)}}</h4>
+            <p>{{= XML(alert)}}</p>
+        </div>
+        {{pass}}
+    </div>
+    <!-- /page alert -->
+    <script type="text/javascript">
+    $(document).ready(function () {
+        var qrcode = new QRCode("qrcode", {
+            width: 128,
+            height: 128,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+        qrcode.makeCode("{{= active_link}}");
+
+        $('#a-qrcode').popover({
+            trigger: 'click',
+            html: true,
+            placement: 'left',
+            content: function() {
+                return $('#div-qrcode').html();
+            },
+        });
+    });
+    </script>

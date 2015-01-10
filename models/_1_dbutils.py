@@ -103,8 +103,7 @@ class DBUTIL(object):
     def last_id(table, query):
         max = table['id'].max()
         max_id = db(query).select(max).first()[max]
-        return max_id        
+        return max_id
 
 ###############################################################################
 
-        

@@ -37,9 +37,44 @@ class InventoryModel(ModelBase):
     }
 
 
+    @staticmethod
+    def unit_of_measure_lookup(field, default):
+        wgt = LookupWidget(
+            add_new=lookup_url_new(c='inventory', f='unit_of_measure')
+            ).widget(field, default)
+        return wgt
+
+    @staticmethod
+    def system_lookup(field, default):
+        wgt = LookupWidget(
+            add_new=lookup_url_new(c='inventory', f='system')
+            ).widget(field, default)
+        return wgt
+
+    @staticmethod
+    def subsystem_lookup(field, default):
+        wgt = LookupWidget(
+            add_new=lookup_url_new(c='inventory', f='subsystem')
+            ).widget(field, default)
+        return wgt
+
+    @staticmethod
+    def system_item_lookup(field, default):
+        wgt = LookupWidget(
+            add_new=lookup_url_new(c='inventory', f='system_item')
+            ).widget(field, default)
+        return wgt
+
+    @staticmethod
+    def inventory_item_lookup(field, default):
+        wgt = LookupWidget(
+            add_new=lookup_url_new(c='inventory', f='inventory_item')
+            ).widget(field, default)
+        return wgt
+
+
     def define_tables(self):
         #self.validate_required(db, ['platform', 'customer'])
-
 
         db.define_table('unit_of_measure',
             Field('acronym', 'string', label=T('Acronym')),
@@ -68,7 +103,7 @@ class InventoryModel(ModelBase):
             format=lambda row:_subsystem_format(row))
         db.subsystem.name.requires = [IS_NOT_EMPTY(),IS_NOT_IN_DB(db, 'subsystem.name')]
         db.subsystem.system_id.requires = IS_IN_DB(db, db.system, db.system._format)
-        db.subsystem.system_id.widget = LookupWidget(add_new=URL(c='inventory', f='system', args='new')).widget
+        db.subsystem.system_id.widget = InventoryModel.system_lookup
 
 
         db.define_table('system_item',
@@ -83,8 +118,9 @@ class InventoryModel(ModelBase):
         db.system_item.item_type.requires = IS_IN_SET(InventoryModel.system_item_type)
         db.system_item.item_type.represent = lambda value, row: InventoryModel.system_item_type[value]
         db.system_item.unit_of_measure_id.requires = IS_IN_DB(db, db.unit_of_measure, db.unit_of_measure._format)
+        db.system_item.unit_of_measure_id.widget = InventoryModel.unit_of_measure_lookup
         db.system_item.subsystem_id.requires = IS_IN_DB(db, db.subsystem, db.subsystem._format)
-        db.system_item.subsystem_id.widget = LookupWidget(add_new=URL(c='inventory', f='subsystem', args='new')).widget
+        db.system_item.subsystem_id.widget = InventoryModel.subsystem_lookup
         db.system_item.is_active.default = True
 
 
@@ -95,6 +131,7 @@ class InventoryModel(ModelBase):
             Field('unit_of_measure_id', db.unit_of_measure, label=T('Unit of Measure')),
             Field('status', 'string', label=T('Status')),
             Field('material_id', db.system_item, label=T('Material')),
+            Field('use_count', 'double', label=T('Use Count')),
             Field('initial_groove', 'double', label=T('Initial Groove')),
             Field('end_groove', 'double', label=T('End Groove')),
             #Field('life_cycle_status', 'string', label=T('Life Cycle Status')),
@@ -122,12 +159,14 @@ class InventoryModel(ModelBase):
         db.inventory_item.item_type.requires = IS_IN_SET(InventoryModel.inventory_item_type)
         db.inventory_item.item_type.represent = lambda value, row: InventoryModel.inventory_item_type.get(value, value)
         db.inventory_item.unit_of_measure_id.requires = IS_IN_DB(db, db.unit_of_measure, db.unit_of_measure._format)
+        db.inventory_item.unit_of_measure_id.widget = InventoryModel.unit_of_measure_lookup
         db.inventory_item.unit_of_measure_id.default = InventoryModel.unit_of_measure_default
         db.inventory_item.status.requires = IS_IN_SET(InventoryModel.inventory_item_status)
         db.inventory_item.status.represent = lambda value, row: InventoryModel.inventory_item_status.get(value, value)
         db.inventory_item.status.default = 'available'
         db.inventory_item.material_id.requires = IS_IN_DB(db(db.system_item.item_type == 'material'), db.system_item, db.system_item._format)
-        db.inventory_item.material_id.widget = LookupWidget().widget
+        db.inventory_item.material_id.widget = InventoryModel.system_item_lookup
+        db.inventory_item.use_count.default = 0.0
         db.inventory_item.initial_groove.default = 10.0
         db.inventory_item.initial_groove.show_grid = False
         db.inventory_item.end_groove.default = 1.0

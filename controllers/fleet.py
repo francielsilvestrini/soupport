@@ -54,9 +54,8 @@ def vehicle():
     def do_before_init(self, action):
         if action == 'new':
             db.vehicle.accumulated_odometer.compute = lambda row: row.current_odometer
-        else:
-            db.vehicle.current_odometer.writable = False
-
+            db.vehicle.accumulated_odometer.writable = False
+            db.vehicle.accumulated_odometer.readable = False
         return
 
     def do_form_success(form):
@@ -85,57 +84,42 @@ def vehicle():
     oform.child_controls = True
     oform.save_and_add_enabled = False
     content = oform.get_current_action()
+
+    children = [LOAD(c='fleet', f='vehicle_fuel.load', args=['list',request.args(1)], ajax=True, content=loading)]
+    content['children'] = children
+
     breadcrumbs_add()
     return content
 
 
 def vehicle_fuel():
     try:
-        parent_id = int(request.args(0))
+        action = request.args(0)
+        parent_id = int(request.args(1))
+        item_id = int(request.args(2) or 0)
+        table_item = db.vehicle_fuel
+        target = request.function
+        list_url = URL(f=target+'.load', args=['list', parent_id])
+
+        def _do_get_content(*args):
+            if action == 'list':
+                rows = db(table_item.vehicle_id==parent_id).select()
+                for row in rows:
+                    ONXREPR.row_repr(row, table_item)
+                return rows
+            elif action == 'edit':
+                response.view = 'others/generic_modal.load'
+                table_item.vehicle_id.default = parent_id
+                table_item.vehicle_id.writable = False
+                form = SQLFORM(table_item, item_id, formstyle=formstyle_onx)
+                return form
+
+        content = ONXFORM.child_item(action, parent_id, item_id, table_item,
+            target, list_url, _do_get_content)
+        return content
     except Exception, e:
         response.view = 'others/load_error.html'
-        return dict(msg=T('ERROR: %s') % str(e) )
-
-    rows = db(db.vehicle_fuel.vehicle_id==parent_id).select()
-    for row in rows:
-        ONXREPR.row_repr(row, db.vehicle_fuel)
-    return dict(content=rows)
-
-
-def vehicle_fuel_edit():
-    try:
-        parent_id = int(request.args(0))
-        item_id = int(request.args(1))
-    except Exception, e:
-        response.view = 'others/load_error.html'
-        return dict(msg=T('ERROR: %s') % str(e) )
-
-    db.vehicle_fuel.vehicle_id.default = parent_id
-    db.vehicle_fuel.vehicle_id.writable = False
-    form = SQLFORM(db.vehicle_fuel, item_id)
-    if form.process().accepted:
-        response.js = """
-            $('#dialog_modal').modal('hide');
-            web2py_component('%s','vehicle_fuel-load');
-            """ % URL(f='vehicle_fuel.load', args=[parent_id])
-    response.view = 'others/generic_modal.load'
-    return dict(content=form)
-
-
-def vehicle_fuel_remove():
-    try:
-        parent_id = int(request.args(0))
-        item_id = int(request.args(1))
-    except Exception, e:
-        response.view = 'others/load_error.html'
-        return dict(msg=T('ERROR: %s') % str(e) )
-
-    db(db.vehicle_fuel.id == item_id).delete()
-    response.flash=T('Removed with success!')
-    response.js = """
-        web2py_component('%s','vehicle_fuel-load');
-        """ % URL(f='vehicle_fuel.load', args=[parent_id])
-    return
+        return dict(msg=str(e) )
 
 
 @auth.requires(lambda: auth_has_access())
@@ -163,7 +147,7 @@ def add_status_note():
 
     db.vehicle_status.vehicle_id.writable=False
     db.vehicle_status.status.writable=False
-    form = SQLFORM(db.vehicle_status, status_id)
+    form = SQLFORM(db.vehicle_status, status_id, formstyle=formstyle_onx)
     if form.process().accepted:
         response.js = """
             window.location.reload(true);
@@ -274,8 +258,11 @@ def refueling():
 
             item = db.vehicle_refueling[item_id]
             current_refueling = bus['accumulated']
-            distance = current_refueling - item.old_refueling
-            average = round(distance / item.liters, 3)
+            distance = 0.0
+            average = 0.0
+            if item.old_refueling > 0.0:
+                distance = current_refueling - item.old_refueling
+                average = round(distance / item.liters, 3)
 
             item.update_record(
                 current_refueling=current_refueling,
@@ -349,7 +336,7 @@ def reset_odometer():
         odometer = float(form.vars['odometer'])
         VehicleModel.vehicle_odometer_change(
             vehicle_id=vehicle.id,
-            odometer_status='odometer_reset',
+            odometer_status='normal',
             odometer=odometer,
             note=form.vars['note'],
             owner_table=None,
@@ -358,7 +345,7 @@ def reset_odometer():
             )
         VehicleModel.vehicle_odometer_change(
             vehicle_id=vehicle.id,
-            odometer_status='normal',
+            odometer_status='odometer_reset',
             odometer=0.00,
             note=T('Restarted'),
             owner_table=None,

@@ -1,11 +1,11 @@
 <!--[if HTML5]><![endif]-->
 <!DOCTYPE html>
 <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
-<!--[if lt IE 7]><html class="ie ie6 ie-lte9 ie-lte8 ie-lte7 no-js" lang="{{=T.accepted_language or 'en'}}"> <![endif]-->
-<!--[if IE 7]><html class="ie ie7 ie-lte9 ie-lte8 ie-lte7 no-js" lang="{{=T.accepted_language or 'en'}}"> <![endif]-->
-<!--[if IE 8]><html class="ie ie8 ie-lte9 ie-lte8 no-js" lang="{{=T.accepted_language or 'en'}}"> <![endif]-->
-<!--[if IE 9]><html class="ie9 ie-lte9 no-js" lang="{{=T.accepted_language or 'en'}}"> <![endif]-->
-<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js" lang="{{=T.accepted_language or 'en'}}"> <!--<![endif]-->
+<!--[if lt IE 7]><html class="ie ie6 ie-lte9 ie-lte8 ie-lte7 no-js" lang="{{=response.language}}"> <![endif]-->
+<!--[if IE 7]><html class="ie ie7 ie-lte9 ie-lte8 ie-lte7 no-js" lang="{{=response.language}}"> <![endif]-->
+<!--[if IE 8]><html class="ie ie8 ie-lte9 ie-lte8 no-js" lang="{{=response.language}}"> <![endif]-->
+<!--[if IE 9]><html class="ie9 ie-lte9 no-js" lang="{{=response.language}}"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js" lang="{{= response.language}}"> <!--<![endif]-->
 <head>
     <title>{{=response.title or request.application}}</title>
     <!--[if !HTML5]>
@@ -66,7 +66,7 @@
     {{= session.page.include_header_files() }}
     {{pass}}
     <!-- end widgets header files -->
-    
+
     {{block head}}
     <!-- include css -->
     {{end}}
@@ -88,22 +88,15 @@
         <script src="{{=URL('static','js/web2py_bootstrap.js')}}"></script>
         <script src="{{=URL('static','js/calendar.js')}}"></script>
         <script src="{{=URL('static','js/responsive-tables.js')}}"></script>
+        <script src="{{=URL('static','assets/qrcode/qrcode.min.js')}}"></script>
         <script src="{{=URL('static','assets/jquery.confirm/jquery.confirm.min.js')}}"></script>
-        <script type="text/javascript">
-            $.confirm.options = {
-                title: "{{= T('Confirmation required')}}",
-                confirmButton: "{{= T('Confirm')}}",
-                cancelButton: "{{= T('Cancel')}}",
-                confirmButtonClass: "btn-danger"
-            }    
-        </script>
 
         <!--[if lt IE 7 ]>
             <script src="{{=URL('static','w2p/js/dd_belatedpng.js')}}"></script>
             <script> DD_belatedPNG.fix('img, .png_bg'); //fix any <img> or .png_bg background-images </script>
         <![endif]-->
     {{end}}
-    
+
     {{ response.include_files() }}
 
     <!-- begin widgets footer files -->
@@ -120,10 +113,30 @@
         <script src="{{=URL('static','js/analytics.min.js')}}"></script>
         <script type="text/javascript">
             analytics.initialize({
-                'Google Analytics':{trackingId:'{{=response.google_analytics_id}}'} 
+                'Google Analytics':{trackingId:'{{=response.google_analytics_id}}'}
             });
         </script>
     {{pass}}
-    
+
+    <script type="text/javascript">
+    $.confirm.options = {
+        title: "{{= T('Confirmation required')}}",
+        confirmButton: "{{= T('Confirm')}}",
+        cancelButton: "{{= T('Cancel')}}",
+        confirmButtonClass: "btn-danger"
+    }
+
+    $(document).ready(function () {
+        $('body').on('click', function (e) {
+            $('.a-popover').each(function () {
+                //the 'is' for buttons that trigger popups
+                //the 'has' for icons within a button that triggers a popup
+                if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                    $(this).popover('hide');
+                }
+            });
+        });
+    });
+    </script>
 </body>
 </html>

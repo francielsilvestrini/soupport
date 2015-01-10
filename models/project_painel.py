@@ -13,17 +13,17 @@ class ProjectPainel(ProjectBase):
 
     def load_menus(self):
         self.append_menu(
-            name='auth_user', 
-            caption=T('User'), 
-            controller='user', 
+            name='auth_user',
+            caption='User',
+            controller='user',
             function='auth_user',
             )
         self.append_menu(
-            name='auth_group', 
-            caption=T('User Group'), 
-            controller='user', 
+            name='auth_group',
+            caption='User Group',
+            controller='user',
             function='auth_user',
-            )       
+            )
         return
 
 

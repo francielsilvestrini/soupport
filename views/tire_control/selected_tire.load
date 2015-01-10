@@ -2,8 +2,8 @@
 <div class="block">
     <div class="navbar navbar-inner block-header">
         <div class="brand pull-left">
-            <a href="{{=URL(c='inventory', f='inventory_item', args=['read', record.inventory_item.id])}}">
-            {{= record.inventory_item.repr.number}} <small>&nbsp;{{= record.inventory_item.repr.description}}</small>
+            <a href="{{=URL(c='inventory', f='inventory_item', args=['read', record.tire_id])}}">
+            <small>{{= record.repr.tire_id}}</small>
             </a>
         </div>
         <div class="pull-right" style="padding-top:10px">
@@ -17,13 +17,33 @@
         <div class="row-fluid">
             <div class="span6">
                 <span class="onx-col-header">{{= T('Axle')}}</span>
-                <div>{{= T('Position %(axle_position)s, Sequence %(axle_sequence)s') % record.tire_control_item.repr}}</div>
+                <div>{{= T('Position %(axle_position)s, Sequence %(axle_sequence)s') % record.repr}}</div>
             </div>
             <div class="span6">
                 <span class="onx-col-header">{{= T('Wheel')}}</span>
-                <div>{{= T('Side %(wheel_side)s, Position %(wheel_position)s') % record.tire_control_item.repr}}</div>
+                <div>{{= T('Side %(wheel_side)s, Position %(wheel_position)s') % record.repr}}</div>
             </div>
         </div>
+        <div class="row-fluid">
+            <div class="span3">
+                <span class="onx-col-header">{{= record.label.start_date}}</span>
+                <div>{{= record.repr.start_date}}</div>
+            </div>
+
+            <div class="span3">
+                <span class="onx-col-header">{{= record.label.start_odometer}}</span>
+                <div>{{= record.repr.start_odometer}}</div>
+            </div>
+            <div class="span3">
+                <span class="onx-col-header">{{= db.tire_control_item.distance.label}}</span>
+                <div>{{= record.distance}}</div>
+            </div>
+            <div class="span3">
+                <span class="onx-col-header">{{= db.tire_control_item.full_distance.label}}</span>
+                <div>{{= record.full_distance}}</div>
+            </div>
+        </div>
+
     </div>
 </div>
 

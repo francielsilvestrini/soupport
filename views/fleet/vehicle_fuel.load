@@ -1,85 +1,38 @@
-<!-- vehicle fuel -->
-<div id="vehicle_fuel-load" class="row-fluid">
-        <div class="block">
-            <div class="navbar navbar-inner block-header">
-                <div class="muted pull-left">{{= T('Vehicle Fuel')}}</div>
-                <div class="pull-right">
-                    <a class="btn btn-primary vehicle_fuel-edit"
-                        href="javascript:void(0);"
-                        data-id="0">
-                        {{= T('Add Fuel')}}
-                    </a>
-                </div>
-            </div>
-            <div class="block-record collapse in">
-                <table class="table table-condensed table-hover">
-                    <thead>
-                        <tr>
-                            {{if len(content):}}
-                            <th>{{= content[0].label.fuel_id}}</th>
-                            <th>{{= content[0].label.average_standard}}</th>
-                            <th>{{= T('Statistics')}}</th>
-                            <th></th>
-                            {{pass}}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{for row in content:}}
-                        <tr>
-                            <td>{{= row.repr.fuel_id}}</td>
-                            <td>{{= row.repr.average_standard}}</td>
-                            <td>graphic</td>
-                            <td>
-                                <a class="btn btn-mini vehicle_fuel-edit"
-                                    href="javascript:void(0);"
-                                    title="{{= T('Edit')}}"
-                                    data-id="{{= row.id}}" 
-                                    data-toggle="tooltip">
-                                    <i class="icon icon-pencil"></i>
-                                </a>
-                                <a class="btn btn-mini vehicle_fuel-remove"
-                                    href="javascript:void(0);"
-                                    title="{{= T('Remove')}}" 
-                                    data-id="{{=row.id}}" 
-                                    data-toggle="tooltip">
-                                    <i class="icon icon-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        {{pass}}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-</div>
+{{extend 'layouts/child.load'}}
 
-<script type="text/javascript">
-{{parent_id = request.args(0)}}
-function vehicle_fuel_edit(item_id) {
-    var parent = $("#dialog_modal-label").parent();
-    $("#dialog_modal-label").remove();
-    $(parent).append("<h3 id='dialog_modal-label'>{{= T('Vehicle Fuel')}}</h3>");
+{{block declare_vars}}
+{{
+    target = request.function
+    parent_id = request.args(1)
+    captions = (T('Vehicle Fuel'), T('Vehicle Fuel'))
+    caption_new_btn = T('Add Fuel')
+    url_edit = URL(f=target, args=['edit',parent_id] )
+    url_remove = URL(f=target, args=['remove', parent_id])
+}}
+{{end}}
 
-    $.web2py.component("{{= URL(f='vehicle_fuel_edit.load', args=[parent_id] )}}/"+item_id, "dialog_modal-form");
-    $("#dialog_modal").modal("show");
-}
 
-$(document).ready (function () {
-    $(".vehicle_fuel-edit").click(function () {
-        $("#dialog_modal-label").text("{{= T('Vehicle Fuel')}}");
-        var item_id = $(this).attr("data-id");
-        $.web2py.component("{{= URL(f='vehicle_fuel_edit.load', args=[parent_id] )}}/"+item_id, "dialog_modal-form");
-        $("#dialog_modal").modal("show");
-    });      
-    $(".vehicle_fuel-remove").confirm({
-        text: w2p_ajax_confirm_message,
-        confirm: function(button) {
-            var item_id = $(button).attr("data-id");
-            var url = '{{= URL(f="vehicle_fuel_remove", args=[parent_id])}}/'+item_id;
-            ajax(url, [], '');
-        },
-    });
-});
-</script>
-<!-- /vehicle fuel -->
-
+<table class="table table-condensed table-hover">
+    <thead>
+        <tr>
+            {{if len(content):}}
+            <th>{{= content[0].label.fuel_id}}</th>
+            <th>{{= content[0].label.average_standard}}</th>
+            <th>{{= T('Statistics')}}</th>
+            <th></th>
+            {{pass}}
+        </tr>
+    </thead>
+    <tbody>
+        {{for row in content:}}
+        <tr>
+            <td>{{= row.repr.fuel_id}}</td>
+            <td>{{= row.repr.average_standard}}</td>
+            <td>graphic</td>
+            <td>
+                {{include 'others/child_item_buttons.html'}}
+            </td>
+        </tr>
+        {{pass}}
+    </tbody>
+</table>

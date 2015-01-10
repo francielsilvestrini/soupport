@@ -28,6 +28,23 @@ class VehicleModel(ModelBase):
         'normal':T('Normal'),
         'odometer_reset':T('Odometer Reset'),
     }
+
+    @staticmethod
+    def vehicle_lookup(field, default):
+        wgt = LookupWidget(
+            add_new=lookup_url_new(c='fleet', f='vehicle')
+            ).widget(field, default)
+        return wgt
+
+    @staticmethod
+    def default_odometer(field, vehicle, default, start_range=0.0):
+        field.default = default
+        field.comment = T('Vehicle Odometer: %s %s') % (vehicle.current_odometer, \
+            field_rep(db.vehicle.odometer_unit_id, vehicle.odometer_unit_id, vehicle))
+        field.requires = IS_FLOAT_IN_RANGE(start_range, None)
+        return field
+
+
     def define_tables(self):
         self.validate_required(db, ['inventory_item'])
 
@@ -43,8 +60,9 @@ class VehicleModel(ModelBase):
             Field('licence_plate', 'string', label=T('License Plate')),
             Field('description', 'string', label=T('Description')),
             Field('vehicle_type_id', db.vehicle_type, label=T('Type')),
+            Field('reset_odometer', 'integer', label=T('Reset Odometer')),
             Field('current_odometer', 'double', label=T('Current Odometer')),
-            Field('accumulated_odometer', 'double', label=T('Accumulated Odometer'), writable=False, readable=False),
+            Field('accumulated_odometer', 'double', label=T('Accumulated Odometer')),
             Field('odometer_unit_id', db.unit_of_measure, label=T('Unit of Odometer')),
 
             Field('bio_renavan', 'string', label=T('Renavan')),
@@ -75,8 +93,10 @@ class VehicleModel(ModelBase):
         db.vehicle.vehicle_type_id.requires = IS_IN_DB(db, db.vehicle_type, db.vehicle_type._format)
         db.vehicle.is_active.default = True
         db.vehicle.is_active.represent = ONXREPR.repr_yes_no
+        db.vehicle.reset_odometer.default = 1
         db.vehicle.current_odometer.default = 0.0
         db.vehicle.odometer_unit_id.requires = IS_IN_DB(db, db.unit_of_measure, db.unit_of_measure._format)
+        db.vehicle.odometer_unit_id.widget = InventoryModel.unit_of_measure_lookup
         db.vehicle.odometer_unit_id.default = InventoryModel.km_unit_default
 
         #db.vehicle.acquisition_date.show_grid = False
@@ -97,15 +117,16 @@ class VehicleModel(ModelBase):
         db.vehicle_status.status.represent = lambda v,row: VehicleModel.vehicle_status.get(v, v)
 
 
-        def _unit_from_vehicle(row):
-            unit_id = db.vehicle[row.vehicle_id].odometer_unit_id
-            return unit_id
+        def _from_vehicle(field_name, row):
+            value = db.vehicle[row.vehicle_id][field_name]
+            return value
 
 
         db.define_table('vehicle_odometer',
             Field('vehicle_id', db.vehicle, label=T('Vehicle')),
             Field('odometer_date', 'date', label=T('Date')),
             Field('status', 'string', label=T('Status'), writable=False),
+            Field('reset', 'integer', label=T('Reset')),
             Field('odometer', 'double', label=T('Odometer')),
             Field('distance', 'double', label=T('Distance')),
             Field('note', 'string', label=T('Note')),
@@ -119,10 +140,12 @@ class VehicleModel(ModelBase):
         db.vehicle_odometer.status.requires = IS_IN_SET(VehicleModel.vehicle_odometer_status)
         db.vehicle_odometer.status.represent = lambda v,row: VehicleModel.vehicle_odometer_status.get(v, v)
         db.vehicle_odometer.status.default = 'normal'
+        db.vehicle_odometer.reset.compute = lambda row: _from_vehicle('reset_odometer', row)
         db.vehicle_odometer.odometer.default = 0.0
         db.vehicle_odometer.distance.default = 0.0
         db.vehicle_odometer.unit_id.requires = IS_IN_DB(db, db.unit_of_measure, db.unit_of_measure._format)
-        db.vehicle_odometer.unit_id.compute = lambda row: _unit_from_vehicle(row)
+        db.vehicle_odometer.unit_id.widget = InventoryModel.unit_of_measure_lookup
+        db.vehicle_odometer.unit_id.compute = lambda row: _from_vehicle('odometer_unit_id', row)
 
 
         def _vehicle_average_represent(value, row):
@@ -142,6 +165,8 @@ class VehicleModel(ModelBase):
             format=lambda row: _vehicle_fuel_format(row))
         db.vehicle_fuel.vehicle_id.requires = IS_IN_DB(db, db.vehicle, db.vehicle._format)
         db.vehicle_fuel.fuel_id.requires = IS_IN_DB(db(db.system_item.item_type == 'fuel'), db.system_item, db.system_item._format)
+        db.vehicle_fuel.fuel_id.width_lookup = '85%'
+        db.vehicle_fuel.fuel_id.widget = InventoryModel.system_item_lookup
         db.vehicle_fuel.type_average.requires = IS_IN_SET(VehicleModel.vehicle_type_average)
         db.vehicle_fuel.type_average.represent = lambda value, row: VehicleModel.vehicle_type_average[value]
         db.vehicle_fuel.type_average.default = 'km_lt'
@@ -248,19 +273,21 @@ class VehicleModel(ModelBase):
 
     @staticmethod
     def vehicle_odometer_change(vehicle_id, odometer_status, odometer, note, owner_table, owner_key, owner_link):
-        old_id = DBUTIL.last_id(db.vehicle_odometer, db.vehicle_odometer.vehicle_id == vehicle_id)
-        distance = odometer
-        accumulated = 0.0
-        if old_id:
-            if odometer > 0.0:
-                old_odometer = db(db.vehicle_odometer.id == old_id).select().first()
-                if old_odometer:
-                    distance = odometer - old_odometer.odometer
+        vehicle = db.vehicle[vehicle_id]
 
-            sum = db.vehicle_odometer.distance.sum()
-            accumulated = db((db.vehicle_odometer.vehicle_id == vehicle_id) & (db.vehicle_odometer.id <= old_id)) \
-                .select(sum).first()[sum]
-        accumulated = accumulated + distance
+        if odometer_status == 'odometer_reset':
+            reset = vehicle.reset_odometer + 1
+            odometer = 0.0
+            distance = 0.0
+            accumulated = vehicle.accumulated_odometer
+        elif odometer > vehicle.current_odometer:
+            reset = vehicle.reset_odometer
+            distance = odometer - vehicle.current_odometer
+            accumulated = vehicle.accumulated_odometer + distance
+        else:
+            reset = vehicle.reset_odometer
+            distance = vehicle.accumulated_odometer if owner_table == 'vehicle' else 0.0
+            accumulated = vehicle.accumulated_odometer
 
         defs = table_default_values(db.vehicle_odometer)
         defs['vehicle_id'] = vehicle_id
@@ -272,11 +299,10 @@ class VehicleModel(ModelBase):
         defs['owner_table'] = owner_table
         defs['owner_key'] = owner_key
         defs['owner_link'] = owner_link
+        db.vehicle_odometer.insert(**defs)
 
-        odometer_id = db.vehicle_odometer.insert(**defs)
-
-        if owner_table != 'vehicle':
-            db(db.vehicle.id == vehicle_id).update(current_odometer=odometer, accumulated_odometer=accumulated)
+        if owner_table != 'vehicle' and (odometer > vehicle.current_odometer or odometer_status == 'odometer_reset'):
+            vehicle.update_record(reset_odometer=reset, current_odometer=odometer, accumulated_odometer=accumulated)
         return dict(accumulated=accumulated)
 
     # END BUSINESS RULES

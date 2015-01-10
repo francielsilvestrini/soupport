@@ -50,6 +50,8 @@ app_models = Storage()
 app_models.users = UserModel()
 app_models.users.model_define()
 
+app_models.painel = PainelModel()
+app_models.painel.model_define()
 
 for cls in _models_class:
     model = cls()
@@ -57,9 +59,6 @@ for cls in _models_class:
     app_models[model.name] = model
 
 
-app_models.painel = PainelModel()
-app_models.painel.model_define()
-app_models.painel.apply_updates()
 
 
 registred_projects = dict()

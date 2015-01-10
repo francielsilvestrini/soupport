@@ -120,7 +120,7 @@
                                     {{row = refueling[0]}}
                                     <th>{{= row.label.refueling_date}}</th>
                                     <th>{{= row.label.fuel_id}}</th>
-                                    <th>{{= row.label.odometer_current}}</th>
+                                    <th>{{= row.label.current_odometer}}</th>
                                     <th>{{= row.label.liters}}</th>
                                     <th>{{= row.label.distance}}</th>
                                     <th>{{= row.label.average}}</th>
@@ -132,7 +132,7 @@
                                 <tr>
                                     <td>{{= row.repr.refueling_date}}</td>
                                     <td>{{= row.repr.fuel_id}}</td>
-                                    <td>{{= row.repr.odometer_current}}</td>
+                                    <td>{{= row.repr.current_odometer}}</td>
                                     <td>{{= row.repr.liters}}</td>
                                     <td>{{= row.repr.distance}}</td>
                                     <td>{{= row.repr.average}}</td>
@@ -203,7 +203,9 @@
                             <td>{{= row.repr.odometer_date}}</td>
                             <td>{{= row.repr.odometer}}</td>
                             <td>{{= row.repr.status}}</td>
-                            <td>{{= row.repr.note}}</td>
+                            <td><a href="{{= row.owner_link}}">
+                                {{= row.repr.note}}
+                            </a></td>
                         </tr>
                         {{pass}}
                     </tbody>
@@ -250,7 +252,7 @@
                         <tr>
                             <td>{{= row.repr.status}}</td>
                             <td>{{= row.repr.updated_on}}</td>
-                            {{if row.repr.note == '':}}
+                            {{if not row.note:}}
                                 <td>
                                     <a onclick="add_status_note({{=row.id}});" href="javascript:void(0);">{{= T('Add status note')}}</a>
                                 </td>

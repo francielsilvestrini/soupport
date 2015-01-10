@@ -4,45 +4,8 @@
 
 
 {{if request.args(0) in ['new', 'update']:}}
-    <div class="row-fluid">
-        <div class="span2">
-            <span class="onx-col-header">{{= T('Average')}}</span>
-            <div id="vehicle_refueling_average">
-                0.000 km/lt
-            </div>
-        </div>
-    </div>
-
     <script type="text/javascript">
     jQuery(document).ready(function(){
-        function average_calc() {
-            var value = $("#vehicle_refueling_distance").val();
-            var distance = parseFloat(value).toFixed(3);
-
-            value = $("#vehicle_refueling_liters").val();
-            var liters = parseFloat(value).toFixed(3);
-            var average = parseFloat(distance/liters).toFixed(3);
-            $("#vehicle_refueling_average").text( average+" km/lt");
-        }
-
-
-        $("#vehicle_refueling_odometer").change(function() {
-            var old = $("#vehicle_refueling_old_odometer__row>div").first().text();
-
-            var value = $("#vehicle_refueling_odometer").val();
-            var distance = parseFloat(value - old).toFixed(3);
-            if (distance > 0.0) {
-                $("#vehicle_refueling_distance").val(distance);
-            }
-            average_calc();
-        });
-        $("#vehicle_refueling_distance").change(function() {
-            average_calc();
-        });
-        $("#vehicle_refueling_liters").change(function() {
-            average_calc();
-        });
-
         $("#vehicle_refueling_liter_price").change(function() {
             var liters = $("#vehicle_refueling_liters").val();
             var value = $(this).val();
@@ -56,8 +19,6 @@
             $("#vehicle_refueling_liter_price").val(price);
         });
 
-
-        average_calc();
     });
     </script>
 {{pass}}

@@ -5,7 +5,7 @@ from datetime import date, timedelta
 
 class MULModel(ModelBase):
     name = 'mul'
-    
+
 
     def define_tables(self):
 
@@ -71,10 +71,10 @@ class MULModel(ModelBase):
             Field('name', 'string', label=T('Name')),
             migrate='mul_product.table',
             format='[%(code)s] %(name)s')
-        db.mul_product.code.requires = [IS_NOT_EMPTY(),IS_NOT_IN_DB(db, 'mul_product.code')]        
+        db.mul_product.code.requires = [IS_NOT_EMPTY(),IS_NOT_IN_DB(db, 'mul_product.code')]
         db.mul_product.code.widget = MaskWidget(mask='0000').widget
-        db.mul_product.name.requires = [IS_NOT_EMPTY()]        
-        
+        db.mul_product.name.requires = [IS_NOT_EMPTY()]
+
 
         def _contract_items_key_compute(row):
             painel = db(db.painel.id > 0).select().first()
@@ -128,42 +128,38 @@ class MULModel(ModelBase):
             format='#%(id)s')
         db.mul_activation.contract_id.requires = IS_IN_DB(db, db.mul_contract, db.mul_contract._format)
         db.mul_activation.activation_date.default = request.now
-        
 
-        '''
+        return
 
-mul_contract
-    customer
-    number
-    date
-    active
-    contact
-    phone
-    email
-    server_name
-    notes
-    validate
-    #attachments
-    key - numero + fator vencimento + digito 1234561234X
+    #--------------------------------------------------------------------------
+    # BEGIN BUSINESS RULES
 
+    @staticmethod
+    def load_contract():
+        from xmlrpclib import ServerProxy
 
-mul_contract_items
-    contract
-    item
-    active
-    validate
-    key
+        url = '%(host)s:%(port)s%(endpoint)s' % dict(
+            host=LICENCE_HOSTNAME,
+            port=LICENCE_HOSTPORT,
+            endpoint=LICENCE_ENDPOINT)
+
+        registry = PainelModel.company().registry
+        contract_id = request.application
+
+        server = ServerProxy(url)
+        contract = server.contract(registry, contract_id)
+        return contract
 
 
-../app/mul/update()
+    @staticmethod
+    def validate_licence():
+        try:
+            contract = MULModel.load_contract()
 
+            return False
+        except Exception, e:
+            logger.error(str(e))
+            return True
 
-/MUL --> management of user licenses
-    /platform    --> exemplo onnix erp (onnix erp e onnix fiscal)
-        #modules --> 02,04,08,16,32...
-    /contract    --> contrato entre o cliente e a plataforma
-        #modules --> modulos liberados no contrato
-    /history     --> historico do contrato eas liberações
-    
-        '''
-        return  
+    # END BUSINESS RULES
+    #--------------------------------------------------------------------------

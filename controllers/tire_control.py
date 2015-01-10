@@ -95,7 +95,7 @@ def _get_chassi_design(tc_id, item_selected, is_manage):
     tc_items = db(db.tire_control_item.tire_control_id == tc_id).select(orderby=tc_items_order)
 
     design = dict()
-    new_vars = ONXFORM.get_new_vars(request.get_vars)
+    new_vars = clear_vars_navegate(request.get_vars)
 
     wheels = {
         'left': {
@@ -173,7 +173,7 @@ def axle_wheel():
                 response.view = 'others/generic_modal.load'
                 table_item.axle_id.default = parent_id
                 table_item.axle_id.writable = False
-                form = SQLFORM(table_item, item_id)
+                form = SQLFORM(table_item, item_id, formstyle=formstyle_onx)
                 return form
 
         content = ONXFORM.child_item(action, parent_id, item_id, table_item,
@@ -216,7 +216,7 @@ def chassi_axle():
             elif action == 'edit':
                 table_item.chassi_id.default = parent_id
                 table_item.chassi_id.writable = False
-                form = SQLFORM(table_item, item_id)
+                form = SQLFORM(table_item, item_id, formstyle=formstyle_onx)
                 return form
 
         content = ONXFORM.child_item(action, parent_id, item_id, table_item,
@@ -260,7 +260,7 @@ def manage():
             return []
 
         controls = []
-        new_vars = ONXFORM.get_new_vars(request.get_vars)
+        new_vars = clear_vars_navegate(request.get_vars)
         item = db(db.tire_control_item.id == item_id).select().first()
         if item.tire_id:
             controls += [LOAD(c='tire_control', f='selected_tire.load', args=[item.id], vars=new_vars, ajax=True, content=loading)]
@@ -285,7 +285,7 @@ def manage():
         & (db.chassi.id == db.tire_control.chassi_id)
     control = db(control_query).select().first()
     if not control:
-        new_vars = ONXFORM.get_new_vars(request.get_vars)
+        new_vars = clear_vars_navegate(request.get_vars)
         new_vars['next'] = current_url()
         new_vars['previous'] = bc.last_url()
         redirect(URL(f='create', vars=new_vars))
@@ -352,24 +352,51 @@ def select_tire():
     db.tire_control_item.tire_id.requires = IS_IN_DB(db((db.inventory_item.item_type == 'tire') \
         & (db.inventory_item.status == 'available')),
         db.inventory_item, db.inventory_item._format)
+    db.tire_control_item.tire_id.width_lookup = '80%'
 
-    tc = db((db.tire_control.id == item.tire_control_id) & (db.vehicle.id == db.tire_control.vehicle_id)).select().first()
-    db.tire_control_item.odometer.default = tc.vehicle.odometer
+    vehicle = db.vehicle[item.vehicle_id]
+    VehicleModel.default_odometer(
+        field=db.tire_control_item.start_odometer,
+        vehicle=vehicle,
+        default=vehicle.current_odometer,
+        start_range=0.0
+        )
 
     form = SQLFORM.factory(
         axle_info, wheel_info,
+        db.tire_control_item.start_date,
         db.tire_control_item.tire_id,
-        db.tire_control_item.odometer,
-        _class='form-horizontal onx-form')
+        db.tire_control_item.start_odometer,
+        submit_button=T('Select'),
+        formstyle=formstyle_onx)
     if form.process(formname='select_tire_form').accepted:
         tire_id = int(form.vars['tire_id'])
-        odometer = float(form.vars['odometer'])
+        start_odometer = float(form.vars['start_odometer'])
+        start_date = form.vars['start_date']
         owner_link = request.vars.get('owner_link')
-        db(db.tire_control_item.id == item_id).update(tire_id=tire_id, odometer=odometer)
-        O1Model.change_item_status(tire_id, 'in_use', 'tire_control_item', item_id, owner_link)
-        O2Model.odometer_change(
-            'tire_control_item', item_id, tc.tire_control.vehicle_id, odometer,
-            'normal', T('Start tire control'))
+        #change to in_use
+        InventoryModel.change_item_status(tire_id, 'in_use', 'tire_control_item', item_id, owner_link)
+        #update odometer
+        VehicleModel.vehicle_odometer_change(
+            vehicle_id=vehicle.id,
+            odometer_status='normal',
+            odometer=start_odometer,
+            note=T('Start tire control'),
+            owner_table='tire_control_item',
+            owner_key=item.id,
+            owner_link=owner_link)
+        #update control
+        vehicle = db.vehicle[item.vehicle_id]
+        if start_odometer >= vehicle.current_odometer:
+            start_control = vehicle.accumulated_odometer
+        else:
+            start_control = vehicle.accumulated_odometer - (vehicle.current_odometer - start_odometer)
+        item.update_record(
+            tire_id=tire_id,
+            start_date=start_date,
+            start_odometer=start_odometer,
+            start_control=start_control)
+
         response.js = """
             window.location.reload(true);
             """
@@ -383,11 +410,12 @@ def selected_tire():
         response.view = 'others/gadget_error.html'
         return dict(msg=str(e) )
 
-    item = db((db.tire_control_item.id == item_id) \
-        & (db.inventory_item.id == db.tire_control_item.tire_id)
-        ).select().first()
-    ONXREPR.row_repr(item.tire_control_item, db.tire_control_item)
-    ONXREPR.row_repr(item.inventory_item, db.inventory_item)
+    item = db.tire_control_item[item_id]
+    ONXREPR.row_repr(item, db.tire_control_item)
+
+    #vehicle = db.vehicle[item.vehicle_id]
+    #item.repr.distance = vehicle.accumulated_odometer - item.start_control
+
     return dict(record=item)
 
 
@@ -402,7 +430,7 @@ def remove_tire():
     item = db(db.tire_control_item.id == item_id).select().first()
     tire_id = item.tire_id
     item.update_record(tire_id=None)
-    O1Model.change_item_status(tire_id, 'available', None, None, None)
+    InventoryModel.change_item_status(tire_id, 'available', None, None, None)
     response.js = """
         window.location.reload(true);
         """
@@ -499,7 +527,7 @@ def tire_groove():
                 table_item.tire_id.default = parent_id
                 table_item.tire_id.writable = False
 
-                form = SQLFORM(table_item, item_id)
+                form = SQLFORM(table_item, item_id, formstyle=formstyle_onx)
                 return form
 
         content = ONXFORM.child_item(action, parent_id, item_id, table_item,

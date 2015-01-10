@@ -31,7 +31,7 @@
                             <li class="divider"></li>
                             <li>
                                 {{
-                                new_vars = ONXFORM.get_new_vars(request.get_vars, remove_keys=['option', 'selected'])
+                                new_vars = clear_vars_navegate(request.get_vars, extra_keys=['option', 'selected'])
                                 new_vars['redirect'] = current_url()
                                 }}
                                 <a href="{{= URL(c='tire_control', f='change_chassi', vars=new_vars)}}">

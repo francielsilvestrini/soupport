@@ -19,14 +19,18 @@
 
 {{= content}}
 
-
 {{block footer_form}}
-{{if request.args(0) in['read', 'update']:}}
-{{= LOAD(c='fleet', f='vehicle_fuel.load', args=request.args(1), ajax=True)}}
+
+{{if request.args(0) in['read']:}}
+    {{children = globals().get('children', None) }}
+    {{if children:}}
+        {{for child in children:}}
+            {{= child}}
+        {{pass}}
+    {{pass}}
 {{pass}}
+
 {{end}}
-
-
 
 
 <script type="text/javascript">

@@ -1,0 +1,11 @@
+{{extend 'layouts/form.html'}}
+
+{{= form}}
+
+<hr/>
+
+<div class="well">
+    {{for r in results:}}
+        <p>{{= r}}</p>
+    {{pass}}
+</div>

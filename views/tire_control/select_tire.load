@@ -6,51 +6,7 @@
         </div>
     </div>
     <div class="block-record collapse in">
-        <div class="row-fluid" style="padding-top:20px">
-
-            {{=content.custom.begin}}
-
-            <fieldset>
-                <div class="row-fluid">
-                    <label class="control-label">{{= content.custom.label.axle_info}}: </label>
-                    <div class="controls">
-                        {{= content.custom.widget.axle_info}}
-                        <span class="help-block"></span>
-                    </div>
-                </div>        
-                <div class="row-fluid">
-                    <label class="control-label">{{= content.custom.label.wheel_info}}: </label>
-                    <div class="controls">
-                        {{= content.custom.widget.wheel_info}}
-                        <span class="help-block"></span>
-                    </div>
-                </div>        
-
-                {{fname = 'tire_id'}}
-                <div class="row-fluid" id="{{= fname}}__row">
-                    <label class="control-label" for="{{= fname}}" id="{{= fname}}__label">{{= content.custom.label[fname]}}: </label>
-                    <div class="controls">
-                        {{= content.custom.widget[fname]}}
-                        <span class="help-block"></span>
-                    </div>
-                </div>        
-                {{fname = 'odometer'}}
-                <div class="row-fluid" id="{{= fname}}__row">
-                    <label class="control-label" for="{{= fname}}" id="{{= fname}}__label">{{= content.custom.label[fname]}}: </label>
-                    <div class="controls">
-                        {{= content.custom.widget[fname]}}
-                        <span class="help-block"></span>
-                    </div>
-                </div>        
-
-                <div class="row-fluid">
-                    <div class="controls">
-                        <input class="btn btn-success" type="submit" value="{{= T('Select')}}">
-                    </div>
-                </div>
-            </fieldset>
-            {{=content.custom.end}}
-        </div>
+        {{= content}}
     </div>
 </div>
-<!-- /select tire -->   
+<!-- /select tire -->

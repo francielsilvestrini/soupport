@@ -12,23 +12,23 @@ class ProjectMUL(ProjectBase):
 
     def load_menus(self):
         self.append_menu(
-            name='customer', 
-            caption=T('Customer'), 
-            controller='entries', 
-            function='customer',        
+            name='customer',
+            caption='Customer',
+            controller='entries',
+            function='customer',
             )
         self.append_menu(
-            name='mul_product', 
-            caption=T('Product'), 
-            controller='mul', 
+            name='mul_product',
+            caption='Product',
+            controller='mul',
             function='product',
-            ) 
+            )
         self.append_menu(
-            name='mul_contract', 
-            caption=T('Contract'), 
-            controller='mul', 
+            name='mul_contract',
+            caption='Contract',
+            controller='mul',
             function='contract',
-            )         
+            )
         return
 
 

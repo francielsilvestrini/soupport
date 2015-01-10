@@ -115,17 +115,6 @@ class ONXFORM(object):
         self.nav = None
         return
 
-    @staticmethod
-    def get_new_vars(old_vars, remove_keys=None):
-        new_vars = old_vars.copy()
-        if not remove_keys:
-            remove_keys = []
-        remove_keys += ['redirect', 'next', '_next', 'previous', \
-            '_previous', '_signature', 'origin']
-        for k in remove_keys:
-            if new_vars.get(k):
-                del new_vars[k]
-        return new_vars
 
     @staticmethod
     def get_btn_save():
@@ -136,30 +125,30 @@ class ONXFORM(object):
     def navegate(self, action):
         '''
         workflow
+        # new
+            cance:
+            save and add:
+            save and next:
+        # read
+            back:
+            edit:
+            new:
+        # update
+            cancel:
+            save and add:
+            save and next:
+        # delete
+            cancel:
+            delete:
 
-        select
-            new
-                save: select
-                save and child: read
-                save and renew: new
-                cancel: select
-            edit
-                save/cancel [origin=select]: select
-                save/cancel [origin=read]: read
-                save and renew: new
-            read
-                edit: edit
-                cancel: select
-            delete
-                cancel/confirm: select
         '''
         request = current.request
 
         vredirect = request.get_vars.get('redirect')
-        vnext = request.get_vars.get('next') or request.get_vars.get('_next')
-        vprevious= request.get_vars.get('previous') or request.get_vars.get('_previous')
+        vnext = request.get_vars.get('next')
+        vprevious= request.get_vars.get('previous')
 
-        new_vars = ONXFORM.get_new_vars(request.get_vars)
+        new_vars = clear_vars_navegate(request.get_vars)
         grid_url = URL(args=['select'], vars=new_vars)
         new_record = URL(args=['new'],  vars=new_vars)
 
@@ -178,7 +167,7 @@ class ONXFORM(object):
     def get_form_buttons(self, action, record_id):
         T = current.T
         request = current.request
-        new_vars = ONXFORM.get_new_vars(request.get_vars)
+        new_vars = clear_vars_navegate(request.get_vars)
 
         btn_save = None
         btn_save_and_add = None
@@ -266,7 +255,7 @@ class ONXFORM(object):
         if not self.is_modal:
             save_redirect = self.nav.next
             if self.child_controls:
-                new_vars = ONXFORM.get_new_vars(request.get_vars)
+                new_vars = clear_vars_navegate(request.get_vars)
                 save_redirect = URL(args=['read', '[id]'], vars=new_vars, url_encode=False)
             hidden['_next'] = save_redirect
 
@@ -295,8 +284,6 @@ class ONXFORM(object):
             hidden['_next'] = request.post_vars['_next']
         if hidden.get('_next'):
             attr['next'] = hidden['_next']
-
-        print attr
 
         form = SQLFORM(
             self.table,
