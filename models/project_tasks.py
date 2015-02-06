@@ -14,6 +14,16 @@ class ProjectTasks(ProjectBase):
         app_models['commom'].get_crud_menus(self)
         app_models['entries'].get_crud_menus(self)
         app_models['tasks'].get_crud_menus(self)
+
+        self.append_menu('tasks', 'index')
+        self.append_menu('tasks', 'my_tasks')
+        self.append_menu('tasks', 'waiting_tests')
+        self.append_menu('tasks', 'solicitation_detail')
+        self.append_menu('tasks', 'solicitation_to_task')
+        self.append_menu('tasks', 'task_detail')
+        self.append_menu('tasks', 'tests')
+        self.append_menu('tasks', 'release_history')
+        self.append_menu('tasks', 'test_history')
         return
 
 

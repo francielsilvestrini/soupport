@@ -85,7 +85,7 @@ class MULModel(ModelBase):
             days = (row.validate - Settings.WINNING_FACTOR).days
             number = db.mul_contract[row.contract_id].number[-4:]
 
-            factor = '{:0>4d}'.format(days)
+            factor = '{0:>4d}'.format(days)
             key = product.code+number+factor
             digit = module11_digit(key)
             return '%s-%s'% (key, digit)

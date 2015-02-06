@@ -56,7 +56,7 @@ class PainelModel(ModelBase):
     @staticmethod
     def validate_factor(end_date):
         days = (end_date - Settings.WINNING_FACTOR).days
-        return '{:0>4d}'.format(days)
+        return '{0:>4d}'.format(days)
 
 
     @staticmethod
@@ -67,7 +67,7 @@ class PainelModel(ModelBase):
     @staticmethod
     def company():
         return db(db.company.id > 0).select().first()
-        
+
 
     @staticmethod
     def read_config(key, default):
