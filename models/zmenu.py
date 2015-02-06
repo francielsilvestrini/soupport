@@ -6,8 +6,7 @@ response.meta.keywords = 'onnix sistemas python web2py'
 response.meta.generator = 'Web2py Web Framework & Python & SQLite & HTMl5 & CSS3 & JS & jQuery'
 response.google_analytics_id = PainelModel.read_config('google_analytics_id', None)# 'UA-45957540-1'
 
-#response.language = PainelModel.read_config('language', 'en')
-response.language = PainelModel.read_config('language', 'pt-br')
+response.language = PainelModel.read_config('language', 'en')
 T.force(response.language)
 
 response.app_version = ('1.0', '2015-01-03')
@@ -36,8 +35,8 @@ response.projects = Dict()
 response.menu = []
 response.unique_menu = dict()
 response.contract = None
-#if auth.is_logged_in() and auth.user.username != Settings.SUPER_USER:
-#    response.contract = MULModel.load_contract()
+if auth.is_logged_in() and auth.user.username != Settings.SUPER_USER:
+    response.contract = MULModel.load_contract()
 
 def _menu_projects():
     user_projects = ['activity', 'painel']

@@ -9,3 +9,4 @@ class Settings(object):
     SUPER_USER = 'onnixsistemas'
     SUPER_USER_PASS = 'onnixsuporte'
     ADMIN_ROLE = 'admin'
+    ONNIX_REGISTRY = '10.753.450/0001-09'

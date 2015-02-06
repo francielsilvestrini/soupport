@@ -142,16 +142,21 @@ class MULModel(ModelBase):
     @staticmethod
     def load_contract():
         try:
-            from xmlrpclib import ServerProxy
+            registry = PainelModel.company().registry
+            contract_id = request.application
+            if contract_id == 'soupport':
+                contract_id = '150002'
 
+            if registry == Settings.ONNIX_REGISTRY:
+                return None
+
+            print registry, contract_id
             url = '%(host)s:%(port)s%(endpoint)s' % dict(
                 host=Settings.LICENCE_HOSTNAME,
                 port=Settings.LICENCE_HOSTPORT,
                 endpoint=Settings.LICENCE_ENDPOINT)
 
-            registry = PainelModel.company().registry
-            contract_id = request.application
-
+            from xmlrpclib import ServerProxy
             server = ServerProxy(url)
             contract = server.contract(registry, contract_id)
             return contract

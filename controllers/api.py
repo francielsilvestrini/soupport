@@ -141,5 +141,7 @@ def contract(registry, contract_number):
         else:
             contract.result['code'] = 102
         contract.result['message'] = contract_results[contract.result['code']]
+        if contract.result['code'] > 100:
+            contract.result['message'] += ' Registry: %s, Contract Number: %s' % registry, contract_number
 
     return contract.copy()
