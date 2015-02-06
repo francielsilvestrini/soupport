@@ -6,6 +6,10 @@
             <div class="brand pull-left">
                 {{= response.title or ''}} <small>&nbsp;{{= response.subtitle or ''}}</small>
             </div>
+            <div class="pull-right">
+                {{block navtitle_right}}
+                {{end}}
+            </div>
         </div>
         <div class="block-content collapse in">
             <div class="span12">

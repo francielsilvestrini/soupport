@@ -10,14 +10,14 @@
                     </a> <span class="divider">/</span>
                 </li>
                 {{bc = session.get('breadcrumbs', {'items':[]})}}
-                {{for i, (title, url) in enumerate(bc.items):}}
+                {{for i, (t, url) in enumerate(bc.items):}}
                     {{if i+1 == len(bc.items):}}
                     <li class="active">
-                        {{= title}}
+                        {{= t}}
                         {{active_link = active_link + url}}
                     {{else:}}
                     <li>
-                        <a href="{{= url}}">{{= title }}</a> <span class="divider">/</span>
+                        <a href="{{= url}}">{{= t }}</a> <span class="divider">/</span>
                     {{pass}}
                     </li>
                 {{pass}}
@@ -40,14 +40,15 @@
     </div>
     <!-- page alert -->
     <div class="row-fluid">
-        {{for title, alert, alert_class in response.page_alerts:}}
+        {{for t, alert, alert_class in response.page_alerts:}}
         <div class="alert alert-{{= alert_class}}" style="margin-bottom: 0px; margin-top: 10px;" >
             <button type="button" class="close" data-dismiss="alert">×</button>
-            <h4>{{= XML(title)}}</h4>
+            <h4>{{= XML(t)}}</h4>
             <p>{{= XML(alert)}}</p>
         </div>
         {{pass}}
     </div>
+
     <!-- /page alert -->
     <script type="text/javascript">
     $(document).ready(function () {

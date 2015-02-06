@@ -13,7 +13,14 @@
     <tbody>
         {{for row in content:}}
         <tr>
-            <td>{{= row.repr.service_id}}</td>
+            <td>
+                {{
+                _vars = request.get_vars.copy()
+                _vars['service'] = row.service_id
+                }}
+                <a href="{{= URL(c='maintenance', f='order.html', args=['new'], vars=_vars)}}">
+                {{= row.repr.service_id}}
+            </a></td>
             <td>{{= row.repr.last_maintenance}}</td>
             <td>{{= row.repr.next_maintenance}}</td>
             <td>{{= row.repr.bar}}</td>

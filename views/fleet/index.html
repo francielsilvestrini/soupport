@@ -10,56 +10,27 @@
         <!-- block -->
         <div class="block">
             <div class="navbar navbar-inner block-header">
-                <div class="muted pull-left">Sumary</div>
-                <div class="pull-right"><span class="badge badge-info">752</span>
-
-                </div>
+                <div class="muted pull-left">{{= PainelModel.company().name}}</div>
+                <div class="pull-right"></div>
             </div>
             <div class="block-record collapse in">
-                <table class="table table-striped">
+                <table class="table table-condensed table-hover">
                     <thead>
                         <tr>
-                            <th>Data</th>
-                            <th></th>
-                            <th>Value</th>
+                            <th>{{= T('Summary')}}</th>
+                            <th>{{= T('Month')}}</th>
+                            <th>{{= T('Year')}}</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {{for k in ['vehicle_count', 'distance_traveled', 'distance_traveled_by_vehicle', 'fuel_cost', 'fuel_cost_by_vehicle', 'maintenance_order', 'maintenance_order_by_vehicle']:}}
                         <tr>
-                            <td>Quantidade de veiculos</td>
-                            <td></td>
-                            <td>40</td>
+                            {{summary_item = summary[k]}}
+                            <td>{{= summary_item['text']}}</td>
+                            <td>{{= summary_item['month'][0]}}</td>
+                            <td>{{= summary_item['year'][0]}}</td>
                         </tr>
-                        <tr>
-                            <td>Media km / mes por caminhao</td>
-                            <td></td>
-                            <td>10.000km</td>
-                        </tr>
-                        <tr>
-                            <td>total percorrido / mes</td>
-                            <td></td>
-                            <td>400.000km</td>
-                        </tr>
-                        <tr>
-                            <td>custo combustivel / mes</td>
-                            <td></td>
-                            <td>$229.520,00</td>
-                        </tr>
-                        <tr>
-                            <td>custo combustivel / ano</td>
-                            <td></td>
-                            <td>$2.754.240,00</td>
-                        </tr>
-                        <tr>
-                            <td># meta</td>
-                            <td>de</td>
-                            <td>para</td>
-                        </tr>
-                        <tr>
-                            <td>Consumo cumbustivel equipamento</td>
-                            <td>2,40 km/l</td>
-                            <td>2,448 km/l</td>
-                        </tr>
+                        {{pass}}
                     </tbody>
                 </table>
             </div>

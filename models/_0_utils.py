@@ -15,49 +15,6 @@ import csv
 import os
 ## END GLOBAL IMPORTS ##
 
-import logging, logging.handlers
-class OnxLogHandler(logging.Handler):
-
-    def emit(self, record):
-        db = globals().get('db')
-        if not db:
-            return
-
-        if not 'log' in db.tables:
-            return
-
-        try:
-            log = db['log']
-            defs = table_default_values(log)
-            defs['name'] = record.name
-            defs['level'] = record.levelname
-            defs['module'] = record.module
-            defs['func_name'] = record.funcName
-            defs['line_no'] = str(record.lineno)
-            defs['thread'] = str(record.thread)
-            defs['thread_name'] = record.threadName
-            defs['process'] = str(record.process)
-            defs['message'] = record.msg
-            defs['args'] = str(record.args)
-
-            log.insert(**defs)
-        except Exception, e:
-            pass
-
-def get_configured_logger(name):
-    handler = OnxLogHandler()
-    handler.setLevel(logging.DEBUG)
-
-    logger = logging.getLogger(name)
-    logger.handler = []
-    logger.addHandler(handler)
-    logger.setLevel(logging.DEBUG)
-    return logger
-
-# Assign application logger to a global var
-logger = get_configured_logger(request.application)
-
-
 SMALL = lambda x, **kwargs: XML(TAG.small(x, **kwargs).xml())
 SUP = lambda x, **kwargs: XML(TAG.sup(x, **kwargs).xml())
 
@@ -141,3 +98,41 @@ def lookup_url_new(c, f):
     if '.load' in redirect:
         redirect = request.env.HTTP_REFERER
     return URL(c=c, f=f, args='new', extension='html', vars=dict(redirect=redirect))
+
+
+def btn_row(href='javascript:void(0);', extra_class=None, title=None, data_id=None, icon=None, caption=None):
+    if not extra_class:
+        extra_class = ''
+    attr = {
+        '_href':href,
+        '_class':'btn btn-mini '+extra_class,
+    }
+    if title:
+        attr['_title'] = title
+        attr['_data-toggle'] = 'tooltip'
+    if data_id:
+        attr['_data-id'] = data_id
+    if icon:
+        ico = I(_class=icon)
+    else:
+        ico = None
+    btn = A(caption or '', ico, **attr)
+    return btn
+
+def btn_edit_row(href='javascript:void(0);', extra_class=None, title=None, data_id=None, icon=None, caption=None):
+    if not title:
+        title = T('Edit')
+    if not icon:
+        icon = 'icon icon-pencil'
+
+    btn = btn_row(href=href, extra_class=extra_class, title=title, data_id=data_id, icon=icon, caption=caption)
+    return btn
+
+def btn_remove_row(href='javascript:void(0);', extra_class=None, title=None, data_id=None, icon=None, caption=None):
+    if not title:
+        title = T('Remove')
+    if not icon:
+        icon = 'icon icon-trash'
+
+    btn = btn_row(href=href, extra_class=extra_class, title=title, data_id=data_id, icon=icon, caption=caption)
+    return btn

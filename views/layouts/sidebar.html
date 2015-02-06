@@ -3,10 +3,27 @@
     <div class="nav nav-collapse collapse">
         <ul class="nav nav-list bs-docs-sidenav">
         {{toplinks = project.sidebar.toplinks}}
-        {{for cap, url, icon in toplinks:}}
-            <li><a href="{{= url}}">
-                <i class="{{= icon }}"></i>&nbsp;
-                {{= cap}}</a>
+        {{for link in toplinks:}}
+            {{
+            if len(link) > 2:
+                caption = link[0]
+                url = link[1]
+                icon = link[2]
+            else:
+                if link[1]:
+                    new_record = link[0]['new_record']
+                    caption = new_record[0]
+                    url = new_record[1]
+                else:
+                    caption = link[0]['caption']
+                    url = link[0]['url']
+                pass
+                icon = link[0]['icon']
+            pass
+            }}
+
+            <li>
+            <a href="{{= url}}"><i class="{{= icon }}" style="color: #000;"></i>&nbsp;{{= caption}}</a>
             </li>
         {{pass}}
         </ul>
@@ -37,8 +54,8 @@
                     </ul>
                 </div>
             </div>
-        </div>  
-        {{is_first = False}} 
+        </div>
+        {{is_first = False}}
         {{pass}}
     </div>
 </div>

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 class ProjectFleet(ProjectBase):
-
+    name = 'fleet'
 
     def __init__(self):
         ProjectBase.__init__(self)
@@ -11,54 +11,28 @@ class ProjectFleet(ProjectBase):
 
 
     def load_menus(self):
-        self.append_menu(
-            name='fleet_vehicle_type',
-            caption='Vehicle Type',
-            controller='fleet',
-            function='vehicle_type',
-            )
-        self.append_menu(
-            name='fleet_vehicle',
-            caption='Vehicle',
-            controller='fleet',
-            function='vehicle',
-            )
-
-        self.append_menu(
-            name='inventory_item',
-            caption='Inventory Item',
-            controller='inventory',
-            function='inventory_item',
-            )
-        self.append_menu(
-            name='unit_of_measure',
-            caption='Unit of Measure',
-            controller='inventory',
-            function='unit_of_measure',
-            )
-        self.append_menu(
-            name='system',
-            caption='System',
-            controller='inventory',
-            function='system',
-            )
-        self.append_menu(
-            name='subsystem',
-            caption='Subsystem',
-            controller='inventory',
-            function='subsystem',
-            )
-        self.append_menu(
-            name='system_item',
-            caption='System Item',
-            controller='inventory',
-            function='system_item',
-            )
-
+        app_models['vehicle'].get_crud_menus(self)
         app_models['inventory'].get_crud_menus(self)
         app_models['tire_control'].get_crud_menus(self)
         app_models['maintenance'].get_crud_menus(self)
 
+        self.append_menu('fleet', 'index')
+        self.append_menu('fleet', 'dashboard')
+        self.append_menu('fleet', 'change_status')
+        self.append_menu('fleet', 'refueling')
+        self.append_menu('fleet', 'odometer')
+        self.append_menu('fleet', 'reset_odometer')
+        self.append_menu('fleet', 'distance_traveled')
+        self.append_menu('tire_control', 'create')
+        self.append_menu('tire_control', 'manage')
+        self.append_menu('tire_control', 'change_chassi')
+        self.append_menu('tire_control', 'remove_tire')
+        self.append_menu('tire_control', 'groove_annotation_print')
+        self.append_menu('tire_control', 'groove_annotation')
+        self.append_menu('inventory', 'components')
+        self.append_menu('maintenance', 'create')
+        self.append_menu('maintenance', 'manage')
+        self.append_menu('maintenance', 'order')
         return
 
 
@@ -72,15 +46,14 @@ class ProjectFleet(ProjectBase):
 
         accordion_menu = [
             (T('Entries'), 'accordion_entries', 'icon-folder-open',  [
-                self.menus.fleet_vehicle,
-                self.menus.fleet_vehicle_type,
+                self.menus['fleet_vehicle'],
                 ]),
             (T('Inventory'), 'accordion_inventory', 'icon-folder-open',  [
-                self.menus.inventory_item,
-                self.menus.unit_of_measure,
-                self.menus.system,
-                self.menus.subsystem,
-                self.menus.system_item,
+                self.menus['inventory_inventory_item'],
+                self.menus['inventory_unit_of_measure'],
+                self.menus['inventory_system'],
+                self.menus['inventory_subsystem'],
+                self.menus['inventory_system_item'],
                 ]),
             ]
         return Storage(toplinks=toplinks, accordion_menu=accordion_menu)

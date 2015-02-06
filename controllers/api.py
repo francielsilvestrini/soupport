@@ -56,53 +56,90 @@ contract_results = {
     103: 'Bad record for the contract!',
     104: 'Contract inactive!',
     105: 'Contract expired!',
+    106: 'Product licence expired!',
 }
 
 
 @service.xmlrpc
 @service.jsonrpc
 def contract(registry, contract_number):
-    result = Dict(
-        code=101,
-        message=contract_results[101]
-        )
     contract = Dict(
+        result = dict(
+            code=101,
+            message=contract_results[101]
+            ),
         registry='',
         name='',
         number='',
         licence_key='',
-        items=[],
+        validate='',
+        items=dict(),
         )
-
-    customer = db(db.customer.registry==registry).select().first()
-    if customer:
-        rcontract = db(db.mul_contract.number == contract_number).select().first()
-        if rcontract.customer_id == customer.id:
-            if rcontract.is_active:
-                if rcontract.validate >= date.today():
-                    result.code = 100
-                    contract.registry = customer.registry
-                    contract.name = customer.name
-                    contract.number = rcontract.number
-                    contract.licence_key = rcontract.licence_key
-
-                    items = db((db.mul_contract_items.contract_id == rcontract.id) \
-                        & (db.mul_contract_items.is_active == True)).select()
-                    for item in items:
-                        product = Dict(
-                            number=item.mul_product.number,
-                            name=item.mul_product.name,
-                            licence_key=item.mul_contract_items.licence_key,
-                            )
-                        contract.items.append(product)
-                else:
-                    result.code = 105
-            else:
-                result.code = 104
-        else:
-            result.code = 103
+    if contract_number in['fleet_demo', 'A']:
+        contract.registry = '00.000.000/0000-00'
+        contract.name = 'Onnix Sistemas'
+        contract.number = contract_number
+        contract.licence_key = ''
+        contract.validate = str(request.now.today())
+        for row in db(db.mul_product).select():
+            product = dict(
+                code=row.code,
+                name=row.name,
+                identifier=row.identifier,
+                licence_key='',
+                validate=str(request.now.today()),
+                result = dict(
+                    code=100,
+                    message=contract_results[100]
+                    ),
+                )
+            products[row.identifier] = product
     else:
-        result.code = 102
-    result.message = contract_results[result.code]
+        customer = db(db.customer.registry==registry).select().first()
+        if customer:
+            rcontract = db(db.mul_contract.number == contract_number).select().first()
+            if rcontract.customer_id == customer.id:
+                if rcontract.is_active:
+                    if rcontract.validate >= date.today():
+                        contract.result['code'] = 100
+                    else:
+                        contract.result['code'] = 105
+                else:
+                    contract.result['code'] = 104
 
-    return dict(result=result, contract=contract)
+                contract.registry = customer.registry
+                contract.name = customer.name
+                contract.number = rcontract.number
+                contract.licence_key = rcontract.licence_key
+                contract.validate = str(rcontract.validate)
+
+                items = db((db.mul_contract_items.contract_id == rcontract.id) \
+                    & (db.mul_product.id == db.mul_contract_items.product_id) \
+                    & (db.mul_contract_items.is_active == True)).select()
+                products = dict()
+                for item in items:
+                    if item.mul_contract_items.validate < date.today():
+                        result_code = 106
+                    else:
+                        result_code = 100
+
+                    product = dict(
+                        code=item.mul_product.code,
+                        name=item.mul_product.name,
+                        identifier=item.mul_product.identifier,
+                        licence_key=item.mul_contract_items.licence_key,
+                        validate=str(item.mul_contract_items.validate),
+                        result = dict(
+                            code=result_code,
+                            message=contract_results[result_code]
+                            ),
+                        )
+                    products[item.mul_product.identifier] = product
+                contract.items = products
+            else:
+                contract.result['code'] = 103
+        else:
+            contract.result['code'] = 102
+        contract.result['message'] = contract_results[contract.result['code']]
+
+    return contract.copy()

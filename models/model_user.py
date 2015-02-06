@@ -35,46 +35,68 @@ class UserModel(ModelBase):
 
         db._common_fields.append( sf )
 
-        if db(db.auth_user).isempty():
-            row = db(db.auth_group.role==ADMIN_ROLE).select().first()
-            if row:
-                group_id = row.id
-            else:
-                group_id = db.auth_group.insert(role=ADMIN_ROLE, description=T('Admin'))
 
+        row = db(db.auth_group.role==Settings.ADMIN_ROLE).select().first()
+        if row:
+            group_id = row.id
+        else:
+            group_id = db.auth_group.insert(role=Settings.ADMIN_ROLE, description=T('Admin'))
+
+        if db(db.auth_user.username == Settings.ADMIN_ROLE).count() == 0:
             defaults = table_default_values(db.auth_user)
             defaults['first_name'] = 'Admin'
             defaults['last_name'] = 'Admin'
             defaults['email'] = 'admin@admin.app'
-            defaults['username'] = 'admin'
-            defaults['password'] = db.auth_user.password.validate('admin')[0]
+            defaults['username'] = Settings.ADMIN_ROLE
+            defaults['password'] = db.auth_user.password.validate(Settings.ADMIN_ROLE)[0]
             user_id = db.auth_user.insert(**defaults)
+            auth.add_membership(group_id, user_id)
 
+        if db(db.auth_user.username == Settings.SUPER_USER).count() == 0:
+            defaults = table_default_values(db.auth_user)
+            defaults['first_name'] = Settings.SUPER_USER
+            defaults['last_name'] = Settings.SUPER_USER
+            defaults['email'] = 'desenv@onnixsistemas.com.br'
+            defaults['username'] = Settings.SUPER_USER
+            defaults['password'] = db.auth_user.password.validate(Settings.SUPER_USER_PASS)[0]
+            user_id = db.auth_user.insert(**defaults)
             auth.add_membership(group_id, user_id)
         return
 
-def validate_licence():
-    def session_licence_checked():
-        licence_checked = int(session.get('licence_checked', 0))
-        return licence_checked >= PainelModel.validate_factor(request.now.date())
-
-    try:
-        if not session_licence_checked():
-            MULModel.validate_licence()
-            if not session_licence_checked():
-                auth.settings.on_failed_authorization = URL(c='painel', f='licence')
-                return False
-        else:
-            return True
-    except Exception, e:
-        raise
 
 def auth_has_access(c=request.controller, f=request.function):
-    if not validate_licence():
-        return False
+    try:
+        if auth.user.username == Settings.SUPER_USER:
+            return True
 
-    if auth.has_membership(role=ADMIN_ROLE):
+        #valida se menu selecionda é de algum produto contratado
+        menu_name = '%s_%s' % (c, f)
+        menu = response.unique_menu.get(menu_name)
+        if not menu:
+            auth.settings.on_failed_authorization = URL(c='activity', f='menu_access', vars=dict(menu=menu_name))
+            return False
+
+        #valida o contrato
+        if response.contract:
+            if response.contract['result']['code'] > 100:
+                auth.settings.on_failed_authorization = URL(c='activity', f='licence')
+                return False
+
+            is_valid = False
+            for menu_prj in menu.projects:
+                product = response.contract['items'].get(menu_prj)
+                if product:
+                    is_valid = product['result']['code'] == 100
+
+            if not is_valid:
+                auth.settings.on_failed_authorization = URL(c='activity', f='licence', vars=dict(menu=menu_name))
+                return False
+
+        if auth.has_membership(role=Settings.ADMIN_ROLE):
+            return True
+        # é o contrario de permitido, se tiver significa bloqueado
+        return not auth.has_permission(c,f)
+    except Exception, e:
+        from onx_log import onx_logger
+        onx_logger().error(str(e))
         return True
-    # é o contrario de permitido, se tiver significa bloqueado
-    return not auth.has_permission(c,f)
-

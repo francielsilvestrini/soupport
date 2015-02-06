@@ -121,7 +121,6 @@ class VehicleModel(ModelBase):
             value = db.vehicle[row.vehicle_id][field_name]
             return value
 
-
         db.define_table('vehicle_odometer',
             Field('vehicle_id', db.vehicle, label=T('Vehicle')),
             Field('odometer_date', 'date', label=T('Date')),
@@ -188,9 +187,9 @@ class VehicleModel(ModelBase):
             Field('fuel_id', db.vehicle_fuel, label=T('Fuel')),
             Field('refueling_date', 'date', label=T('Date')),
             Field('current_odometer', 'double', label=T('Odometer Current')),
-            Field('liters', 'double', label=T('Liters')),
             Field('liter_price', 'double', label=T('Price per Liter')),
             Field('total_price', 'double', label=T('Total Price')),
+            Field('liters', 'double', label=T('Liters')),
             Field('note', 'string', label=T('Note')),
 
             Field('old_refueling', 'double', label=T('Old Refueling'), writable=False, readable=False),
@@ -212,9 +211,9 @@ class VehicleModel(ModelBase):
         db.vehicle_refueling.refueling_date.default = request.now
         db.vehicle_refueling.current_odometer.requires = [IS_NOT_EMPTY()]
         db.vehicle_refueling.current_odometer.default = 0.0
-        db.vehicle_refueling.liters.default = 0.0
         db.vehicle_refueling.liter_price.default = 0.0
         db.vehicle_refueling.total_price.default = 0.0
+        db.vehicle_refueling.liters.default = 0.0
 
         db.vehicle_refueling.old_refueling.default = 0.0
         db.vehicle_refueling.current_refueling.default = 0.0
@@ -230,6 +229,10 @@ class VehicleModel(ModelBase):
         db.vehicle_refueling.average_standard.compute = lambda row: _from_fuel_selected(row, 'average_standard')
         db.vehicle_refueling.distance_standard.compute = lambda row: row.average_standard * row.liters
 
+        self.cruds += [
+            dict(c='fleet', f='vehicle_type'),
+            dict(c='fleet', f='vehicle'),
+            ]
         return
 
 

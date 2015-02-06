@@ -8,9 +8,9 @@ def index():
 
 
 @auth.requires(lambda: auth_has_access())
-def customer():
-    db.customer.note.readable = request.args(0) == 'delete'
-    content = ONXFORM.make(db.customer)
+def person():
+    db.person.note.readable = request.args(0) == 'delete'
+    content = ONXFORM.make(db.person)
     breadcrumbs_add()
     return content
 

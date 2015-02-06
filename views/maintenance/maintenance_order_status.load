@@ -1,0 +1,18 @@
+{{
+    target = request.function
+}}
+<!-- {{= target}} -->
+<div id="{{= target}}-load" class="row-fluid">
+        <div class="block">
+            <div class="navbar navbar-inner block-header">
+                <div class="muted pull-left">{{= T('Order Status')}}</div>
+                <div class="pull-right">
+                </div>
+            </div>
+            <div class="block-record collapse in">
+                <div style="padding-top:10px;">
+                    {{= form}}
+                </div>
+            </div>
+        </div>
+</div>

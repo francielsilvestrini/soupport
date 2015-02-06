@@ -28,9 +28,12 @@ $(document).ready (function () {
     $(".{{= target}}-edit").click(function () {
         $("#dialog_modal-label").text("{{= captions[1]}}");
         var item_id = $(this).attr("data-id");
+        var url_edit = "{{= url_edit }}"
+
+
         $.web2py.component("{{= url_edit}}/"+item_id, "dialog_modal-form");
         $("#dialog_modal").modal("show");
-    });      
+    });
     $(".{{= target}}-remove").confirm({
         text: w2p_ajax_confirm_message,
         title: "{{= captions[1]}}",
@@ -41,7 +44,7 @@ $(document).ready (function () {
         },
     });
 
-    $("a[data-toggle='tooltip']").tooltip({ });    
+    $("a[data-toggle='tooltip'], span[data-toggle='tooltip']").tooltip({ });
 });
 </script>
 <!-- /{{= target}} -->

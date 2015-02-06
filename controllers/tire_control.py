@@ -304,7 +304,7 @@ def manage():
     return dict(control=control, design=design, tire_controls=tire_controls, table=table)
 
 
-@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+@auth.requires(auth.has_membership(role=Settings.ADMIN_ROLE))
 def change_chassi():
     try:
         vehicle_id = int( request.vars['vehicle'] )

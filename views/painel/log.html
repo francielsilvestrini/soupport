@@ -1,0 +1,13 @@
+{{extend 'layouts/form.html'}}
+
+
+{{block navtitle_right}}
+{{if not request.args(0) or request.args(0) == 'select':}}
+<a href="{{= URL(f='log', args=['clear'])}}"
+    class="btn btn-danger">{{=T('Clear Logs')}}</a>
+{{pass}}
+
+{{end}}
+
+
+{{= content}}

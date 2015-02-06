@@ -11,9 +11,8 @@ class ModelBase(object):
     '''
 
     def __init__(self):
+        #self.cruds = [{c='controller', f='function', t='tablename'}]
         self.cruds = []
-        self.crud_controller = 'default'
-        self.crud_start = 0
 
         #self.table_defaults = [(table, version, on_update_data(table, version))]
         self.table_defaults = []
@@ -43,11 +42,13 @@ class ModelBase(object):
 
     def get_crud_menus(self, project):
         for crud in self.cruds:
+            tablename = crud.get('t', crud['f'])
             project.append_menu(
-                name=crud,
-                caption=db[crud]._plural,
-                controller=self.crud_controller,
-                function=crud[self.crud_start:],
+                name='%(c)s_%(f)s' % crud,
+                caption=db[tablename]._plural,
+                controller=crud['c'],
+                function=crud['f'],
+                is_crud=True,
             )
         return
 
@@ -85,7 +86,8 @@ class ModelBase(object):
                         on_update_data(table, version)
                 save_version(table._tablename, version)
             except Exception, e:
-                logger.error(str(e))
+                from onx_log import onx_logger
+                onx_logger().error(str(e))
         return
 
 

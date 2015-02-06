@@ -1,0 +1,24 @@
+{{extend 'layouts/form.html'}}
+
+<table class="table table-condensed table-hover">
+    <thead>
+        <tr>
+            <th>{{= T('Licence Plate')}}</th>
+            <th>{{= T('Description')}}</th>
+            <th>{{= T('Month')}}</th>
+            <th>{{= T('Year')}}</th>
+        </tr>
+    </thead>
+    <tbody>
+    {{for k in data:}}
+        <tr>
+            {{data_item = data[k]}}
+            <td>{{= data_item['licence_plate']}}</td>
+            <td>{{= data_item['description']}}</td>
+            <td>{{= data_item['month'][0]}}</td>
+            <td>{{= data_item['year'][0]}}</td>
+        </tr>
+        {{pass}}
+    </tbody>
+</table>
+{{pass}}

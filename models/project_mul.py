@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 class ProjectMUL(ProjectBase):
-
+    name = 'mul'
 
     def __init__(self):
         ProjectBase.__init__(self)
@@ -11,12 +11,8 @@ class ProjectMUL(ProjectBase):
 
 
     def load_menus(self):
-        self.append_menu(
-            name='customer',
-            caption='Customer',
-            controller='entries',
-            function='customer',
-            )
+        app_models['entries'].get_crud_menus(self)
+
         self.append_menu(
             name='mul_product',
             caption='Product',
@@ -41,7 +37,7 @@ class ProjectMUL(ProjectBase):
             (T('MUL'), 'accordion_entries', 'icon-folder-open',  [
                 self.menus.mul_product,
                 self.menus.mul_contract,
-                self.menus.customer,
+                self.menus.entries_person,
 
                 ]),
 

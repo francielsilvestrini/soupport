@@ -3,13 +3,14 @@ from gluon.html import XML, A, SPAN, URL, DIV, UL, LI, CAT, I, SCRIPT
 from gluon.html import INPUT, BUTTON, FIELDSET, SELECT, TEXTAREA, LABEL
 from gluon.globals import current
 from gluon.sqlhtml import SQLFORM
-from gluon.dal import Table
+from gluon.dal.objects import Table
 from gluon.storage import Storage
 from gluon.http import redirect, HTTP
 
 
-def formstyle_onx(form, fields):
+def _formstyle_onx(form, fields, is_modal):
     form.add_class('form-horizontal onx-form')
+    input_class = {True: 'span8', False: 'span4'}
     parent = FIELDSET()
     for id, label, controls, help in fields:
         # wrappers
@@ -29,7 +30,7 @@ def formstyle_onx(form, fields):
         _submit = False
 
         if isinstance(controls, INPUT):
-            controls.add_class('span4')
+            controls.add_class(input_class[is_modal])
             if controls['_type'] == 'submit':
                 # flag submit button
                 _submit = True
@@ -41,13 +42,13 @@ def formstyle_onx(form, fields):
 
         # For password fields, which are wrapped in a CAT object.
         if isinstance(controls, CAT) and isinstance(controls[0], INPUT):
-            controls[0].add_class('span4')
+            controls[0].add_class(input_class[is_modal])
 
         if isinstance(controls, SELECT):
-            controls.add_class('span4')
+            controls.add_class(input_class[is_modal])
 
         if isinstance(controls, TEXTAREA):
-            controls['_class'] = 'text span6'
+            controls['_class'] = 'text %s' % 'span8' if is_modal else 'span6'
 
         if isinstance(label, LABEL):
             label['_class'] = 'control-label'
@@ -61,6 +62,14 @@ def formstyle_onx(form, fields):
             # unwrapped label
             parent.append(DIV(label, _controls, _class='row-fluid', _id=id))
     return parent
+
+
+def formstyle_onx(form, fields):
+    return _formstyle_onx(form, fields, False)
+
+
+def formstyle_onx_modal(form, fields):
+    return _formstyle_onx(form, fields, True)
 
 
 class ONXFORM(object):
@@ -651,12 +660,20 @@ class ONXFORM(object):
             response.view = 'others/generic_modal.load'
 
             content = on_get_content(action, item_id)
+            if isinstance(content, dict):
+                form = content['form']
+                extra_js = content.get('extra_js', '')
+            else:
+                form = content
+                extra_js = ''
+
             attr = dict(onsuccess=onsuccess)
 
-            if content.process(**attr).accepted:
+            if form.process(**attr).accepted:
                 response.js = "$('#dialog_modal').modal('hide');" if item_id > 0 else ""
                 response.js += "web2py_component('%s','%s-load');" % (list_url, target)
-            return dict(content=content)
+                response.js += extra_js
+            return dict(content=form)
 
         elif action == 'remove':
             content = on_get_content(action, item_id)

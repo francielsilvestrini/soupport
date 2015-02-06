@@ -1,14 +1,50 @@
-Retrospectiva 2014
-1. Criação da Dinastia da Estampa﻿ com o Franciane;
-2. Programar voltou a ser divertido com Python e Web2py﻿;
-3. Onnix Sistemas com sistema estável;
-4. Novos clientes (metas alcançadas);
-5. The Developer's Conference﻿ em Porto Alegre;
-6. Conhecimento e novas perpectivas com ParanaTIC;
-7. Reuniões de família (obrigado família Silvestrini);
-8. Quando ir pra Possadas na Argentina deve levar Pesos;
-9. ...
-10. ...
+new maintenance
+    vehicle
+    date
+    supplier
+    invoice number
+    odometro atual
+
+    services
+        item = troca de oleo
+        note = ''
+        custo_servico = 20,0
+        custo_material = 35,0
+        custo_total = 55,0
+        limite=5000km
+        proxima revisao = 123456
+        *garantia
+        material
+            item = oleo xpto 50
+            qtde = 3,5 lt
+            custo_unit = 10
+            desconto = 0
+            total = 35,0
+        item = troca do filtro de oleo
+        note = ''
+        custo_servico = 0,0
+        custo_material = 50,0
+        custo_total = 50,0
+        proxima revisao = 123456
+        material
+            item = filtro tecfil
+            note = ''
+            qtde = 1
+            custo_unit = 55
+            desconto = 5
+            total = 50
+
+    total da ordem
+        total bruto= 110,00
+        descontos = 5,0
+        impostos = 0.0
+        total liquido=105,00
+
+
+
+
+
+
 
 
 criar um plano de manutencao para o veiculo
@@ -27,53 +63,6 @@ gerenciamento do plano de manutenção
 		odometro anterior
 		odometro atual
 
-
-
-contador
-	reinicio
-	contador_atual
-	contador_acumulado
-	unidade_de_medida
-
-contador veiculo abc1234
-2 - 000500 - 002900
-
-1 - 000100 - 000100 - km - n - x
-1 - 001000 - 001100 - km - n - a
-1 - 001500 - 001600 - km - n - p1
-1 - 002300 - 002400 - km - r - a
-2 - 000000 - 002400 - km - n - x
-2 - 000250 - 002650 - km - n - p1
-2 - 000500 - 002900 - km - n - a
-2 - 001200 - 003600 - km - n - a
-2 - 001800 - 004200 - km - n - p1
-2 - 002400 - 004800 - km - n - a
-2 - 003100 - 005400 - km - n - a
-2 - 003100 - 005400 - km - n - p1
-- broken
-2 - 003700 - 006000 - km - n - x
-3 - 000000 - 006000 - km - n - x
-3 - 000700 - 006700 - km - n - a
-3 - 000800 - 006800 - km - n - p1
-
-abastecimento
-000000 - 001000 - 250lt -    0km - 0,00km/lt
-001100 - 002300 - 300lt - 1100km - 3,67km/lt
-002400 - 000500 - 280lt - 1300km - 4,64km/lt
-002900 - 001200 - 100lt -  500km - 5,00km/lt
-003600 - 002400 - 150lt -  700km - 4,67km/lt
-004800 - 003100 - 200lt - 1200km - 6,00km/lt
-005400 - 000700 - 100lt -  600km - 5,00km/lt
-
-pneus
-001100 - 001500 - 000km
-001600 - 000250 - 500km
-002650 - 001800 - 1050km
-004200 - 003100 - 1350km
-005400 - 000800 - 1200km
-
-
-    '''
 
 pneu
     aplicacao/rodizio
@@ -198,7 +187,7 @@ git push origin master
 atualizar na kinghost
 git pull origin master
 
-
+https://github.com/francielsilvestrini/soupport.git
 
 GESTÃO DE EQUIPAMENTOS
 ====== == ============
