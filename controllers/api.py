@@ -95,7 +95,7 @@ def contract(registry, contract_number):
                 )
             products[row.identifier] = product
     else:
-        customer = db(db.customer.registry==registry).select().first()
+        customer = db(db.person.registry==registry).select().first()
         if customer:
             rcontract = db(db.mul_contract.number == contract_number).select().first()
             if rcontract.customer_id == customer.id:
@@ -142,6 +142,6 @@ def contract(registry, contract_number):
             contract.result['code'] = 102
         contract.result['message'] = contract_results[contract.result['code']]
         if contract.result['code'] > 100:
-            contract.result['message'] += ' Registry: %s, Contract Number: %s' % registry, contract_number
+            contract.result['message'] += ' {Registry: %s, Contract Number: %s}' % (registry, contract_number)
 
     return contract.copy()

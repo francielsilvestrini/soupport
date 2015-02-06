@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from gluon.globals import current
-from onx_utils.OnxUtils import table_default_values
+from onx_utils import OnxUtils
 
 import logging, logging.handlers
 class OnxLogHandler(logging.Handler):
@@ -19,7 +19,7 @@ class OnxLogHandler(logging.Handler):
 
         try:
             log = db['log']
-            defs = table_default_values(log)
+            defs = OnxUtils.table_default_values(log)
             defs['name'] = record.name
             defs['level'] = record.levelname
             defs['module'] = record.module
