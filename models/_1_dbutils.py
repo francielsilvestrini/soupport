@@ -5,17 +5,11 @@ UPLOAD_URLS = {
     'profile': path.join(request.folder,'uploads','profile'),
     'attachments': path.join(request.folder,'uploads','attachments'),
 }
-ADMIN_ROLE = 'admin'
 
 
 def table_default_values(table):
-    defaults = {}
-    for fname in table.fields:
-        if table[fname].default:
-            if callable(table[fname].default):
-                defaults[fname] = table[fname].default()
-            else:
-                defaults[fname] = table[fname].default
+    from onx_utils import OnxUtils
+    defaults = OnxUtils.table_default_values(table)
     return defaults
 
 
@@ -104,6 +98,12 @@ class DBUTIL(object):
         max = table['id'].max()
         max_id = db(query).select(max).first()[max]
         return max_id
+
+    @staticmethod
+    def sum_field(field, query):
+        sum = field.sum()
+        sum_result = db(query).select(sum).first()[sum]
+        return sum_result
 
 ###############################################################################
 

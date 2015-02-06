@@ -1,0 +1,49 @@
+{{extend 'layouts/child.load'}}
+
+{{block declare_vars}}
+{{
+    target = request.function
+    parent_id = request.args(1)
+    captions = (T('Materials'), T('Material'))
+    caption_new_btn = T('Add Material')
+    url_edit = URL(f=target, args=['edit',parent_id] )
+    url_remove = URL(f=target, args=['remove', parent_id])
+}}
+{{end}}
+
+<table class="table table-condensed table-hover">
+    <thead>
+        <tr>
+            {{if len(content):}}
+            <th>{{= content[0].label.material_id}}</th>
+            <th>{{= content[0].label.quantity}}</th>
+            <th>{{= content[0].label.total_cost}}</th>
+            <th>{{= content[0].label.service_reference_id}}</th>
+            <th></th>
+            {{pass}}
+        </tr>
+    </thead>
+    <tbody>
+        {{for row in content:}}
+        <tr>
+            <td>{{= row.repr.material_id}}&nbsp;<small class="muted">{{= row.repr.description}}</small></td>
+            <td>{{= row.repr.quantity}}</td>
+            <td><span
+                title="{{= '%(label_unit_cost)s: %(unit_cost)s (%(label_discount)s: %(discount)s)' % {
+                    'label_unit_cost': content[0].label.unit_cost,
+                    'unit_cost': content[0].unit_cost,
+                    'label_discount': content[0].label.discount,
+                    'discount': content[0].discount,
+                    }
+                    }}"
+                data-toggle="tooltip">
+
+                {{= row.repr.total_cost}}</span></td>
+            <td>{{= row.repr.service_reference_id}}</td>
+            <td>
+                {{include 'others/child_item_buttons.html'}}
+            </td>
+        </tr>
+        {{pass}}
+    </tbody>
+</table>

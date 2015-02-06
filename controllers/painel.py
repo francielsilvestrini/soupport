@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+@auth.requires(auth.has_membership(role=Settings.ADMIN_ROLE))
 def index():
     session.project = 'painel'
     session.breadcrumbs.reset(T('Painel'), current_url())
@@ -15,7 +15,7 @@ def index():
     return dict(menus=menus)
 
 
-@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+@auth.requires(auth.has_membership(role=Settings.ADMIN_ROLE))
 def config():
     def do_navegate(self, nav, action):
         nav.next = URL(c='painel', f='index')
@@ -29,11 +29,12 @@ def config():
     oform.customize.on_navegate = do_navegate
     content = oform.execute_action('update', record.id)
 
+    response.breadcrumbs = T('Config')
     breadcrumbs_add()
     return content
 
 
-@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+@auth.requires(auth.has_membership(role=Settings.ADMIN_ROLE))
 def company():
     def do_navegate(self, nav, action):
         nav.next = URL(c='painel', f='index')
@@ -51,7 +52,7 @@ def company():
     return content
 
 
-@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+@auth.requires(auth.has_membership(role=Settings.ADMIN_ROLE))
 def database():
     menus = []
     menus += [(T('Backup'), URL(f='database_backup'))]
@@ -63,7 +64,7 @@ def database():
     return dict(menus=menus)
 
 
-@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+@auth.requires(auth.has_membership(role=Settings.ADMIN_ROLE))
 def database_backup():
     import cStringIO
     s = cStringIO.StringIO()
@@ -77,7 +78,7 @@ def database_backup():
     return s.getvalue()
 
 
-@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+@auth.requires(auth.has_membership(role=Settings.ADMIN_ROLE))
 def database_clear():
     def make_form():
         tables = dict(all=T(' All '))
@@ -115,7 +116,7 @@ def clear_cache():
     return
 
 
-@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+@auth.requires(auth.has_membership(role=Settings.ADMIN_ROLE))
 def users():
     menus = []
     menus += [(T('Users'), URL(c='user', f='auth_user'))]
@@ -126,7 +127,7 @@ def users():
     return dict(menus=menus)
 
 
-@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+@auth.requires(auth.has_membership(role=Settings.ADMIN_ROLE))
 def development():
     menus = []
     menus += [(T('Translate'), URL(f='translate'))]
@@ -137,7 +138,7 @@ def development():
     return dict(menus=menus)
 
 
-@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+@auth.requires(auth.has_membership(role=Settings.ADMIN_ROLE))
 def translate():
     response.breadcrumbs = T('Translate')
     breadcrumbs_add()
@@ -215,17 +216,23 @@ def translate():
     return dict(content=form)
 
 
-@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+@auth.requires(auth.has_membership(role=Settings.ADMIN_ROLE))
 def log():
+    if request.args(0) == 'clear':
+        db(db.log.id > 0).delete()
+        redirect(URL(f='log'))
+        return
+
     content = ONXFORM.make(db.log)
 
     response.title = T('Log')
     response.subtitle = ''
     breadcrumbs_add(response.title)
+    response.view = 'painel/log.html'
     return content
 
 
-@auth.requires(auth.has_membership(role=ADMIN_ROLE))
+@auth.requires(auth.has_membership(role=Settings.ADMIN_ROLE))
 def sql_command():
     command_type_set = {
         'command':T('Command'),
@@ -251,7 +258,3 @@ def sql_command():
         results = [results]
     return dict(form=form, results=results)
 
-
-def licence():
-
-    return dict()

@@ -3,7 +3,7 @@
 from h5_widgets import NicEditorWidget, LookupWidget
 
 class TasksModel(ModelBase):
-    name = 'task'
+    name = 'tasks'
 
     PRIORITY_SET = {
         'normal':T('Normal'),
@@ -28,7 +28,7 @@ class TasksModel(ModelBase):
         }
 
     def define_tables(self):
-        self.validate_required(db, ['platform', 'customer'])
+        self.validate_required(db, ['platform', 'person'])
 
         def defaultPlatform():
             r = db(db.platform).select().first()
@@ -55,7 +55,7 @@ class TasksModel(ModelBase):
 
         db.define_table('solicitation',
             Field('platform_id', db.platform, label=T('Platform'), readable=False, writable=False),
-            Field('customer_id', db.customer, label=T('Customer')),
+            Field('customer_id', db.person, label=T('Customer')),
             Field('customer_detail', 'string', label=T('Customer Detail')),
             Field('priority', 'string', label=T('Priority')),
             Field('subject', 'string', label=T('Subject')),
@@ -66,8 +66,8 @@ class TasksModel(ModelBase):
             format='%(subject)s')
         db.solicitation.platform_id.requires = IS_IN_DB(db, db.platform, db.platform._format)
         db.solicitation.platform_id.default = defaultPlatform
-        db.solicitation.customer_id.requires = IS_IN_DB(db(db.customer.is_active == True),
-            db.customer, db.customer._format, orderby=db.customer.name)
+        db.solicitation.customer_id.requires = IS_IN_DB(db((db.person.is_active == True) & db.person.person_type.contains('customer') ),
+            db.person, db.person._format, orderby=db.person.name)
         db.solicitation.customer_id.widget = LookupWidget().widget
         db.solicitation.priority.requires = IS_IN_SET(TasksModel.PRIORITY_SET)
         db.solicitation.priority.default = 'normal'
@@ -76,6 +76,7 @@ class TasksModel(ModelBase):
         db.solicitation.content_txt.widget = NicEditorWidget().widget
         db.solicitation.content_txt.represent = lambda value,row: XML(value, sanitize=False)
         db.solicitation.is_new.default = True
+        self.cruds += [dict(c='tasks', f='solicitation')]
 
 
         db.define_table('releases',
@@ -87,6 +88,7 @@ class TasksModel(ModelBase):
         db.releases.name.requires = [IS_NOT_EMPTY(),IS_NOT_IN_DB(db, 'releases.name')]
         db.releases.started.default = request.now
         db.releases.is_final.default = True
+        self.cruds += [dict(c='tasks', f='releases')]
 
 
         db.define_table('task',
@@ -121,6 +123,7 @@ class TasksModel(ModelBase):
         db.task.what.represent = lambda value,row: XML(value, sanitize=False)
         db.task.note.widget = NicEditorWidget().widget
         db.task.note.represent = lambda value,row: XML(value, sanitize=False)
+        self.cruds += [dict(c='tasks', f='task')]
 
 
         db.define_table('test',
@@ -134,6 +137,8 @@ class TasksModel(ModelBase):
         db.test.test_result.represent = lambda value,row: test_result_rep(value)
         db.test.note.widget = NicEditorWidget().widget
         db.test.note.represent = lambda value,row: XML(value, sanitize=False)
+
+
         return
 
 

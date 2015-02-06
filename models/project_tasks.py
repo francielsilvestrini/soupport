@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 class ProjectTasks(ProjectBase):
-
+    name = 'tasks'
 
     def __init__(self):
         ProjectBase.__init__(self)
@@ -11,62 +11,26 @@ class ProjectTasks(ProjectBase):
 
 
     def load_menus(self):
-        self.append_menu(
-            name='platform',
-            caption='Platform',
-            controller='entries',
-            function='platform',
-            )
-        self.append_menu(
-            name='customer',
-            caption='Customer',
-            controller='entries',
-            function='customer',
-            )
-        self.append_menu(
-            name='tag',
-            caption='Tag',
-            controller='tags',
-            function='tag',
-            )
-        self.append_menu(
-            name='solicitation',
-            caption='Solicitation',
-            controller='tasks',
-            function='solicitation',
-            icon='icon-bullhorn',
-            )
-        self.append_menu(
-            name='task',
-            caption='Task',
-            controller='tasks',
-            function='task',
-            icon='icon-tasks',
-            )
-        self.append_menu(
-            name='releases',
-            caption='Releases',
-            controller='tasks',
-            function='releases',
-            icon='icon-tags',
-            )
+        app_models['commom'].get_crud_menus(self)
+        app_models['entries'].get_crud_menus(self)
+        app_models['tasks'].get_crud_menus(self)
         return
 
 
     def sidebar(self):
         toplinks = [
             (T('Home'), URL(c='tasks', f='index'), 'icon-home'),
-            (self.menus.solicitation.new_record[0], self.menus.solicitation.new_record[1], self.menus.solicitation.icon),
-            (self.menus.task.new_record[0], self.menus.task.new_record[1], self.menus.task.icon),
+            (self.menus['tasks_solicitation'], True),
+            (self.menus['tasks_task'], True),
             ]
 
         accordion_menu = [
             (T('Entries'), 'accordion_entries', 'icon-folder-open',  [
-                self.menus.solicitation,
-                self.menus.task,
-                self.menus.releases,
-                self.menus.customer,
-                self.menus.tag,
+                self.menus['tasks_solicitation'],
+                self.menus['tasks_task'],
+                self.menus['tasks_releases'],
+                self.menus['entries_customer'],
+                self.menus['tags_tag'],
 
                 ]),
 

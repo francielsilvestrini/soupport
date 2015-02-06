@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 class ProjectActivity(ProjectBase):
-
+    name = 'activity'
 
     def __init__(self):
         ProjectBase.__init__(self)
@@ -11,41 +11,15 @@ class ProjectActivity(ProjectBase):
 
 
     def load_menus(self):
-        self.append_menu(
-            name='customer',
-            caption='Customer',
-            controller='entries',
-            function='customer',
-            )
-        self.append_menu(
-            name='mul_product',
-            caption='Product',
-            controller='mul',
-            function='product',
-            )
-        self.append_menu(
-            name='mul_contract',
-            caption='Contract',
-            controller='mul',
-            function='contract',
-            )
+        app_models['entries'].get_crud_menus(self)
         return
 
 
     def sidebar(self):
         toplinks = [
-            (T('Home'), URL(c='mul', f='index'), 'icon-home'),
+            (T('Home'), URL(c='activity', f='index'), 'icon-home'),
             ]
-
-        accordion_menu = [
-            (T('MUL'), 'accordion_entries', 'icon-folder-open',  [
-                self.menus.mul_product,
-                self.menus.mul_contract,
-                self.menus.customer,
-
-                ]),
-
-            ]
+        accordion_menu = []
         return Storage(toplinks=toplinks, accordion_menu=accordion_menu)
 
 

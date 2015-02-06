@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-db = DAL('sqlite://storage.sqlite',pool_size=1,check_reserved=['sqlite', 'mysql'])
-
-session.connect(request, response, separate=True)
+db = DAL('sqlite://storage.sqlite',pool_size=0,check_reserved=['sqlite', 'mysql'])
+#session.connect(request, response, separate=True)
 
 from gluon import current
 current.db = db
@@ -12,7 +11,6 @@ owner_fields = db.Table(db, 'owner',
     Field('owner_key', 'string', label=T('Owner Key'), writable=False, readable=False),
     Field('owner_link', 'string', label=T('Owner Link'), writable=False, readable=False),
     )
-
 
 from onx_views import PageConfig
 if not 'page' in session:
@@ -57,8 +55,6 @@ for cls in _models_class:
     model = cls()
     model.model_define()
     app_models[model.name] = model
-
-
 
 
 registred_projects = dict()

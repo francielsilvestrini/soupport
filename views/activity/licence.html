@@ -1,0 +1,99 @@
+{{extend 'layouts/main.html'}}
+
+<style type="text/css">
+    div.block-record {min-height:330px;}
+</style>
+
+
+<div class="row-fluid">
+    <div class="span6">
+        <!-- block -->
+        <div class="block">
+            <div class="navbar navbar-inner block-header">
+                <div class="muted pull-left">{{= T('Contract')}}</div>
+                <div class="pull-right">
+                </div>
+            </div>
+            <div class="block-record collapse in">
+                <table class="table table-striped table-hover">
+                    <tbody>
+                        <tr>
+                            <td class="onx-col-header">{{= T('Contract Number')}}</td>
+                            <td>{{= response.contract['number']}}</td>
+                        </tr>
+                        <tr>
+                            <td class="onx-col-header">{{= T('Registred To')}}</td>
+                            <td>{{= response.contract['name']}}</td>
+                        </tr>
+                        <tr>
+                            <td class="onx-col-header">{{= T('Registry')}}</td>
+                            <td>{{= response.contract['registry']}}</td>
+                        </tr>
+                        <tr>
+                            <td class="onx-col-header">{{= T('Licence Key')}}</td>
+                            <td>{{= response.contract['licence_key']}}</td>
+                        </tr>
+                        <tr>
+                            <td class="onx-col-header">{{= T('Validate')}}</td>
+                            <td>{{= response.contract['validate']}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="onx-col-header">{{= T('Result')}}</td>
+                        </tr>
+
+                        <tr>
+                            <td class="onx-col-header">{{= T('Code')}}</td>
+                            <td class="{{= 'text-error' if response.contract['result']['code'] > 100 else 'text-success'}}">
+                                {{= response.contract['result']['code']}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="onx-col-header">{{= T('Message')}}</td>
+                            <td class="{{= 'text-error' if response.contract['result']['code'] > 100 else 'text-success'}}">
+                                {{= response.contract['result']['message']}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- /block -->
+    </div>
+
+    <div class="span6">
+        <!-- block -->
+        <div class="block">
+            <div class="navbar navbar-inner block-header">
+                <div class="muted pull-left">Products</div>
+                <div class="pull-right">
+                </div>
+            </div>
+            <div class="block-record collapse in">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>{{= T('Product')}}</th>
+                            <th>{{= T('Licence Key')}}</th>
+                            <th>{{= T('Validate')}}</th>
+                            <th>{{= T('Result')}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{contract_items = response.contract['items']}}
+                        {{ for k in contract_items:}}
+                        <tr>
+                            <td>{{= contract_items[k]['name']}}</td>
+                            <td>{{= contract_items[k]['licence_key']}}</td>
+                            <td>{{= contract_items[k]['validate']}}</td>
+                            <td class="{{= 'text-error' if contract_items[k]['result']['code'] > 100 else 'text-success'}}">
+                                {{= '%(code)s - %(message)s' % contract_items[k]['result']}}
+                            </td>
+                        </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- /block -->
+    </div>
+</div>

@@ -10,7 +10,7 @@
 <!-- end navbar -->
 
 <div class="container-fluid">
-    <div class="row-fluid">       
+    <div class="row-fluid">
 
         <!-- begin sidebar -->
         {{block left_sidebar_main}}
@@ -38,7 +38,7 @@
 
 <footer class="footer" id="footer">
     <div class="footer-content">
-        {{block footer}} 
+        {{block footer}}
             <div class="copyright pull-left">{{=T('Copyright')}} &#169; {{=request.now.year}}</div>
             <div id="poweredBy" class="pull-right">
                 {{=T('Powered with')}}
@@ -53,7 +53,7 @@
 {{end}}
 
 {{block scripts}}
-    {{super}} 
+    {{super}}
 
     <script src="{{=URL('static','assets/screenfull.js/screenfull.min.js')}}"></script>
     <script src="{{=URL('static','assets/select2-3.5.1/select2.min.js')}}"></script>

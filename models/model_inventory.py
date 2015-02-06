@@ -5,11 +5,6 @@ from onx_files import csv_defaults
 class InventoryModel(ModelBase):
     name = 'inventory'
 
-    def __init__(self):
-        ModelBase.__init__(self)
-        self.crud_controller = 'inventory'
-        return
-
     system_item_type = {
         'fuel':T('Fuel'),
         'lubricant':T('Lubricant'),
@@ -22,6 +17,7 @@ class InventoryModel(ModelBase):
     inventory_item_type = {
         'tire':T('Tire'),
         'component':T('Component'),
+        'material':T('Material'),
         }
 
     inventory_item_status = {
@@ -74,8 +70,6 @@ class InventoryModel(ModelBase):
 
 
     def define_tables(self):
-        #self.validate_required(db, ['platform', 'customer'])
-
         db.define_table('unit_of_measure',
             Field('acronym', 'string', label=T('Acronym')),
             Field('name', 'string', label=T('Name')),
@@ -195,6 +189,13 @@ class InventoryModel(ModelBase):
         db.component_item.component_id.requires = IS_IN_DB(db(db.inventory_item.item_type == 'component'), db.inventory_item, db.inventory_item._format)
         db.component_item.component_id.widget = LookupWidget(width='90%').widget
 
+        self.cruds += [
+            dict(c='inventory', f='unit_of_measure'),
+            dict(c='inventory', f='system'),
+            dict(c='inventory', f='subsystem'),
+            dict(c='inventory', f='system_item'),
+            dict(c='inventory', f='inventory_item'),
+            ]
         return
 
 
@@ -311,6 +312,16 @@ class InventoryModel(ModelBase):
         if unit:
             id = unit.id
         return id
+
+    @staticmethod
+    def item_IS_IN_DB(status=None, item_type=None):
+        query = (db.inventory_item.id > 0)
+        if item_type:
+            query &= (db.inventory_item.item_type == item_type)
+        if status:
+            query &= db.inventory_item.status.contains(status, all=False)
+
+        return IS_IN_DB(db(query), db.inventory_item, db.inventory_item._format)
 
     #--------------------------------------------------------------------------
     # BEGIN BUSINESS RULES

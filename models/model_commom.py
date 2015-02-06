@@ -3,7 +3,7 @@
 from h5_widgets import TagsInputWidget
 
 class CommomModel(ModelBase):
-    name = 'attachments'
+    name = 'commom'
 
     def define_tables(self):
         db.define_table('attachments',
@@ -29,7 +29,7 @@ class CommomModel(ModelBase):
             format='%(name)s')
         db.tag.name.requires = [IS_NOT_EMPTY(),IS_NOT_IN_DB(db, 'tag.name')]
         self.set_table_defaults(db.comments, 0)
-
+        self.cruds += [dict(c='tags', f='tag')]
 
         db.define_table('sequence_ticket',
             Field('target', 'string', label=T('Target')),

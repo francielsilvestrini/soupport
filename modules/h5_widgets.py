@@ -159,6 +159,56 @@ class LookupWidget(OptionsWidget):
         wrapper.components.extend([wgt_default, btn_new, jq_script])
         return wrapper
 
+from gluon.sqlhtml import MultipleOptionsWidget
+class MultipleWidget(MultipleOptionsWidget):
+
+    def __init__(self, width=None, add_new=None):
+        self.width = width
+        self.add_new = add_new
+        return
+
+    @staticmethod
+    def widget_files():
+        current.session.page.header_files['select2.css'] = URL('static','assets/select2-3.5.1/select2.css')
+        current.session.page.footer_files['select2.min.js'] = URL('static','assets/select2-3.5.1/select2.min.js')
+        return
+
+    def widget(self, field, value, **attr):
+        LookupWidget.widget_files()
+
+        width = self.width or getattr(field, 'widget_width', None)
+
+        if not width:
+            attr['_class'] = 'span4'
+        attr['_style'] = 'height: 20px; margin-bottom: 14px;'
+        if width:
+            attr['_style'] += 'width:%s;' % width
+
+        wgt_default = MultipleOptionsWidget.widget(field, value, **attr)
+        wgt_id = wgt_default.attributes.get('_id', 'no_id')
+
+        js = '''
+            jQuery(document).ready(function(){
+                jQuery('#%(field_name)s').select2();
+            });
+            ''' % {'field_name':wgt_id}
+        jq_script=SCRIPT(js, _type="text/javascript")
+
+        btn_new = ''
+        if self.add_new:
+            btn_new = A(
+                I(_class='fa fa-plus-circle'),
+                _href=self.add_new,
+                _class='btn btn-small',
+                _title=current.T('New record'),
+                _style='margin-top: 0px; margin-left:3px;',
+                **{'_data-toggle':'tooltip'}
+                )
+
+        wrapper = DIV(_class="LookupWidget")
+        wrapper.components.extend([wgt_default, btn_new, jq_script])
+        return wrapper
+
 
 class MaskWidget(StringWidget):
 

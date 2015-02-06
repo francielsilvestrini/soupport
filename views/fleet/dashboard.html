@@ -7,69 +7,97 @@
 
 <!-- main view -->
 <div class="row-fluid">
-    <div class="block">
-
-        <div class="navbar navbar-inner block-header">
-            <div class="brand pull-left">
-                <a href="{{=URL(c='fleet', f='vehicle', args=['read', record.id])}}">
-                {{= record.repr.licence_plate}} <small>&nbsp;{{= record.repr.description}}</small>
-                </a>
-            </div>
-            <div class="pull-right" style="margin-top: 0px;padding-top: 0px;">
-                <div class="btn-group" style="margin-top: 0px;padding-top: 10px;">
-                    <a class="btn-status dropdown-toggle"
-                        title="{{= record.status.repr.note}}"
-                        data-toggle="dropdown" style="background-color: {{=record.status.repr.color}};"
-                        id="main_status"
-                        >
-                        {{= record.status.repr.status}}&nbsp;<span class="caret"></span>
+    <div class="span9">
+        <div class="block">
+            <div class="navbar navbar-inner block-header">
+                <div class="brand pull-left">
+                    <a href="{{=URL(c='fleet', f='vehicle', args=['read', record.id])}}">
+                    {{= record.repr.licence_plate}} <small>&nbsp;{{= record.repr.description}}</small>
                     </a>
-                    <ul class="dropdown-menu">
-                        {{for k in status_list:}}
-                        <li {{= 'class=disabled' if k == record.status.status else ''}}>
-                            <a href="{{= URL(c='fleet', f='change_status', args=[k], vars=request.vars)}}">
-                                {{= status_list[k]}}</a>
-                        </li>
-                        {{pass}}
-                        <li class="divider"></li>
-                        <li><a onclick="add_status_note({{=record.status.id}});" href="javascript:void(0);">{{= T('Add status note')}}</a></li>
-                    </ul>
                 </div>
+                <div class="pull-right" style="margin-top: 0px;padding-top: 0px;">
+                    <div class="btn-group" style="margin-top: 0px;padding-top: 10px;">
+                        <a class="btn-status dropdown-toggle"
+                            title="{{= record.status.repr.note}}"
+                            data-toggle="dropdown" style="background-color: {{=record.status.repr.color}};"
+                            id="main_status"
+                            >
+                            {{= record.status.repr.status}}&nbsp;<span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            {{for k in status_list:}}
+                            <li {{= 'class=disabled' if k == record.status.status else ''}}>
+                                <a href="{{= URL(c='fleet', f='change_status', args=[k], vars=request.vars)}}">
+                                    {{= status_list[k]}}</a>
+                            </li>
+                            {{pass}}
+                            <li class="divider"></li>
+                            <li><a onclick="add_status_note({{=record.status.id}});" href="javascript:void(0);">{{= T('Add status note')}}</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="block-record collapse in">
+                <!--
+                    <a href="#">planejamento de manutenção</a><br>
+                    <a href="#">solicitacao de serviço</a><br>
+                    <a href="#">apontamento de despesas</a><br>
+                    <a href="#">ordem de reforma</a><br>
+                    <a href="#">durabilidade</a><br>
+                    <a href="#">custos</a><br>
+                    <a href="#">desperdicios e economias</a><br>
+                    <a href="#">gerenciamento de vencimento (licenciamento/seguro/etc)</a><br>
+                    <a href="#">analise de lubrificantes(amostra, aparencia, odor, etc)</a><br>
+
+                    <div class="chart easyPieChart" data-percent="83" style="width: 110px; height: 110px; line-height: 110px;">83%<canvas width="110" height="110"></canvas></div>
+                    <div class="chart-bottom-heading"><span class="label label-info">Users</span>
+
+                    </div>
+                -->
+                <table class="table table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th>{{= T('Summary')}}</th>
+                            <th>{{= T('Month')}}</th>
+                            <th>{{= T('Year')}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{for k in ['distance_traveled', 'fuel_liters', 'fuel_average', 'fuel_cost', 'maintenance_order']:}}
+                        <tr>
+                            {{summary_item = summary[k]}}
+                            <td>{{= summary_item['item']}}</td>
+                            <td>{{= summary_item['month'][0]}}</td>
+                            <td>{{= summary_item['year'][0]}}</td>
+                        </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
             </div>
         </div>
-
-
-        <div class="block-record collapse in">
-            <div class="span9">
-            <!--
-                <a href="#">planejamento de manutenção</a><br>
-                <a href="#">solicitacao de serviço</a><br>
-                <a href="#">apontamento de despesas</a><br>
-                <a href="#">ordem de reforma</a><br>
-                <a href="#">durabilidade</a><br>
-                <a href="#">custos</a><br>
-                <a href="#">desperdicios e economias</a><br>
-                <a href="#">gerenciamento de vencimento (licenciamento/seguro/etc)</a><br>
-                <a href="#">analise de lubrificantes(amostra, aparencia, odor, etc)</a><br>
-
-                <div class="chart easyPieChart" data-percent="83" style="width: 110px; height: 110px; line-height: 110px;">83%<canvas width="110" height="110"></canvas></div>
-                <div class="chart-bottom-heading"><span class="label label-info">Users</span>
-
-                </div>
-            -->
-            </div>
-            <div class="span3">
-                <div class="pull-right" style="padding:8px;">
-                    <a href="{{= URL(c='tire_control', f='manage', vars=request.get_vars)}}" class="btn btn-info">{{= T('Tire Control')}}</a>
-                    <a href="{{= URL(c='inventory', f='components', args=['vehicle', record.id], vars=request.get_vars)}}"
-                        class="btn btn-info">{{= T('Component Control')}}</a>
-
-                </div>
-            </div>
+    </div>
+    <div class="span3">
+        <div class="nav nav-collapse collapse">
+            <ul class="nav nav-list bs-docs-sidenav">
+                <li>
+                    <a href="{{= URL(c='tire_control', f='manage', vars=request.get_vars)}}">{{= T('Tire Control')}}
+                    <i class="icon-chevron-right"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{= URL(c='inventory', f='components', args=['vehicle', record.id], vars=request.get_vars)}}">{{= T('Component Control')}}
+                    <i class="icon-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
 <!-- /main view -->
+
+
+
 
 <div class="row-fluid">
     <div class="span6">
@@ -148,18 +176,73 @@
     </div>
 
     <div class="span6">
-        <!-- block -->
+        <!-- maintenance order -->
         <div class="block">
             <div class="navbar navbar-inner block-header">
-                <div class="muted pull-left">#</div>
+                <div class="muted pull-left">{{= T('Maintenance Order')}}</div>
                 <div class="pull-right">
+                    <ul id="maintenance_order_tab" class="nav nav-tabs">
+                        <li class="active"><a href="#maintenance_order_statistics" data-toggle="tab">{{=T('Statistics')}}</a></li>
+                        <li class=""><a href="#maintenance_order_open" data-toggle="tab">
+                            {{=T('Open')}}&nbsp;<span class="badge badge-info">{{= len(maintenance_order.open)}}</span></a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class='fa fa-bars'></i></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{= URL(c='maintenance', f='order', args='new', vars=request.vars)}}">
+                                    {{= T('New Maintenance Order')}}
+                                </a></li>
+                                <li><a href="{{= URL(c='maintenance', f='order', vars=request.vars)}}">
+                                    {{= T('Manager')}}
+                                </a></li>
+                            </ul>
+                        </li>
+                    </ul>
 
                 </div>
             </div>
             <div class="block-record collapse in">
+                <div id="maintenance_order_tab" class="tab-content">
+                    <div class="tab-pane active in fade" id="maintenance_order_statistics">
+                        <div class="row-fluid" style="overflow:hidden;">
+                            <div class="chart">
+                                <div id="maintenance-order-average" class="chart-view"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="maintenance_order_open">
+                        <table class="table table-condensed table-hover">
+                            <thead>
+                                <tr>
+                                    {{if len(maintenance_order.open):}}
+                                    {{row = maintenance_order.open[0]}}
+                                    <th>{{= row.label.id}}</th>
+                                    <th>{{= row.label.order_date}}</th>
+                                    <th>{{= row.label.supplier_id}}</th>
+                                    <th>{{= row.label.total_order}}</th>
+                                    <th></th>
+                                    {{pass}}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{for row in maintenance_order.open:}}
+                                <tr>
+                                    <td>{{= row.repr.id}}</td>
+                                    <td>{{= row.repr.order_date}}</td>
+                                    <td>{{= row.repr.supplier_id}}</td>
+                                    <td>{{= row.repr.total_order}}</td>
+                                    <td>{{= btn_edit_row(href=URL(c='maintenance', f='order', args=['read', row.id], vars=request.get_vars)) }}</td>
+                                </tr>
+                                {{pass}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-        <!-- /block -->
+        <!-- /maintenance order -->
     </div>
 </div>
 <div class="row-fluid">
@@ -294,7 +377,9 @@
             </div>
         </div>
         <div class="block-record collapse in">
-            {{= LOAD(c='maintenance', f='maintenance.load', args=['list',record.maintenance_control_id], ajax=True, content=loading)}}
+            {{= LOAD(c='maintenance', f='maintenance.load',
+                args=['list',record.maintenance_control_id], vars=request.get_vars,
+                ajax=True, content=loading)}}
         </div>
     </div>
     <!-- /maintenance -->
@@ -316,14 +401,14 @@ function add_status_note(status_id) {
 $(document).ready(function() {
     $("#main_status").tooltip();
 
-    var refueling_data = [
+    var data = [
     {{for row in reversed(refueling):}}
         {period: "{{= row.refueling_date.strftime('%d/%m')}}", distance: {{= row.distance}}, distance_standard: {{= row.distance_standard}} },
     {{pass}}
     ];
     Morris.Bar({
         element: "refueling-stats-distance",
-        data: refueling_data,
+        data: data,
         xkey: "period",
         ykeys: ["distance", "distance_standard"],
         labels: ["{{= T('Distance')}}", "Standard"],
@@ -333,7 +418,7 @@ $(document).ready(function() {
         barColors: ["#3d88ba", "#a6e182"]
     });
 
-    refueling_data = [
+    data = [
     {{for key, row in enumerate(reversed(refueling)):}}
         {key_id: "{{= key}}  {{= '%s (%s)' % (row.repr.fuel_id, row.repr.type_average) }}",
          average: {{= row.average}},
@@ -343,7 +428,7 @@ $(document).ready(function() {
 
     Morris.Line({
         element: "refueling-stats-average",
-        data: refueling_data,
+        data: data,
         xkey: "key_id",
         ykeys: ["average", "standard"],
         labels: ["{{= T('Average')}}", "{{= T('Standard')}}"],
@@ -355,6 +440,24 @@ $(document).ready(function() {
         },
 
     });
+
+    data = [
+    {{for row in maintenance_order.statistics:}}
+        {period: "{{= row.maintenance_order.order_date.strftime('%Y-%m')}}", total_order: {{= row['SUM(maintenance_order.total_order)']}} },
+    {{pass}}
+    ];
+    Morris.Bar({
+        element: "maintenance-order-average",
+        data: data,
+        xkey: "period",
+        ykeys: ["total_order"],
+        labels: ["{{= T('Total Order')}}"],
+        barRatio: 0.4,
+        xLabelMargin: 10,
+        hideHover: "auto",
+        barColors: ["#3d88ba"]
+    });
+
 
 });
 

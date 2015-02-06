@@ -1,17 +1,169 @@
 # -*- coding: utf-8 -*-
 
-def _get_vehicle():
-    vehicle_id = int( request.vars['vehicle'] )
+def _get_vehicle(vehicle_id=None):
+    if not vehicle_id:
+        vehicle_id = int( request.vars['vehicle'] )
     vehicle = db(db.vehicle.id == vehicle_id).select().first()
     ONXREPR.row_repr(vehicle, db.vehicle)
     return vehicle
+
+
+def one_month_ago():
+    return request.now.today() - timedelta(days=30)
+
+
+def one_year_ago():
+    return request.now.today() - timedelta(days=365)
+
+
+def _distance_traveled(vehicle_id):
+    def odometer_history(vid, initial_date):
+        row = db((db.vehicle_odometer.vehicle_id==vid) & (db.vehicle_odometer.odometer_date >= initial_date)).select(
+            orderby=db.vehicle_odometer.odometer_date, limitby=(0,1)).first()
+        return row
+
+    data = {}
+    if vehicle_id != None:
+        query = (db.vehicle.id == vehicle_id)
+    else:
+        query = (db.vehicle.is_active == True)
+    for vehicle in db(query).select():
+        data_item = {}
+        data_item['licence_plate'] = vehicle.licence_plate
+        data_item['description'] = vehicle.description
+        data_item['month'] = ('0km', 0.0)
+        data_item['year'] = ('0km', 0.0)
+
+        history = odometer_history(vehicle.id, one_month_ago())
+        if history:
+            value = round(vehicle.accumulated_odometer - history.accumulated, 3)
+            data_item['month'] = ('%skm' % value, value)
+        history = odometer_history(vehicle.id, one_year_ago())
+        if history:
+            value = round(vehicle.accumulated_odometer - history.accumulated, 3)
+            data_item['year'] = ('%skm' % value, value)
+        data[vehicle.id] = data_item
+    return data
+
+
+def _fleet_summary():
+    data = {
+        'vehicle_count': {
+            'text' :A(T('Vehicle Count'), _href=URL(c='fleet', f='vehicle')),
+            'month':('', 0),
+            'year' :('', 0),
+            },
+        'distance_traveled': {
+            'text' :A(T('Distance Traveled'), _href=URL(c='fleet', f='distance_traveled')),
+            'month':('0km', 0.0),
+            'year' :('0km', 0.0),
+            },
+        'distance_traveled_by_vehicle': {
+            'text' :A(T('Distance Traveled by Vehicle'), _href=URL(c='fleet', f='distance_traveled')),
+            'month':('0km', 0.0),
+            'year' :('0km', 0.0),
+            },
+        'fuel_cost': {
+            'text' :T('Fuel Cost'),
+            'month':('$0.00', 0.0),
+            'year' :('$0.00', 0.0),
+            },
+        'fuel_cost_by_vehicle': {
+            'text' :T('Fuel Cost by Vehicle'),
+            'month':('$0.00', 0.0),
+            'year' :('$0.00', 0.0),
+            },
+        'maintenance_order': {
+            'text' :T('Maintenance Order'),
+            'month':('$0.00', 0.0),
+            'year' :('$0.00', 0.0),
+            },
+        'maintenance_order_by_vehicle': {
+            'text' :T('Maintenance Order by Vehicle'),
+            'month':('$0.00', 0.0),
+            'year' :('$0.00', 0.0),
+            },
+    }
+
+    # vehicle_count
+    data_item = data['vehicle_count']
+    vehicle_count = db(db.vehicle.is_active == True).count()
+    data_item['month'] = (str(vehicle_count), vehicle_count)
+
+    # distance_traveled
+    data_item = data['distance_traveled']
+    distance_all_vehicles = _distance_traveled(None)
+    month, year = 0.0, 0.0
+    for vid in distance_all_vehicles:
+        vehicle = distance_all_vehicles[vid]
+        month += vehicle['month'][1]
+        year += vehicle['year'][1]
+    data_item['month'] = ('%skm' % month, month)
+    data_item['year'] = ('%skm' % year, year)
+
+    # distance_traveled_by_vehicle
+    if vehicle_count > 0:
+        data_item = data['distance_traveled_by_vehicle']
+        value = round(month/vehicle_count, 3)
+        data_item['month'] = ('%skm' % value, value)
+        value = round(year/vehicle_count, 3)
+        data_item['year'] = ('%skm' % value, value)
+
+    # fuel cost
+    data_item = data['fuel_cost']
+    value = DBUTIL.sum_field(db.vehicle_refueling.total_price, (db.vehicle_refueling.refueling_date >= one_month_ago()))
+    value = round(value or 0.0, 2)
+    data_item['month'] = ('$%.2f' % value, value)
+
+    value = DBUTIL.sum_field(db.vehicle_refueling.total_price, (db.vehicle_refueling.refueling_date >= one_year_ago()))
+    value = round(value or 0.0, 2)
+    data_item['year'] = ('$%.2f' % value, value)
+
+    # fuel_cost_by_vehicle
+    if vehicle_count > 0:
+        data_item = data['fuel_cost_by_vehicle']
+        month = data['fuel_cost']['month'][1]
+        value = round(month/vehicle_count, 2)
+        data_item['month'] = ('$%.2f' % value, value)
+        year = data['fuel_cost']['year'][1]
+        value = round(year/vehicle_count, 2)
+        data_item['year'] = ('$%.2f' % value, value)
+
+    # maintenance_order
+    data_item = data['maintenance_order']
+    value = DBUTIL.sum_field(db.maintenance_order.total_order,
+        (db.maintenance_order.status == 'finalized') & (db.maintenance_order.order_date >= one_month_ago()))
+    value = round(value or 0.0, 2)
+    data_item['month'] = ('$%.2f' % value, value)
+
+    value = DBUTIL.sum_field(db.maintenance_order.total_order,
+        (db.maintenance_order.status == 'finalized') & (db.maintenance_order.order_date >= one_year_ago()))
+    value = round(value or 0.0, 2)
+    data_item['year'] = ('$%.2f' % value, value)
+
+    # maintenance_order_by_vehicle
+    if vehicle_count > 0:
+        data_item = data['maintenance_order_by_vehicle']
+        month = data['maintenance_order']['month'][1]
+        value = round(month/vehicle_count, 2)
+        data_item['month'] = ('$%.2f' % value, value)
+        year = data['maintenance_order']['year'][1]
+        value = round(year/vehicle_count, 2)
+        data_item['year'] = ('$%.2f' % value, value)
+
+    return data
 
 
 @auth.requires(lambda: auth_has_access())
 def index():
     session.project = 'fleet'
     session.breadcrumbs.reset(T('Fleet'), current_url())
-    return dict()
+
+
+    content = dict(
+        summary=_fleet_summary(),
+        )
+    return content
 
 
 @auth.requires(lambda: auth_has_access())
@@ -169,6 +321,118 @@ def toplinks():
     return dict(content=rows)
 
 
+def _maintenance_order(vehicle_id):
+    maintenance_order = db((db.maintenance_order.vehicle_id==vehicle_id) & (db.maintenance_order.status == 'open')).select(
+        orderby=db.maintenance_order.id, limitby=(0,5))
+    for row in maintenance_order:
+        ONXREPR.row_repr(row, db.maintenance_order)
+
+    group_month = db.maintenance_order.order_date.year()|db.maintenance_order.order_date.month()
+    sum = db.maintenance_order.total_order.sum()
+    statistics = db((db.maintenance_order.vehicle_id==vehicle_id) & (db.maintenance_order.status == 'finalized')).select(
+        db.maintenance_order.order_date, sum, groupby=group_month, limitby=(0,5))
+    return Dict(open=maintenance_order, statistics=statistics)
+
+
+def _vehicle_summary(vehicle_id):
+    data = {
+        'distance_traveled': {
+            'item' :T('Distance Traveled'),
+            'month':('0km', 0.0),
+            'year' :('0km', 0.0),
+        },
+        'fuel_cost': {
+            'item' :T('Fuel Cost'),
+            'month':('$0.00', 0.0),
+            'year' :('$0.00', 0.0),
+        },
+        'fuel_liters': {
+            'item' :T('Fuel Liters'),
+            'month':('0lt', 0.0),
+            'year' :('0lt', 0.0),
+        },
+        'fuel_average': {
+            'item' :T('Fuel Average'),
+            'month':('0km/lt', 0.0),
+            'year' :('0km/lt', 0.0),
+        },
+        'maintenance_order': {
+            'item' :T('Maintenance Order'),
+            'month':('$0.00', 0.0),
+            'year' :('$0.00', 0.0),
+        },
+
+    }
+
+    vehicle = _get_vehicle(vehicle_id)
+
+    # distance traveled
+    data_item = data['distance_traveled']
+    history = _distance_traveled(vehicle.id)
+    data_item['month'] = history[vehicle.id]['month']
+    data_item['year'] = history[vehicle.id]['year']
+
+    # fuel cost
+    data_item = data['fuel_cost']
+    value = DBUTIL.sum_field(db.vehicle_refueling.total_price,
+        (db.vehicle_refueling.vehicle_id==vehicle_id) & (db.vehicle_refueling.refueling_date >= one_month_ago()))
+    value = round(value or 0.0, 2)
+    data_item['month'] = ('$%s' % value, value)
+
+    value = DBUTIL.sum_field(db.vehicle_refueling.total_price,
+        (db.vehicle_refueling.vehicle_id==vehicle_id) & (db.vehicle_refueling.refueling_date >= one_year_ago()))
+    value = round(value or 0.0, 2)
+    data_item['year'] = ('$%s' % value, value)
+
+    # fuel liters
+    data_item = data['fuel_liters']
+    value = DBUTIL.sum_field(db.vehicle_refueling.liters,
+        (db.vehicle_refueling.vehicle_id==vehicle_id) & (db.vehicle_refueling.refueling_date >= one_month_ago()))
+    value = round(value or 0.0, 3)
+    data_item['month'] = ('%slt' % value, value)
+
+    value = DBUTIL.sum_field(db.vehicle_refueling.liters,
+        (db.vehicle_refueling.vehicle_id==vehicle_id) & (db.vehicle_refueling.refueling_date >= one_year_ago()))
+    value = round(value or 0.0, 3)
+    data_item['year'] = ('%slt' % value, value)
+
+    # fuel average
+    data_item = data['fuel_average']
+    distance = data['distance_traveled']['month'][1]
+    liters = data['fuel_liters']['month'][1]
+    if liters > 0.0:
+        value = round(distance/liters, 3)
+    else:
+        value = 0.0
+    data_item['month'] = ('%skm/lt' % value, value)
+
+    distance = data['distance_traveled']['year'][1]
+    liters = data['fuel_liters']['year'][1]
+    if liters > 0.0:
+        value = round(distance/liters, 3)
+    else:
+        value = 0.0
+    data_item['year'] = ('%skm/lt' % value, value)
+
+    # maintenance order
+    data_item = data['maintenance_order']
+    value = DBUTIL.sum_field(db.maintenance_order.total_order,
+        (db.maintenance_order.vehicle_id==vehicle_id) \
+        & (db.maintenance_order.status == 'finalized') \
+        & (db.maintenance_order.order_date >= one_month_ago()))
+    value = round(value or 0.0, 2)
+    data_item['month'] = ('$%s' % value, value)
+
+    data_item = data['maintenance_order']
+    value = DBUTIL.sum_field(db.maintenance_order.total_order,
+        (db.maintenance_order.vehicle_id==vehicle_id) \
+        & (db.maintenance_order.status == 'finalized') \
+        & (db.maintenance_order.order_date >= one_year_ago()))
+    value = round(value or 0.0, 2)
+    data_item['year'] = ('$%s' % value, value)
+    return data
+
+
 @auth.requires(lambda: auth_has_access())
 def dashboard():
     try:
@@ -210,7 +474,10 @@ def dashboard():
         status_list=VehicleModel.vehicle_status,
         status_history=status_history,
         refueling=refueling,
-        odometer=odometer,)
+        odometer=odometer,
+        maintenance_order=_maintenance_order(vehicle_id),
+        summary=_vehicle_summary(vehicle_id),
+        )
 
     session.breadcrumbs.reset(T('Fleet'), URL(c='fleet',f='index'))
     response.title = T('Dashboard')
@@ -373,3 +640,11 @@ def reset_odometer():
     response.title = T('Reset Odometer')
     breadcrumbs_add(response.title)
     return dict(content=form)
+
+
+@auth.requires(lambda: auth_has_access())
+def distance_traveled():
+    data = _distance_traveled(None)
+    response.title = T('Distance Traveled')
+    breadcrumbs_add()
+    return dict(data=data)

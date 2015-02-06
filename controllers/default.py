@@ -10,7 +10,7 @@
 #########################################################################
 
 def index():
-    redirect(URL(c='fleet', f='index'))
+    redirect(URL(c='activity', f='index'))
     return dict()
 
 @cache.action()

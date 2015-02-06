@@ -37,12 +37,12 @@ class TireControlModel(ModelBase):
     def define_tables(self):
         self.validate_required(db, ['vehicle'])
 
-        self.cruds += ['axle']
         db.define_table('axle',
             Field('name', 'string', label=T('Name')),
             migrate='axle.table',
             format='%(name)s')
         db.axle.name.requires = [IS_NOT_EMPTY()]
+        self.cruds += [dict(c='tire_control', f='axle')]
 
 
         db.define_table('axle_wheel',
@@ -57,12 +57,13 @@ class TireControlModel(ModelBase):
         db.axle_wheel.position.default = 1
 
 
-        self.cruds += ['chassi']
         db.define_table('chassi',
             Field('name', 'string', label=T('Name')),
             migrate='chassi.table',
             format='%(name)s')
         db.chassi.name.requires = [IS_NOT_EMPTY()]
+        self.cruds += [dict(c='tire_control', f='chassi')]
+
 
         db.define_table('chassi_axle',
             Field('chassi_id', db.chassi, label=T('Chassi')),

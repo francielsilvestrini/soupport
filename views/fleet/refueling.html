@@ -6,19 +6,14 @@
 {{if request.args(0) in ['new', 'update']:}}
     <script type="text/javascript">
     jQuery(document).ready(function(){
-        $("#vehicle_refueling_liter_price").change(function() {
-            var liters = $("#vehicle_refueling_liters").val();
-            var value = $(this).val();
-            var total = parseFloat(liters * value).toFixed(2);
-            $("#vehicle_refueling_total_price").val(total);
-        });
         $("#vehicle_refueling_total_price").change(function() {
-            var liters = $("#vehicle_refueling_liters").val();
+            var liter_price = $("#vehicle_refueling_liter_price").val();
             var value = $(this).val();
-            var price = parseFloat(value / liters).toFixed(4);
-            $("#vehicle_refueling_liter_price").val(price);
+            var price = parseFloat(value / liter_price).toFixed(3);
+            $("#vehicle_refueling_liters").val(price);
         });
 
     });
     </script>
+
 {{pass}}
