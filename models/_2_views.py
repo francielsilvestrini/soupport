@@ -3,7 +3,7 @@ from gluon.html import XML, A, SPAN, URL, DIV, UL, LI, CAT, I, SCRIPT
 from gluon.html import INPUT, BUTTON, FIELDSET, SELECT, TEXTAREA, LABEL
 from gluon.globals import current
 from gluon.sqlhtml import SQLFORM
-from gluon.dal import Table
+from gluon.dal.objects import Table
 from gluon.storage import Storage
 from gluon.http import redirect, HTTP
 
