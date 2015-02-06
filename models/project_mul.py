@@ -13,6 +13,8 @@ class ProjectMUL(ProjectBase):
     def load_menus(self):
         app_models['entries'].get_crud_menus(self)
 
+        self.append_menu('mul', 'index')
+        self.append_menu('mul', 'contract_detail')
         self.append_menu(
             name='mul_product',
             caption='Product',

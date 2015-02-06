@@ -12,10 +12,9 @@ class MULModel(ModelBase):
         self.validate_required(db, ['platform', 'person'])
 
         def _contract_key_compute(row):
-            painel = db(db.painel.id > 0).select().first()
             days = (row.validate - Settings.WINNING_FACTOR).days
 
-            factor = '{:0>4d}'.format(days)
+            factor = '{0:>4d}'.format(days)
             key = row.number+factor
             digit = module11_digit(key)
             return '%s-%s'% (key, digit)

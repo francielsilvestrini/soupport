@@ -29,7 +29,7 @@ class ProjectTasks(ProjectBase):
                 self.menus['tasks_solicitation'],
                 self.menus['tasks_task'],
                 self.menus['tasks_releases'],
-                self.menus['entries_customer'],
+                self.menus.entries_person,
                 self.menus['tags_tag'],
 
                 ]),
