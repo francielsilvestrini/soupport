@@ -31,7 +31,6 @@ class PainelModel(ModelBase):
         db.painel.ticket_size.default = 6
         db.painel.language.requires = IS_IN_SET(PainelModel.system_languages)
         db.painel.language.default = 'en'
-        db.painel.language.comment = T.
         db.painel.google_analytics_id.default = None
         self.set_table_defaults(db.painel, 1, on_update_data=ModelBase.insert_default)
 
