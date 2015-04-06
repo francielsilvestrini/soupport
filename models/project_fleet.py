@@ -15,6 +15,7 @@ class ProjectFleet(ProjectBase):
         app_models['inventory'].get_crud_menus(self)
         app_models['tire_control'].get_crud_menus(self)
         app_models['maintenance'].get_crud_menus(self)
+        app_models['entries'].get_crud_menus(self)
 
         self.append_menu('fleet', 'index')
         self.append_menu('fleet', 'dashboard')

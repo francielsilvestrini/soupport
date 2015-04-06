@@ -145,7 +145,7 @@ class MULModel(ModelBase):
             registry = PainelModel.company().registry
             contract_id = request.application
             if contract_id == 'soupport':
-                contract_id = '150002'
+                contract_id = '150003'
 
             if registry == Settings.ONNIX_REGISTRY:
                 return None
