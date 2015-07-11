@@ -1,138 +1,229 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-from gluon.custom_import import track_changes
-track_changes(True)
-
-loading = DIV([DIV(_id="fountainG_%s"%i, _class="fountainG") for i in range(8)], _id="fountainG")
-
-## GLOBAL IMPORTS ##
-from gluon.tools import prettydate
-import uuid
-from os import path
-from gluon.sqlhtml import represent
-from gluon.storage import Storage as Dict
-import csv
-import os
-## END GLOBAL IMPORTS ##
 
 SMALL = lambda x, **kwargs: XML(TAG.small(x, **kwargs).xml())
 SUP = lambda x, **kwargs: XML(TAG.sup(x, **kwargs).xml())
 
+class Utils(object):
 
-def getlist(x, index, default=None):
-    return x[index] if len(x) > index else default
+    @staticmethod
+    def url_vars_remove(remove_navegate=True):
+        keys =  ['_signature', 'origin', 'amp']
+        if remove_navegate:
+            keys +=  ['next', '_next', 'previous', '_previous']
+        return keys
 
+    #loading = DIV([DIV(_id="fountainG_%s"%i, _class="fountainG") for i in range(8)], _id="fountainG")
 
-def alert_gedgat_error(msg):
-    alert = DIV(
-        BUTTON('&times;', _type='button', _class='close', **{'_data-dismiss':'alert'}),
-        STRONG(T('ERROR!')),
-        SPAN(T(msg)),
-        _class='alert alert-error')
-    return alert
+    @staticmethod
+    def url_vars(vars, remove=None, add=None, remove_navegate=True):
+        new_vars = vars.copy()
+        remove_keys = list(Utils.url_vars_remove(remove_navegate=remove_navegate))
+        if remove:
+            remove_keys += remove
+        for k in remove_keys:
+            if k in new_vars:
+                del new_vars[k]
 
+        if add:
+            new_vars.update(add)
+        return new_vars
 
-def clear_vars_navegate(old_vars, extra_keys=None):
-    new_vars = old_vars.copy()
-    remove_keys = ['next', '_next', 'previous', \
-        '_previous', '_signature', 'origin']
-    if extra_keys:
-        remove_keys += extra_keys
-    for k in remove_keys:
-        if new_vars.get(k):
-            del new_vars[k]
-    return new_vars
-
-
-def current_url(clear_vars=True):
-    new_vars = clear_vars_navegate(request.get_vars) if clear_vars else request.get_vars
-    url = URL(r=request, args=request.args, vars=new_vars)
-    return url
-
-
-def breadcrumbs_add(title=None, url=None, reset=None):
-    if not title:
-        if 'breadcrumbs' in response:
-            title = response.breadcrumbs
+    @staticmethod
+    def url(c=None, f=None, args=None, vars=None, clear_vars=False, url_encode=True, \
+            anchor=''):
+        if clear_vars:
+            new_vars = vars
         else:
-            title = response.title+' '+response.subtitle
-    if not url:
-        url = current_url()
+            new_vars = Utils.url_vars(request.get_vars, add=vars)
 
-    if reset == None:
-        if request.vars.get('_signature'):
-            reset = False
+        url = URL(c=c, f=f, args=args, vars=new_vars, url_encode=url_encode, \
+            anchor=anchor)
+        return url
+
+    @staticmethod
+    def href_back_or(default):
+        href = request.get_vars.get('previous') or request.env.get('HTTP_REFERER')
+        if not href:
+            href = default
+        return href
+
+    @staticmethod
+    def url_previous():
+        return Utils.href_back_or(response.app_home)
+
+    @staticmethod
+    def is_redirect(e):
+        return str(e) == '303 SEE OTHER'
+
+
+    @staticmethod
+    def url_current():
+        return URL(args=request.args, vars=request.get_vars)
+
+    @staticmethod
+    def logger(name):
+        logger = logging.getLogger(request.application+'/'+name)
+        logger.setLevel(logging.DEBUG)
+        return logger
+
+
+#------------------------------------------------------------------------------
+class DBUtils(object):
+
+    @staticmethod
+    def owner_fields():
+        fields = db.Table(current.db, 'owner',
+            Field('owner_table', 'string', label=T('Owner Table'),
+                writable=False, readable=False),
+            Field('owner_key', 'string', label=T('Owner Key'),
+                writable=False, readable=False),
+            Field('owner_link', 'string', label=T('Owner Link'),
+                writable=False, readable=False),
+        )
+        return fields
+
+    @staticmethod
+    def signature_fields():
+        def local_default_user():
+            if auth.is_logged_in():
+                return auth.user_id
+            else:
+                return None
+
+        signature = db.Table(db, 'signature',
+            Field('created_on', 'datetime', label=T('Criado em'),
+                default=request.now, writable=False, readable=False),
+            Field('created_by', db.auth_user, label=T('Criado por'),
+                default= local_default_user, writable=False, readable=False),
+            Field('updated_on', 'datetime', label=T('Alterado em'),
+                update=request.now, writable=False, readable=False),
+            Field('updated_by', db.auth_user, label=T('Alterado por'),
+                update=local_default_user, writable=False, readable=False),
+            Field('sender', 'string', label=T('Remetente (API)'),
+                writable=False, readable=False),
+            )
+        return signature
+
+    @staticmethod
+    def field_repr(field, value, row):
+        try:
+            if field.type.startswith('reference '):
+                rtable = field.type.split()[1]
+                table =  db[rtable]
+                table_format = table._format
+                if isinstance(table_format, str):
+                    rep = table_format % table[value]
+                else:
+                    rep = table._format(table[value])
+            else:
+                rep = represent(field, value, row)
+            if str(rep) == 'None':
+                rep = ' '
+            return rep
+        except:
+            return value
+
+    @staticmethod
+    def row_repr(row, table, ignore=None):
+        row.repr = Dict()
+        row.label = Dict()
+        for f in table:
+            if ignore and f.name in ignore:
+                row.repr[f.name] = row[f.name]
+            else:
+                row.repr[f.name] = DBUtils.field_repr(f, row[f.name], row)
+            row.label[f.name] = f.label
+        return row
+
+    @staticmethod
+    def default_values(table):
+        values = {}
+        for fname in table.fields:
+            if not table[fname].default is None:
+                if callable(table[fname].default):
+                    values[fname] = table[fname].default()
+                else:
+                    values[fname] = table[fname].default
+        return values
+
+    @staticmethod
+    def copydata(src, dest, fields):
+        for k in fields:
+            if src.has_key(k):
+                dest[k] = src[k]
+        return dest
+
+    @staticmethod
+    def last_id(table, query):
+        max = table['id'].max()
+        max_id = db(query).select(max).first()[max]
+        return max_id
+
+    @staticmethod
+    def sum_field(field, query):
+        sum = field.sum()
+        sum_result = db(query).select(sum).first()[sum]
+        return sum_result
+
+    @staticmethod
+    def str_date(date):
+        if date:
+            return date.strftime('%d-%m-%Y')
+        return None
+
+    @staticmethod
+    def repr_currency(value, decimals=2):
+        fmt = '{:10.%sf}'%decimals
+        wrap = SPAN(SPAN('R$', _class='symbol'), SPAN(fmt.format(value), _class='value'), _class='currency')
+        return wrap
+
+
+#------------------------------------------------------------------------------
+class CAS(object):
+
+    controller = 'cas'
+
+    @staticmethod
+    def has_access(c=request.controller, f=request.function):
+        #if auth.user.username == Constants.SUPER_USER:
+        #    return True
+
+        if auth.has_membership(role=Constants.ADMIN_ROLE[0]):
+            return True
+        # é o contrario de permitido, se tiver significa bloqueado
+        return not auth.has_permission(c,f)
+
+    @staticmethod
+    def init():
+        # auth.settings.extra_fields['auth_user'] = [
+        #     Field('job_title', 'string', label=T('Job Title')),
+        #     Field('photo', 'upload', label=T('Photo'), uploadfolder=UPLOAD_URLS['profile'], autodelete=True),
+        #     Field('phone', 'string', label=T('Phone')),
+        #     Field('birthday', 'date', label=T('Birthday')),
+        #     Field('about', 'text', label=T('About Me')),
+        #     ]
+        auth.define_tables(username=True, signature=False)
+
+        row = db(db.auth_group.role==Constants.ADMIN_ROLE[0]).select().first()
+        if row:
+            group_id = row.id
         else:
-            reset = request.vars.get('origin', '') == 'menu'
-        if reset: del request.vars['origin']
+            group_id = db.auth_group.insert(role=Constants.ADMIN_ROLE[0], description=Constants.ADMIN_ROLE[1])
 
-    if 'breadcrumbs' in session:
-        session.breadcrumbs.add(title, url, reset)
-    return
+        if db(db.auth_user.username == Constants.SUPER_USER).count() == 0:
+            values = DBUtils.default_values(db.auth_user)
+            values.update(Constants.SUPER_USER_DEF)
+            user_id = db.auth_user.insert(**values)
+            auth.add_membership(group_id, user_id)
 
+        if db(db.auth_user.username == Constants.ADMIN_USER).count() == 0:
+            values = DBUtils.default_values(db.auth_user)
+            values.update(Constants.ADMIN_USER_DEF)
+            #values['password'] = db.auth_user.password.validate(Constants.ADMIN_USER_PASS)[0]
+            user_id = db.auth_user.insert(**values)
+            auth.add_membership(group_id, user_id)
 
-def module11(num):
-    base = 9
-    factor = 2
-    nsum = 0
-
-    for n in reversed(list(num)):
-        nsum += int(n) * factor
-        factor += 1
-        if factor > base:
-            factor = 2
-
-    r = nsum % 11
-    return 11 - r
-
-
-def module11_digit(num, replace_as=[0, 10, 11], substitute=1):
-    digit = module11(num)
-    if digit in replace_as:
-        digit = substitute
-    return digit
-
-
-def lookup_url_new(c, f):
-    redirect = current_url()
-    if '.load' in redirect:
-        redirect = request.env.HTTP_REFERER
-    return URL(c=c, f=f, args='new', extension='html', vars=dict(redirect=redirect))
-
-
-def btn_row(href='javascript:void(0);', extra_class=None, title=None, data_id=None, icon=None, caption=None):
-    if not extra_class:
-        extra_class = ''
-    attr = {
-        '_href':href,
-        '_class':'btn btn-mini '+extra_class,
-    }
-    if title:
-        attr['_title'] = title
-        attr['_data-toggle'] = 'tooltip'
-    if data_id:
-        attr['_data-id'] = data_id
-    if icon:
-        ico = I(_class=icon)
-    else:
-        ico = None
-    btn = A(caption or '', ico, **attr)
-    return btn
-
-def btn_edit_row(href='javascript:void(0);', extra_class=None, title=None, data_id=None, icon=None, caption=None):
-    if not title:
-        title = T('Edit')
-    if not icon:
-        icon = 'icon icon-pencil'
-
-    btn = btn_row(href=href, extra_class=extra_class, title=title, data_id=data_id, icon=icon, caption=caption)
-    return btn
-
-def btn_remove_row(href='javascript:void(0);', extra_class=None, title=None, data_id=None, icon=None, caption=None):
-    if not title:
-        title = T('Remove')
-    if not icon:
-        icon = 'icon icon-trash'
-
-    btn = btn_row(href=href, extra_class=extra_class, title=title, data_id=data_id, icon=icon, caption=caption)
-    return btn
+        auth.settings.login_url = URL(c='cas', f='login')
+        auth.settings.login_next = response.app_home
+        auth.settings.logout_next = auth.settings.login_url

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
- 
+
 query_my_tasks = (db.task.user_task == auth.user_id) & (db.task.status.belongs('analysis','development','test') )
 
-query_waiting_tests = (db.task.status == 'test') 
+query_waiting_tests = (db.task.status == 'test')
 query_waiting_tests &= (db.task.test_status.belongs('waiting', 'retest'))
 query_waiting_tests &= (db.releases.id == db.task.test_release)
 
@@ -48,10 +48,10 @@ def make_pagination(page, pages):
     for i in range(pages):
         request.vars.page = i+1
         wgt += [LI(A(i+1, _href=URL(vars=request.vars)), _class='active' if i+1 == page else 'inactive')]
-    
+
     if not pages:
         wgt += [LI(A(T('No Records'), _href='#'), _class='active')]
-        
+
     request.vars.page = page+1
     wgt += [LI(A('»', _href=URL(vars=request.vars)), _class='disabled' if page == pages else '')]
     return DIV(UL(wgt),_class='pagination pagination-right')
@@ -199,7 +199,7 @@ def solicitation():
         for name in tags.split(','):
             record = db(db.tag.name == name).select().first()
             if not record:
-                db.tag.insert(name=name)        
+                db.tag.insert(name=name)
         return
 
     def do_form_after_init(self, form, action):
@@ -222,7 +222,7 @@ def solicitation():
 
     content = oform.get_current_action()
 
-    breadcrumbs_add()    
+    breadcrumbs_add()
     return content
 
 
@@ -238,7 +238,7 @@ def solicitation_detail():
     from h5_widgets import NicEditorWidget
     NicEditorWidget.widget_files()
 
-    response.title = T(db.solicitation._plural)    
+    response.title = T(db.solicitation._plural)
     response.subtitle = T('Detail')
     breadcrumbs_add(title=record.subject)
     return dict(record=record)
@@ -253,7 +253,7 @@ def solicitation_preview():
         id = int(request.vars.get('record_id'))
         record = db(db.solicitation.id == id).select().first()
     if not record:
-        response.view = 'others/gadget_error.html'        
+        response.view = 'others/gadget_error.html'
         return dict(msg='solicitation preview dont work!')
 
     return dict(record=record)
@@ -331,7 +331,7 @@ def task():
     oform = _task_oform()
     content = oform.get_current_action()
 
-    breadcrumbs_add()    
+    breadcrumbs_add()
     return content
 
 
@@ -341,7 +341,7 @@ def solicitation_to_task():
     solicitation = db(db.solicitation.oplink == owner_key).select().first()
     if not solicitation:
         raise HTTP(404)
-    
+
     defaults = table_default_values(db.task)
     defaults['owner_table'] = 'solicitation'
     defaults['owner_key'] = owner_key
@@ -358,11 +358,11 @@ def tasks_list():
     owner_table = getlist(request.args, 0)
     owner_key  = getlist(request.args, 1)
     if not (owner_table and owner_key):
-        response.view = 'others/gadget_error.html'        
+        response.view = 'others/gadget_error.html'
         return dict(msg='tasks dont work!')
 
     query = ((db.task.owner_table == owner_table) & (db.task.owner_key == owner_key))
-    
+
     tasks = db(query).select()
     return dict(tasks=tasks)
 
@@ -392,7 +392,7 @@ def tasks_modal_form():
         return
 
     edit_id = request.vars.get('edit', 0)
-        
+
     db.task.owner_table.default = owner_table
     db.task.owner_key.default = owner_key
 
@@ -427,13 +427,13 @@ def task_detail():
 
     has_test = db((db.test.owner_table == 'task') & (db.test.owner_key == record.oplink)).count()
 
-    response.title = T(table._plural)    
+    response.title = T(table._plural)
     response.subtitle = T('Detail')
 
     from h5_widgets import NicEditorWidget
     NicEditorWidget.widget_files()
 
-    breadcrumbs_add()    
+    breadcrumbs_add()
     return dict(record=record,has_test=has_test)
 
 
@@ -442,7 +442,7 @@ def task_remove():
     owner_key  = getlist(request.args, 1)
     delete_id = request.vars.get('delete', 0)
     if delete_id:
-        db(db.task.id == delete_id).delete()    
+        db(db.task.id == delete_id).delete()
         response.js = "web2py_component('%s','tasks_list');" % URL(f='tasks_list.load', args=[owner_table, owner_key])
     pass
 
@@ -478,19 +478,19 @@ def tests():
         (db.task.test_release == record.test_release) &
         query_waiting_tests).select(limitby=(0,1)).first()
 
-    response.title = T('Tests')    
+    response.title = T('Tests')
     response.subtitle = T('Task')
 
     db.test.owner_table.default = 'task'
     db.test.owner_key.default = record.oplink
 
-    form = SQLFORM(db.test, fields=['note', 'test_result'])
+    form = SQLFORM(db.test, fields=['note', 'test_result'],hidden={'_next':Utils.url_previous()})
 
     form.elements('#test_test_result')[0] ['_style'] = 'width:100%;'
 
     if form.process().accepted:
-        record.update_record(test_status=form.vars.test_result)        
-        next = form.vars.get('next')
+        record.update_record(test_status=form.vars.test_result)
+        next = request.post_vars.get('_next')
         redirect(next or URL(f='index'))
 
     has_test = db((db.test.owner_table == 'task') & (db.test.owner_key == record.oplink)).count()
@@ -499,7 +499,7 @@ def tests():
         next_task = next_test.task
     else:
         next_task = None
-    breadcrumbs_add()    
+    breadcrumbs_add()
     return dict(record=record,next_test=next_task, form=form, has_test=has_test)
 
 
@@ -507,11 +507,11 @@ def tests_list():
     owner_table = getlist(request.args, 0)
     owner_key  = getlist(request.args, 1)
     if not (owner_table and owner_key):
-        response.view = 'others/gadget_error.html'        
+        response.view = 'others/gadget_error.html'
         return dict(msg='tests dont work!')
 
     query = ((db.test.owner_table == owner_table) & (db.test.owner_key == owner_key))
-    
+
     tests = db(query).select()
     return dict(tests=tests)
 
@@ -526,13 +526,13 @@ def release_history():
         except:
             release_id = 0
     else:
-        release_id = int(request.args[0])    
+        release_id = int(request.args[0])
 
     history = app_crud_grid((db.task.final_release == release_id),
-        controller=request.controller, 
+        controller=request.controller,
         function=request.function,
         **dict(show_link_edit=False, show_link_remove=False))
-    response.title = T('Release History')    
+    response.title = T('Release History')
     response.subtitle = T('Report')
     return dict(releases=releases, history=history)
 
@@ -545,15 +545,15 @@ def test_history():
     if not request.args(0) or not request.args[0].isdigit():
         release_id = releases[0].id
     else:
-        release_id = int(request.args[0])    
+        release_id = int(request.args[0])
 
     history = app_crud_grid((db.task.test_release == release_id),
-        controller=request.controller, 
+        controller=request.controller,
         function=request.function,
         **dict(show_link_edit=False, show_link_remove=False))
-    response.title = T('Test History')    
+    response.title = T('Test History')
     response.subtitle = T('Report')
-    response.view = 'default/release_history.html'        
+    response.view = 'default/release_history.html'
     return dict(releases=releases, history=history)
 
 

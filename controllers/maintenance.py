@@ -228,9 +228,9 @@ def maintenance():
             _class = 'progress-success'
         bar = DIV(
             DIV(
-                _title=T('Current Life: {0:.2f}%').format(percent),
+                _title=T('Current Life: {:.2f}%').format(percent),
                 _class='bar',
-                _style='width: {0:.2f}%'.format(percent),
+                _style='width: {:.2f}%'.format(percent),
                 **{'_data-toggle':'tooltip'}
                 ),
             _class='progress %s' % _class)

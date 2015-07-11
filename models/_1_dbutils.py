@@ -49,10 +49,22 @@ def field_rep(field, value, row):
 
     return value
     '''
-    rep = represent(field, value, row)
-    if str(rep) == 'None':
-        rep = ' '
-    return rep
+    try:
+        if field.type.startswith('reference '):
+            rtable = field.type.split()[1]
+            table =  db[rtable]
+            table_format = table._format
+            if isinstance(table_format, str):
+                rep = table_format % table[value]
+            else:
+                rep = table._format(table[value])
+        else:
+            rep = represent(field, value, row)
+        if str(rep) == 'None':
+            rep = ' '
+        return rep
+    except:
+        return value
 
 class ONXREPR(object):
 

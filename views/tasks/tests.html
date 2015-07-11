@@ -1,17 +1,17 @@
 {{extend 'layouts/form.html'}}
 
-{{ 
+{{
 owner_table = record.owner_table
 owner_key  = record.owner_key
 }}
 
 {{if record.owner_table == 'solicitation':}}
-    {{= LOAD(f='solicitation_preview.load', vars=dict(oplink=record.owner_key), ajax=True)}}    
+    {{= LOAD(f='solicitation_preview.load', vars=dict(oplink=record.owner_key), ajax=True)}}
     <hr/>
 {{pass}}
 
 {{
-next_url = URL(c='tasks', f='tests.html', args=[next_test.id]) if next_test else None
+next_url = Utils.url_previous()
 }}
 
 
@@ -20,7 +20,7 @@ next_url = URL(c='tasks', f='tests.html', args=[next_test.id]) if next_test else
         <small><strong>{{= T('Priority')}}</strong></small>
         <div>
             {{= field_rep(db.task.priority, record.priority, record)}}
-        </div>  
+        </div>
     </div>
     <div class="span2">
         <small><strong>{{= T('User Task')}}</strong></small>
@@ -79,10 +79,6 @@ next_url = URL(c='tasks', f='tests.html', args=[next_test.id]) if next_test else
     </div>
 </div>
 
-{{if next_url:}}
-    <input name="_next" type="hidden" value="{{= next_url}}">
-{{pass}}
-
 {{= form.custom.end}}
 
 <hr/>
@@ -94,5 +90,5 @@ next_url = URL(c='tasks', f='tests.html', args=[next_test.id]) if next_test else
 {{include 'attachments/attachments_frame.html'}}
 
 <hr/>
-    
+
 {{include 'comments/comments_frame.html'}}

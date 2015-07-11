@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from datetime import date
 
+response.app_name = 'Soupport'
+response.app_home = URL(c='tasks', f='index')
+
 class Settings(object):
     LICENCE_HOSTNAME = 'http://www.onnixsistemas.com.br'
     LICENCE_HOSTPORT = '80'
